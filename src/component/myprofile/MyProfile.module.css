@@ -1,0 +1,90 @@
+.page {
+  background-color: rgb(241, 241, 241);
+  padding: 16px;
+}
+.main {
+  margin: auto;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.info {
+  display: flex;
+  border: 0.5px solid rgb(226, 225, 225);
+  border-radius: 7px;
+  padding: 10px;
+  background-color: white;
+  margin-bottom: 16px;
+}
+.userData {
+  flex: 1;
+  padding-left: 10px;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+}
+.user {
+  display: block;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 5px solid white;
+}
+.card {
+  border: 0.5px solid rgb(226, 225, 225);
+  border-radius: 7px;
+  padding: 10px;
+  background-color: white;
+  margin-bottom: 16px;
+}
+.submit {
+  width: 100%;
+  padding: 5px 10px;
+  background-color: green;
+  color: white;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+.linkTitle {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  font-size: 18px;
+}
+.link {
+  padding: 5px 10px;
+  border: 1px solid grey;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.listSocial {
+  list-style: none;
+  margin-top: 16px;
+  display: flex;
+  gap: 16px;
+}
+.listFilter {
+  list-style: none;
+  margin-top: 10px;
+  padding-left: 16px;
+}
+.listFilter li {
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
+.iconSocial {
+  font-size: 26px;
+  color: black;
+}
+
+.listReviews {
+  list-style: none;
+  margin-top: 10px;
+  padding-left: 16px;
+}

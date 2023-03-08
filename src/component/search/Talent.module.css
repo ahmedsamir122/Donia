@@ -1,0 +1,27 @@
+.card {
+  /* padding: 10px; */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  margin-bottom: 14px;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  /* aspect-ratio: 2/1; */
+  object-fit: fit;
+}
+.name {
+  padding: 10px;
+}
+.button {
+  width: fit-content;
+  padding: 5px 10px;
+  background-color: green;
+  color: white;
+  margin: auto;
+  border-radius: 7px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}

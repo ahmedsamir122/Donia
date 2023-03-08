@@ -1,0 +1,17 @@
+.main {
+  background-color: rgb(241, 241, 241);
+  min-height: calc(100vh - 76px);
+  padding: 10px;
+}
+.conArtists {
+  display: block;
+}
+
+@media (min-width: 400px) {
+  .conArtists {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-column-gap: 14px;
+    grid-row-gap: 14px;
+  }
+}

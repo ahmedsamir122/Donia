@@ -1,0 +1,25 @@
+.card {
+  padding: 10px;
+}
+.top {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.img {
+  display: block;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+}
+.bottom {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+.resp {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}

@@ -1,0 +1,9 @@
+.card {
+  padding: 10px;
+  background-color: rgb(233, 233, 233);
+  border-radius: 7px;
+  margin-top: 10px;
+}
+.name {
+  padding-bottom: 10px;
+}
