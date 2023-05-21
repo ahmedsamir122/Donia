@@ -67,9 +67,7 @@ const SigninCard = () => {
             <p className={classes.error}>please enter your password</p>
           )}
           <div className={classes.forget}>Forgetten passowrd?</div>
-          {isError && (
-            <p className={classes.error}>{error.response.data.message}</p>
-          )}
+          {isError && <p className={classes.error}>{error}</p>}
           <button className={classes.button}>Log in</button>
         </form>
 
