@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const URL = "http://127.0.0.1:8000";
+export const URL = "https://donia-ahmedsamir122.vercel.app";
 export const getWishList = (url, token) => {
   return axios.get(url, {
     withCredentials: true,

@@ -11,9 +11,10 @@ import "react-phone-number-input/style.css";
 import PhoneInputWithCountry from "react-phone-number-input/react-hook-form";
 import axios from "axios";
 import { useMutation, useQueryClient } from "react-query";
+import { URL } from "../utils/queryFunctions";
 
 const postData = (data) => {
-  return axios.post("http://127.0.0.1:8000/api/v1/users/signup", data, {
+  return axios.post(`${URL}/api/v1/users/signup`, data, {
     withCredentials: true,
   });
 };
