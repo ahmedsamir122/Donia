@@ -6,9 +6,10 @@ import { authActions } from "../../store/login-slice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useMutation, useQueryClient } from "react-query";
+import { URL } from "../utils/queryFunctions";
 
 const postData = (data) => {
-  return axios.post("http://127.0.0.1:8000/api/v1/users/signin", data, {
+  return axios.post(`${URL}/api/v1/users/signin`, data, {
     withCredentials: true,
   });
 };
