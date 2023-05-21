@@ -37,7 +37,7 @@ const SigninCard = () => {
   } = useForm({ mode: "onSubmit" });
 
   const onsubmit = async (data) => {
-    console.log(data);
+    console.log(error);
     const [email, password] = getValues(["email", "password"]);
 
     mutate({ email, password });
@@ -68,7 +68,9 @@ const SigninCard = () => {
             <p className={classes.error}>please enter your password</p>
           )}
           <div className={classes.forget}>Forgetten passowrd?</div>
-          {isError && <p className={classes.error}>{error}</p>}
+          {isError && (
+            <p className={classes.error}>{error.response.data.message}</p>
+          )}
           <button className={classes.button}>Log in</button>
         </form>
 
