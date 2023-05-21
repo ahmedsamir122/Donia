@@ -1,0 +1,121 @@
+.main {
+  position: absolute;
+  top: 50px;
+  right: 10px;
+  width: 300px;
+  background-color: white;
+  z-index: 4;
+  box-shadow: 1px 2px 7px 3px #888888;
+  padding: 16px;
+  border-radius: 8px;
+}
+.topTitle {
+  display: flex;
+  gap: 5px;
+  border-bottom: 1px solid #888888;
+  height: 35px;
+}
+.arrowLeft {
+  cursor: pointer;
+  display: none;
+}
+.title {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+.messCon {
+  padding: 10px;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.messCon:hover {
+  color: green;
+}
+.messContent {
+  padding-left: 10px;
+  flex: 1;
+  text-decoration: none;
+  color: black;
+}
+.viewProfile {
+  display: block;
+  text-decoration: none;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border: 0.5px solid black;
+  text-align: center;
+  padding-top: 2.5px;
+  padding-bottom: 2.5px;
+  border-radius: 20px;
+  color: #139ff0;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.viewProfile:hover {
+  background-color: #b1dcf5;
+  color: #139ff0;
+  border: 0.5px solid #139ff0;
+  color: white;
+}
+.messTop {
+  display: flex;
+  justify-content: space-between;
+}
+
+.img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: block;
+  object-fit: cover;
+}
+.item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  transition: 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+}
+.item:hover {
+  background-color: #dbd8d8;
+}
+.icon {
+  margin-right: 15px;
+  font-size: 18px;
+}
+.iconName {
+  font-size: 14px;
+}
+
+.iconLogout {
+  color: red;
+  margin-right: 15px;
+  font-size: 18px;
+}
+.iconLogoutName {
+  color: red;
+}
+
+@media (max-width: 767px) {
+  .main {
+    border-top: 0.5px solid rgb(231, 231, 231);
+    top: 0px;
+    width: 100vw;
+    right: 0;
+    box-shadow: none;
+    padding: 10px;
+    height: 100vh;
+    position: fixed;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .arrowLeft {
+    display: block;
+  }
+}

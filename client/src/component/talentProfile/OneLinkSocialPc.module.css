@@ -1,0 +1,36 @@
+.link {
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  background-color: #007fed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 15px;
+  position: relative;
+}
+
+.oneLink {
+  text-decoration: none;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+.closeIcon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}

@@ -1,0 +1,29 @@
+.oneFilter {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #4d525b;
+  padding-bottom: 15px;
+}
+.oneFilter:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+.oneFilterLeft {
+  display: flex;
+}
+.nameFilter {
+  color: #001e00;
+  font-weight: 300;
+}
+.valueFilter {
+  color: #001e00;
+  font-weight: 400;
+}
+.iconDelete {
+  color: red;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 300;
+}

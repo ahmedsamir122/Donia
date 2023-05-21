@@ -1,0 +1,119 @@
+.main {
+  background-color: #f7f7f7;
+  min-height: calc(100vh - 76px);
+  padding-top: 10px;
+}
+.top {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.userTypeCon {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  gap: 10px;
+}
+.userType {
+  padding: 5px;
+  width: 100px;
+  border: 1px solid black;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 7px;
+}
+.active {
+  background-color: #139ff0;
+  color: white;
+  border: none;
+}
+.filterCon {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 10px;
+  padding-left: 5px;
+}
+.filter {
+  cursor: pointer;
+  padding-bottom: 4px;
+  font-size: 20px;
+}
+.activeFilter {
+  border-bottom: 2px solid #139ff0;
+}
+.dataCon {
+  display: none;
+}
+@media (max-width: 768px) {
+  .userType {
+    padding: 0px;
+    width: 80px;
+    height: 30px;
+    font-size: 13px;
+  }
+  .dataCon {
+    display: block;
+  }
+  .contract {
+    border: 1px solid rgb(165, 163, 163);
+    border-radius: 7px;
+    padding: 8px;
+    margin-bottom: 10px;
+    background-color: white;
+  }
+  .topContract {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 5px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgb(165, 163, 163);
+  }
+  .dateContract {
+    font-size: 12px;
+    padding: 4px;
+  }
+  .statusContract {
+    background-color: rgb(255, 136, 0);
+    padding: 4px;
+    border-radius: 5px;
+    font-size: 12px;
+  }
+  .nameContract {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+  .bottomContract {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .userContract {
+    color: #139ff0;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .chatCon {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(32, 32, 32, 0.753);
+    text-decoration: none;
+    padding: 4px;
+    border: 1px solid rgba(179, 176, 176, 0.753);
+    border-radius: 4px;
+  }
+  .chatPoint {
+    background-color: grey;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+  }
+  .activeChat {
+    background-color: green;
+  }
+}

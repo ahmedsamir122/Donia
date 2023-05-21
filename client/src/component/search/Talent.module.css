@@ -1,0 +1,76 @@
+.card {
+  /* padding: 10px; */
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  margin-bottom: 14px;
+  cursor: pointer;
+  position: relative;
+  height: 280px;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  /* aspect-ratio: 1/1; */
+  object-fit: cover;
+  height: 170px;
+}
+.middle {
+  padding: 10px;
+}
+.name {
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 17px;
+  margin-bottom: 10px;
+}
+
+.location {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.city {
+  font-size: 13px;
+  line-height: 17px;
+}
+.rate {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.reviewValue {
+  font-size: 13px;
+}
+.button {
+  width: fit-content;
+  padding: 5px 10px;
+  background-color: green;
+  color: white;
+  margin: auto;
+  border-radius: 7px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.bookmark {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 22px;
+  height: 22px;
+  background-color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.bookmarkIcon {
+  font-size: 12px;
+  position: relative;
+  z-index: 3;
+  cursor: pointer;
+}

@@ -1,0 +1,35 @@
+.contractName {
+  color: #139ff0;
+  text-decoration: none;
+}
+
+.offer {
+  background-color: rgb(255, 136, 0);
+  padding: 4px;
+  border-radius: 5px;
+}
+
+.chatCon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: rgba(32, 32, 32, 0.753);
+  text-decoration: none;
+  padding: 4px;
+  border: 1px solid rgba(179, 176, 176, 0.753);
+  border-radius: 4px;
+}
+.chatPoint {
+  background-color: grey;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+.active {
+  background-color: green;
+}
+@media (max-width: 768px) {
+  .tableCon {
+    display: none;
+  }
+}

@@ -1,0 +1,107 @@
+.main {
+  height: 100vh;
+}
+.top {
+  height: 76px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.logo {
+  text-decoration: none;
+  line-height: 21px;
+  font-size: 22px;
+  font-weight: bold;
+  font-style: italic;
+  color: black;
+}
+
+.login {
+  font-weight: bold;
+  font-size: 18px;
+  padding-right: 20px;
+  cursor: pointer;
+}
+.login:hover {
+  color: green;
+}
+.input {
+  display: flex;
+  gap: 10px;
+}
+.input input {
+  padding: 4px;
+  width: 150px;
+  margin-left: 5px;
+}
+.input label {
+  margin-left: 8px;
+}
+.input button {
+  padding: 4px;
+  margin-left: 4px;
+}
+.input input:focus,
+.input input:active {
+  outline: none;
+}
+
+.forget {
+  font-size: 14px;
+  color: rgb(79, 79, 231);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.bottom {
+  position: relative;
+}
+
+.img {
+  width: 100%;
+  object-fit: cover;
+  height: calc(100vh - 76px);
+  display: block;
+}
+
+.content {
+  position: absolute;
+  left: 85px;
+  top: 50px;
+  color: white;
+}
+.content h2 {
+  font-size: 40px;
+}
+
+.list {
+  margin-top: 20px;
+  padding-left: 60px;
+}
+.list li {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  gap: 24px;
+}
+.buttons button {
+  padding: 10px 20px;
+  margin-top: 16px;
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  font-size: 20px;
+  transition: 0.5s ease;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}
+.buttons button:hover {
+  background-color: green;
+  color: white;
+}

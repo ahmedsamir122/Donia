@@ -1,0 +1,27 @@
+.socialIcon {
+  font-size: 50px;
+  color: #007fed;
+}
+.oneLink {
+  text-decoration: none;
+  color: white;
+  font-size: 17px;
+  font-weight: bold;
+  display: block;
+  position: relative;
+}
+.closeIcon {
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: translate(0, 0);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid black;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}

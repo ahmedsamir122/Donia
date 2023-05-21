@@ -1,0 +1,7 @@
+.top {
+  display: flex;
+}
+.title {
+  padding: 10px;
+  cursor: pointer;
+}

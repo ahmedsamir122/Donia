@@ -1,0 +1,143 @@
+.main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+.card {
+  width: 300px;
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h3 {
+  text-align: center;
+  margin-bottom: 16px;
+}
+.google {
+  cursor: pointer;
+  margin-bottom: 16px;
+  width: 100%;
+  padding: 10px;
+  background-color: #139ff0;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border-radius: 7px;
+}
+.googlelogo {
+  font-size: 24px;
+}
+
+.CheckboxTotalCon {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
+}
+.CheckboxCon {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  flex: 1;
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 7px;
+  border: 0.5px solid gray;
+}
+.CheckboxCon:hover {
+  border: 2px solid #139ff0;
+}
+.Checkbox {
+  width: 20px;
+}
+.form .input {
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 7px;
+  border: 0.5px solid gray;
+  width: 100%;
+}
+.form input:active,
+.form input:focus {
+  outline: none;
+}
+
+.line {
+  position: relative;
+  background-color: #888888;
+  height: 0.5px;
+  width: 100%;
+  margin-bottom: 25px;
+  margin-top: 30px;
+}
+
+.or {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+}
+.terms {
+  width: 10px;
+}
+
+.button {
+  width: 100%;
+  border: none;
+  background-color: #139ff0;
+  color: white;
+  font-size: 18px;
+  margin-top: 16px;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: 7px;
+}
+
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  margin-right: auto;
+  margin-top: -5px;
+}
+.termsInput {
+  width: 20px;
+}
+.termsCon {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  align-items: start;
+  gap: 10px;
+  /* border: 1px solid red; */
+  height: 38px;
+}
+.termsLabel {
+  height: 38px;
+  margin-top: -3px;
+}
+
+.selectCountry,
+.selectState {
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 7px;
+  border: 0.5px solid gray;
+  width: 100%;
+}
+.select:active,
+select:focus {
+  outline: none;
+}

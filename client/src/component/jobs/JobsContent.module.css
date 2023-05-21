@@ -1,0 +1,33 @@
+.top {
+  display: flex;
+  justify-content: space-between;
+}
+.type {
+  display: flex;
+  align-items: center;
+}
+.talent {
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: white;
+  text-align: center;
+  border: 1px solid gray;
+  width: 150px;
+}
+@media (max-width: 767px) {
+  .top {
+    display: block;
+  }
+  .type {
+    width: 100%;
+  }
+  .talent {
+    width: 50%;
+    text-align: center;
+    border: 1px solid gray;
+  }
+}
+.active {
+  background-color: green;
+  color: white;
+}

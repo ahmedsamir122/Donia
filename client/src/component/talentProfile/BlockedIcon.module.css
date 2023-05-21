@@ -1,0 +1,31 @@
+.main {
+  position: relative;
+}
+.icon {
+  cursor: pointer;
+}
+.list {
+  position: absolute;
+  background-color: white;
+  right: 0;
+  top: 30px;
+  width: 200px;
+  padding: 15px;
+  border-radius: 4px;
+  box-shadow: -3px -2px 15px -5px rgba(0, 0, 0, 0.73);
+  -webkit-box-shadow: -3px -2px 15px -5px rgba(0, 0, 0, 0.73);
+  -moz-box-shadow: -3px -2px 15px -5px rgba(0, 0, 0, 0.73);
+}
+
+.listOne {
+  display: flex;
+  align-items: center;
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 4px;
+  gap: 5px;
+  cursor: pointer;
+}
+.listOne:hover {
+  background-color: rgb(214, 213, 213);
+}

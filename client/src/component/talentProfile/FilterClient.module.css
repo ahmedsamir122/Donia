@@ -1,0 +1,101 @@
+.main {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  z-index: 4;
+  width: 70%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  background-color: #f7f7f7;
+  align-items: center;
+  padding: 5px;
+  height: 34px;
+}
+.topTitle {
+  display: flex;
+  align-items: center;
+}
+.title {
+  margin-bottom: 0;
+}
+.arrowIcon {
+  cursor: pointer;
+  display: none !important;
+}
+.closeIcon {
+  cursor: pointer;
+  display: block;
+}
+.formCon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.formFilter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+.selectFilter {
+  width: 70%;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.valueFilter {
+  width: 70%;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.buttonFilter {
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #007fed;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  margin-right: auto;
+  margin-top: -5px;
+}
+@media (max-width: 767px) {
+  .main {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translate(0, 0);
+  }
+  .closeIcon {
+    display: none !important;
+  }
+  .arrowIcon {
+    display: block !important;
+  }
+  .formCon {
+    height: calc(100vh - 34px);
+  }
+  .buttonFilter {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 0px;
+  }
+}

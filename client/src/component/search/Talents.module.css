@@ -1,0 +1,43 @@
+.main {
+  background-color: #f7f7f7;
+  min-height: calc(100vh - 76px);
+  padding-top: 10px;
+}
+
+.filters {
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  height: 520px;
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .subContainer {
+    display: flex;
+    gap: 20px;
+  }
+  .filters {
+    display: block;
+    width: 20%;
+  }
+  .conArtists {
+    width: 80%;
+  }
+}
+
+@media (min-width: 400px) {
+  .conArtists {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-column-gap: 14px;
+    grid-row-gap: 14px;
+  }
+}
+
+.mainLoading {
+  height: calc(100vh - 76px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

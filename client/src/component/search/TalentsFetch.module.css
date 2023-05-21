@@ -1,0 +1,21 @@
+.mainLoading {
+  height: calc(100vh - 76px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+@media (min-width: 768px) {
+  .conArtists {
+    width: 80%;
+  }
+}
+
+@media (min-width: 400px) {
+  .conArtists {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-column-gap: 14px;
+    grid-row-gap: 14px;
+  }
+}

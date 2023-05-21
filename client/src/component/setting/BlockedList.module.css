@@ -1,0 +1,42 @@
+.main {
+  height: 100%;
+  padding: 10px;
+  overflow-y: auto;
+}
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+.accountCon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f7f7f7;
+  border-radius: 7px;
+  padding: 10px;
+}
+.account {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+.img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.name {
+  font-size: 14px;
+}
+.block {
+  font-size: 12px;
+  cursor: pointer;
+  padding: 5px;
+  background-color: #139ff0;
+  color: white;
+  border-radius: 5px;
+}

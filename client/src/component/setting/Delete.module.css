@@ -1,0 +1,49 @@
+.main {
+  height: 100%;
+  padding: 10px;
+  overflow-y: auto;
+}
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+.description {
+  text-align: center;
+  color: rgb(80, 79, 79);
+  line-height: 25px;
+  font-size: 14;
+  margin-bottom: 20px;
+}
+.form {
+  margin-top: 20px;
+}
+.email {
+  width: 100%;
+  text-align: left;
+  background-color: rgb(209, 208, 208);
+  padding: 10px;
+}
+.input {
+  width: 100%;
+  padding: 10px;
+  font-size: 18px;
+}
+.error {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
+  margin-right: auto;
+  margin-top: 5px;
+}
+.button {
+  margin-top: 20px;
+  padding: 5px 10px;
+  background-color: #139ff0;
+  cursor: pointer;
+  border-radius: 8px;
+  border: none;
+  color: white;
+  font-size: 18px;
+}
