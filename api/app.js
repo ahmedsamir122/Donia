@@ -33,7 +33,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 // app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
-app.use(cors());
+app.use(cors({ credentials: true, origin: "https://donia-v1dk.vercel.app" }));
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
