@@ -16,6 +16,7 @@ const reviewFRouter = require("./routes/reviewFRoutes");
 const userRouter = require("./routes/userRoutes");
 const wishListRouter = require("./routes/wishListRoutes");
 const blockRouter = require("./routes/blockRoutes");
+const contractController = require("./controllers/contractController");
 
 const app = express();
 
@@ -43,6 +44,12 @@ app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
+
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  contractController.webhookCheckout
+);
 app.use(express.json({ limit: "3mb" }));
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true, limit: "3mb" }));

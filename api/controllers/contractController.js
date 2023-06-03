@@ -4,7 +4,8 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel");
 const Block = require("../models/blockModel");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const Stripe = require("stripe");
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 exports.getAllContracts = catchAsync(async (req, res, next) => {
   //excute the query
@@ -216,7 +217,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     mode: "payment",
     // success_url: `${req.protocol}://${req.get("host")}/success`,
     // success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
-    success_url: `https://donia-v1dk-ahmedsamir122.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    success_url: `https://donia-v1dk-ahmedsamir122.vercel.app/success`,
     // cancel_url: `${req.protocol}://${req.get("host")}/${req.params.username}`,
     cancel_url: `https://donia-v1dk-ahmedsamir122.vercel.app/${req.params.username}`,
     customer_email: req.user.email,
@@ -227,6 +228,36 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     status: "success",
     session,
   });
+});
+
+exports.webhookCheckout = catchAsync(async (req, res, next) => {
+  const sig = request.headers["stripe-signature"];
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      request.body,
+      sig,
+      process.env.STRIPE_SECRET_KEY
+    );
+  } catch (err) {
+    response.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  switch (event.type) {
+    case "checkout.session.completed":
+      const checkoutSessionCompleted = event.data.object;
+      // Then define and call a function to handle the event checkout.session.completed
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.send();
 });
 exports.createContract = catchAsync(async (req, res, next) => {
   const other = await User.findOne({ username: req.params.username });
