@@ -10,6 +10,7 @@ const TalentProfile = (props) => {
         ratingsAverage={props.onData.ratingsAverageF}
         ratingsQuantity={props.onData.ratingsQuantityF}
         client={false}
+        reviewClient={false}
         username={props.username}
       />
     </div>

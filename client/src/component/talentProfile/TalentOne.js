@@ -100,7 +100,10 @@ const TalentOne = (props) => {
               <LinkAccount onData={props.onData} />
             )}
             {props.showEdit && !props.client && showAccount && <FilterList />}
-            <ReviewsTalentOne username={props.username} client={props.client} />
+            <ReviewsTalentOne
+              username={props.username}
+              client={props.reviewClient}
+            />
           </div>
           {!props.client && (
             <div className={classes.rightProfile}>
