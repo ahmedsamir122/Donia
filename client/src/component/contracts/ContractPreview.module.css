@@ -1,0 +1,92 @@
+.detailCon {
+  display: flex;
+}
+.left {
+  flex: 4;
+  padding: 7px;
+}
+.nameCon {
+  margin-top: 17px;
+}
+.nameTitle {
+  font-size: 16px;
+}
+.name {
+  padding-top: 10px;
+  padding-left: 20px;
+}
+.task {
+  border: 1px solid rgb(236, 233, 233);
+  max-height: 150px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+.back {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  cursor: pointer;
+  padding: 4px 18px;
+  border: 1px solid #007fed;
+  color: #007fed;
+  border-radius: 10px;
+  transition: 0.3s ease;
+}
+.back:hover {
+  background-color: #007fed;
+  color: white;
+}
+.right {
+  flex: 2;
+  background-color: rgb(243 244 246);
+  height: calc(444px - 50px);
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.rightCon {
+  display: flex;
+  justify-content: space-between;
+}
+.rightTotal {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+  border-top: 1px solid black;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+.check {
+  cursor: pointer;
+  padding: 4px 18px;
+  width: 100%;
+  border: 1px solid #007fed;
+  background-color: #007fed;
+  border-radius: 10px;
+  transition: 0.3s ease;
+  text-align: center;
+  color: white;
+  margin-top: 20px;
+}
+@media (max-width: 767px) {
+  .detailCon {
+    display: block;
+  }
+  .task {
+    max-height: 300px;
+  }
+  .back {
+    position: relative;
+    left: 0;
+    bottom: 0;
+  }
+  .right {
+    background-color: white;
+    height: auto;
+  }
+}
+.mainLoading {
+  height: calc(100vh - 76px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

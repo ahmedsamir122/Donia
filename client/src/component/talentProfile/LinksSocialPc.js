@@ -5,7 +5,6 @@ import React from "react";
 import OneLinksSocialPc from "./OneLinksSocialPc";
 const LinksSocialPc = (props) => {
   const user = useSelector((state) => state.auth.user);
-  console.log(props.onData.links);
 
   return (
     <React.Fragment>

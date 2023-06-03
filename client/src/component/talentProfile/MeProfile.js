@@ -30,6 +30,7 @@ const MeProfile = (props) => {
         ratingsAverage={rate.ratingsAverage}
         ratingsQuantity={rate.ratingsQuantity}
         client={user.perform === "talent" ? false : true}
+        username={user.username}
         onRateFreelancer={rateFreelancerHandler}
         onRateClient={rateClientHandler}
       />

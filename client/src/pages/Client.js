@@ -25,7 +25,11 @@ const Client = () => {
   console.log(data.data.data.user);
   return (
     <React.Fragment>
-      <ClientProfile showEdit={false} onData={data.data.data.user} />
+      <ClientProfile
+        showEdit={false}
+        onData={data.data.data.user}
+        username={params.usernameClient}
+      />
     </React.Fragment>
   );
 };

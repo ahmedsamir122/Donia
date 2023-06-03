@@ -37,8 +37,6 @@ const Talents = (props) => {
     return <div>{error.Msg}</div>;
   }
 
-  console.log(searchParams.entries());
-
   return (
     <div className={classes.main}>
       <div className="container">

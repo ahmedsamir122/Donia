@@ -1,53 +1,3 @@
-.main {
-  background-color: #f7f7f7;
-  min-height: calc(100vh - 76px);
-  padding-top: 10px;
-}
-.top {
-  margin-top: 30px;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-.userTypeCon {
-  display: flex;
-  align-items: center;
-  height: 40px;
-  gap: 10px;
-}
-.userType {
-  padding: 5px;
-  width: 100px;
-  border: 1px solid black;
-  height: 40px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  border-radius: 7px;
-}
-.active {
-  background-color: #139ff0;
-  color: white;
-  border: none;
-}
-.filterCon {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 10px;
-  padding-left: 5px;
-}
-.filter {
-  cursor: pointer;
-  padding-bottom: 4px;
-  font-size: 20px;
-}
-.activeFilter {
-  border-bottom: 2px solid #139ff0;
-}
-.dataCon {
-  display: none;
-}
 @media (max-width: 768px) {
   .userType {
     padding: 0px;
@@ -86,6 +36,9 @@
     margin-top: 10px;
     margin-bottom: 10px;
     font-size: 14px;
+    text-decoration: none;
+    display: block;
+    color: black;
   }
   .bottomContract {
     display: flex;
@@ -93,7 +46,7 @@
     align-items: flex-end;
   }
   .userContract {
-    color: #139ff0;
+    color: black;
     text-decoration: none;
     font-size: 14px;
   }
@@ -116,12 +69,4 @@
   .activeChat {
     background-color: green;
   }
-}
-
-.mainLoading {
-  height: calc(100vh - 76px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
 }

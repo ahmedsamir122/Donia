@@ -62,6 +62,7 @@
   margin-right: auto;
   display: block;
   margin-top: 20px;
+  cursor: pointer;
 }
 @media (max-width: 767px) {
   .main {

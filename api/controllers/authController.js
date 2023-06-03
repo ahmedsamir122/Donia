@@ -22,7 +22,7 @@ const generateCookie = (res, token) => {
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
-    username: req.body.username,
+    username: req.body.username.trim(),
     email: req.body.email,
     city: req.body.city,
     country: req.body.country,
@@ -68,7 +68,7 @@ exports.signin = catchAsync(async (req, res, next) => {
   generateCookie(res, token);
 
   const cookieHeader = req.headers["cookie"];
-  console.log(cookieHeader);
+  // console.log(cookieHeader);
   user.password = undefined;
   res.status(200).json({
     status: "success",
@@ -88,7 +88,6 @@ exports.logout = catchAsync(async (req, res, next) => {
 
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
-  let test;
 
   if (
     req.headers.authorization &&

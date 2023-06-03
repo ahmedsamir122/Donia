@@ -11,8 +11,6 @@ const Filter = (props) => {
   const [filterReviews, setFilterReviews] = useState([]);
   const queryRedux = useSelector((state) => state.query.query);
 
-  console.log(filterRate);
-
   const filterArray = (check, input, prev) => {
     if (check) {
       return [...prev, input];

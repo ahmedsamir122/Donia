@@ -27,6 +27,7 @@ import { useQuery } from "react-query";
 import React from "react";
 import WishList from "./pages/WishList";
 import { getWishList, URL } from "./component/utils/queryFunctions";
+import Success from "./pages/Success";
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -71,6 +72,7 @@ const router = createBrowserRouter([
   { path: "/search", element: <Search /> },
   { path: "/wishList", element: <WishList /> },
   { path: "/talent", element: <Talent /> },
+  { path: "/success", element: <Success /> },
 ]);
 
 function App() {

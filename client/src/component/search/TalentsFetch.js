@@ -43,7 +43,6 @@ const TalentFetch = () => {
 
     setUrl(`${q}${reviews}${rate}`);
   }, [searchParams]);
-  console.log(url);
 
   const { isLoading, data, isError, error, isFetching } = useQuery(
     ["search", url],

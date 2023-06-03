@@ -64,6 +64,7 @@
   align-items: center;
   padding-left: 8px;
   gap: 6px;
+  cursor: pointer;
 }
 .img {
   width: 18px;
@@ -100,4 +101,10 @@
     left: 50%;
     transform: translateX(-50%);
   }
+}
+.loading {
+  height: calc(100vh - 76px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

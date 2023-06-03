@@ -94,7 +94,9 @@ exports.createUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({ username: req.params.username });
+  const user = await User.findOne({
+    username: req.params.username,
+  });
   if (!user) {
     return next(new AppError("No user found with that ID", 404));
   }
@@ -155,9 +157,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     "perform"
   );
   if (req.file) filteredBody.photo = req.file.path;
-  console.log("file", req.file);
-  console.log("photo", req.photo);
-  console.log("req", req.body);
+
   const newUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,

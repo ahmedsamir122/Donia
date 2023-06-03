@@ -1,23 +1,67 @@
 import classes from "./Review.module.css";
-import user from "../../img/user2.jpg";
 import HalfRating from "../rating/Rate";
-const Review = () => {
+import React from "react";
+import TimeAgo from "react-timeago";
+
+const Review = (props) => {
+  let exist;
+
+  if (props.client) {
+    exist = props.review?.reviewFs.length > 0;
+  } else {
+    exist = props.review?.reviewCs.length > 0;
+  }
+
   return (
-    <div className={classes.main}>
-      <div className={classes.top}>
-        <div className={classes.topLeft}>
-          <div className={classes.client}>
-            <img className={classes.img} src={user} alt="" />
-            <span>zaki</span>
+    <React.Fragment>
+      {exist && (
+        <div className={classes.main}>
+          <div className={classes.top}>
+            <div className={classes.topLeft}>
+              <div className={classes.client}>
+                <img
+                  className={classes.img}
+                  src={
+                    props.client
+                      ? props.review.freelancer.photo
+                      : props.review.client.photo
+                  }
+                  alt=""
+                />
+                <span>
+                  {props.client
+                    ? props.review.freelancer.username
+                    : props.review.client.username}
+                </span>
+              </div>
+              <div>
+                <HalfRating
+                  value={
+                    props.client
+                      ? props.review?.reviewFs[0].rating
+                      : props.review?.reviewCs[0].rating
+                  }
+                />
+              </div>
+            </div>
+            <div className={classes.topRight}>
+              <TimeAgo
+                date={
+                  props.client
+                    ? props.review?.reviewFs[0].createdAt
+                    : props.review?.reviewCs[0].createdAt
+                }
+              />
+            </div>
           </div>
-          <div>
-            <HalfRating value={2} />
+          <div className={classes.content}>
+            {props.client
+              ? props.review?.reviewFs[0].review
+              : props.review?.reviewCs[0].review}
           </div>
         </div>
-        <div className={classes.topRight}>3 days ago</div>
-      </div>
-      <div className={classes.content}>" nice to work with you "</div>
-    </div>
+      )}
+    </React.Fragment>
   );
 };
 

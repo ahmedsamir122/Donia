@@ -1,4 +1,11 @@
 .main {
   padding: 10px;
-  border-top: 1px solid #ccc;
+}
+.subMain {
+  margin-top: 25px;
+  margin-bottom: 25px;
+  border-bottom: 1px solid black;
+}
+.subMain:last-of-type {
+  border-bottom: none;
 }

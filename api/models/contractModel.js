@@ -12,7 +12,15 @@ const contractSchema = new mongoose.Schema(
     },
     activity: {
       type: String,
-      enum: ["offer", "progress", "submit", "approve", "cancel"],
+      enum: [
+        "offer",
+        "refuse",
+        "expired",
+        "expiredDeadline",
+        "progress",
+        "submit",
+        "approved",
+      ],
       default: "offer",
     },
     task: {
@@ -22,7 +30,17 @@ const contractSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false,
+    },
+    submitDate: {
+      type: Date,
+    },
+    expiredAt: {
+      type: Date,
+      default: Date.now() + 3 * 24 * 60 * 60 * 1000,
+    },
+    deadline: {
+      type: Date,
+      required: [true, "Contract must have adeadline"],
     },
     client: {
       type: mongoose.Schema.ObjectId,

@@ -16,7 +16,7 @@ export default function RateEdit(props) {
         value={value}
         onChange={(event, newValue) => {
           setValue(newValue);
-          props.onRate(value);
+          props.onRate(newValue);
         }}
       />
     </Box>

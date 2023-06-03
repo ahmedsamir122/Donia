@@ -33,7 +33,6 @@ const reviewFSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false,
     },
   },
   {
@@ -60,20 +59,19 @@ reviewFSchema.statics.calcAverageRatings = async function (clientId) {
 
   if (stats.length > 0) {
     await User.findByIdAndUpdate(clientId, {
-      ratingsQuantityF: stats[0].nRating,
-      ratingsAverageF: stats[0].avgRating,
+      ratingsQuantityC: stats[0].nRating,
+      ratingsAverageC: stats[0].avgRating,
     });
   } else {
     await User.findByIdAndUpdate(clientId, {
-      ratingsQuantityF: 0,
-      ratingsAverageF: 4.5,
+      ratingsQuantityC: 0,
+      ratingsAverageC: 4.5,
     });
   }
 };
 
-reviewFSchema.pre("save", function (next) {
+reviewFSchema.post("save", function () {
   this.constructor.calcAverageRatings(this.client);
-  next();
 });
 
 reviewFSchema.pre(/^findOneAnd/, async function (next) {

@@ -12,8 +12,6 @@ const Talent = () => {
   const params = useParams();
   const userRed = useSelector((state) => state.auth.user);
 
-  console.log(userRed?.username === params.username);
-
   const { isLoading, data, isError, error, isFetching } = useQuery(
     "talentProfile",
     () => {
@@ -22,7 +20,7 @@ const Talent = () => {
     { refetchOnWindowFocus: false }
   );
 
-  if (isLoading || isFetching) {
+  if (isLoading) {
     return (
       <div className={classes.loading}>
         <Loading />
@@ -33,7 +31,6 @@ const Talent = () => {
   if (isError) {
     return <div>{error.message}</div>;
   }
-  console.log(data.data.data.user);
   return (
     <React.Fragment>
       {userRed?.username === params.username && (

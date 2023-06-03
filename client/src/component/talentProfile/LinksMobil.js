@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 
 const LinksMobil = (props) => {
   const user = useSelector((state) => state.auth.user);
-  console.log(user?.links);
   return (
     <div className={classes.linksMobile}>
       <h2 className={classes.reviewsTitle}>Links</h2>

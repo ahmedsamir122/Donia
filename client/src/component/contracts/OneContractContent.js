@@ -1,11 +1,25 @@
 import classes from "./OneContractContent.module.css";
-import img1 from "../../img/user2.jpg";
 import { useState } from "react";
 import BackDropModal from "../modal/BackDrop";
 import ReviewModal from "../modal/ReviewModal";
+import Loading from "../loading/Loading";
+import { useParams } from "react-router-dom";
+import { URL, getWishList } from "../utils/queryFunctions";
+import { useQuery } from "react-query";
+import { useSelector } from "react-redux";
+import dateFormat from "dateformat";
+import { useNavigate } from "react-router-dom";
+import { useQueryClient } from "react-query";
+import { useEditContractActivity } from "../utils/queryFunctions";
 
 const OneContractContent = () => {
   const [showModal, setShowModal] = useState(false);
+  const params = useParams();
+  const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.token);
+  const user = useSelector((state) => state.auth.user);
+  const queryClient = useQueryClient();
+  const { mutate } = useEditContractActivity();
 
   const showModalHandler = () => {
     setShowModal((prev) => {
@@ -13,63 +27,178 @@ const OneContractContent = () => {
     });
   };
 
+  const postData = (data) => {
+    return getWishList(`${URL}/api/v1/contracts/${params.contractId}`, token);
+  };
+
+  const { isLoading, data, isError, error, isFetching } = useQuery(
+    "oneContract",
+    postData,
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!user, // Only execute the query if userId is truthy
+    }
+  );
+
+  if (isLoading) {
+    return (
+      <div className={classes.loading}>
+        <Loading />
+      </div>
+    );
+  }
+
+  if (isError) {
+    return <div>{error.message}</div>;
+  }
+
+  const contract = data?.data.data.contract;
+
+  const client = user?.id === contract?.client?.id ? true : false;
+
+  console.log(client);
   return (
     <div className={classes.main}>
-      <div className="container">
-        <div className={classes.contractCon}>
-          <div className={classes.contractLeft}>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Status</h3>
-              <p className={classes.contractDetailsOne}>
-                Pending - expires on June 30.2023
-              </p>
+      {contract && (
+        <div className="container">
+          <div className={classes.contractCon}>
+            <div className={classes.contractLeft}>
+              <div className={classes.contractDetailsCon}>
+                <h3 className={classes.contractDetailsName}>Status</h3>
+                <p className={classes.contractDetailsOne}>
+                  {contract?.activity}
+                </p>
+              </div>
+              <div className={classes.contractDetailsCon}>
+                <h3 className={classes.contractDetailsName}>Contract Title</h3>
+                <p className={classes.contractDetailsOne}>{contract?.name} </p>
+              </div>
+              <div className={classes.contractDetailsCon}>
+                <h3 className={classes.contractDetailsName}>Job Description</h3>
+                <p className={classes.contractDetailsOne}>{contract?.task}</p>
+              </div>
+              <div className={classes.contractDetailsCon}>
+                <h3 className={classes.contractDetailsName}>Offer Expires</h3>
+                <p className={classes.contractDetailsOne}>
+                  {dateFormat(contract?.deadline, " mmmm dS, yyyy")}
+                </p>
+              </div>
+              <div className={classes.contractDetailsCon}>
+                <h3 className={classes.contractDetailsName}>Offer Date</h3>
+                <p className={classes.contractDetailsOne}>
+                  {dateFormat(contract?.createdAt, " mmmm dS, yyyy")}
+                </p>
+              </div>
             </div>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Contract Title</h3>
-              <p className={classes.contractDetailsOne}>Instagram Story </p>
-            </div>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Job Description</h3>
-              <p className={classes.contractDetailsOne}>
-                I have a product for make up i will send u the video which is 30
-                sec and please put in story in your account
-              </p>
-            </div>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Offer Expires</h3>
-              <p className={classes.contractDetailsOne}>June 30.2023</p>
-            </div>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Offer Date</h3>
-              <p className={classes.contractDetailsOne}>June 23.2023</p>
-            </div>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Contract period</h3>
-              <p className={classes.contractDetailsOne}>7 days</p>
-            </div>
-            <div className={classes.contractDetailsCon}>
-              <h3 className={classes.contractDetailsName}>Payment Method</h3>
-              <p className={classes.contractDetailsOne}>Go pay </p>
-            </div>
-          </div>
-          <div className={classes.contractRight}>
-            <div className={classes.contractOptionCon}>
-              <p onClick={showModalHandler} className={classes.contractOption}>
-                Accept Offer
-              </p>
-              <p className={classes.contractOption}>Decline Offer</p>
-              <p className={classes.contractOption}>Messages</p>
-            </div>
-            <div className={classes.contractClientCon}>
-              <h3 className={classes.contractClientTitle}>The client</h3>
-              <div className={classes.user}>
-                <img src={img1} className={classes.img} />
-                <p className={classes.contractClientName}>Jonas 123</p>
+            <div className={classes.contractRight}>
+              <div className={classes.contractOptionCon}>
+                {contract.activity === "offer" && !client && (
+                  <p
+                    onClick={() =>
+                      mutate(
+                        `${URL}/api/v1/contracts/${params.contractId}/accept`
+                      )
+                    }
+                    className={classes.contractOption}
+                  >
+                    Accept Offer
+                  </p>
+                )}
+                {contract.activity === "offer" && !client && (
+                  <p
+                    className={classes.contractOption}
+                    onClick={() =>
+                      mutate(
+                        `${URL}/api/v1/contracts/${params.contractId}/refuse`
+                      )
+                    }
+                  >
+                    Decline Offer
+                  </p>
+                )}
+                {contract.activity === "progress" && !client && (
+                  <p
+                    className={classes.contractOption}
+                    onClick={() =>
+                      mutate(
+                        `${URL}/api/v1/contracts/${params.contractId}/submit`
+                      )
+                    }
+                  >
+                    submit your work
+                  </p>
+                )}
+                {contract.activity === "submit" && client && (
+                  <p className={classes.contractOption}>report</p>
+                )}
+                {contract.activity === "submit" &&
+                  client &&
+                  contract.reviewCs.length === 0 && (
+                    <p
+                      className={classes.contractOption}
+                      onClick={() => setShowModal(true)}
+                    >
+                      add review
+                    </p>
+                  )}
+                {contract.activity === "submit" &&
+                  !client &&
+                  contract.reviewFs.length === 0 && (
+                    <p
+                      className={classes.contractOption}
+                      onClick={() => setShowModal(true)}
+                    >
+                      add review
+                    </p>
+                  )}
+
+                {contract.activity === "submit" &&
+                  client &&
+                  contract.reviewCs.length > 0 && (
+                    <p className={classes.contractOption}>view review</p>
+                  )}
+                {contract.activity === "submit" &&
+                  !client &&
+                  contract.reviewFs.length > 0 && (
+                    <p className={classes.contractOption}>view review</p>
+                  )}
+
+                <p className={classes.contractOption}>Messages</p>
+              </div>
+              <div className={classes.contractClientCon}>
+                <h3 className={classes.contractClientTitle}>
+                  {client ? "The talent" : "the client"}
+                </h3>
+                <div
+                  className={classes.user}
+                  onClick={() =>
+                    navigate(
+                      client
+                        ? `/${contract.freelancer?.username}`
+                        : `/u/${contract.client?.username}`
+                    )
+                  }
+                >
+                  <img
+                    src={
+                      client
+                        ? ` ${contract.freelancer?.photo}`
+                        : `${contract.client?.photo}`
+                    }
+                    className={classes.img}
+                    alt=""
+                  />
+                  <p className={classes.contractClientName}>
+                    {client
+                      ? `${contract.freelancer?.username}`
+                      : `${contract.client?.username}`}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {showModal && <BackDropModal onClick={showModalHandler} />}
       {showModal && <ReviewModal onClick={showModalHandler} />}
     </div>

@@ -13,13 +13,27 @@ import { useNavigate } from "react-router-dom";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import LinksSocialPc from "./LinksSocialPc";
 import AddLinksModal from "../modal/LinksAccounts";
+import { useMutation } from "react-query";
+import { postDataProtect, URL } from "../utils/queryFunctions";
+import Loading from "../loading/Loading";
 
 const TalentOne = (props) => {
   const [showModal, setShowModal] = useState(false);
   const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
   const [showAccount, setShowAccount] = useState(true);
   const [showLinksModal, setShowLinksModal] = useState(false);
   const navigate = useNavigate();
+
+  const postData = (data) => {
+    return postDataProtect(
+      `${URL}/api/v1/contracts/open/${props.onData.username}`,
+      data,
+      token
+    );
+  };
+
+  const { mutate, isError, error, isLoading } = useMutation(postData);
 
   const showLinksModalHandler = () => {
     setShowLinksModal((prev) => {
@@ -38,10 +52,21 @@ const TalentOne = (props) => {
       navigate("/signin");
       return;
     }
+
+    mutate();
+
     setShowModal((prev) => {
       return !prev;
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className={classes.mainLoading}>
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div className={classes.main}>
@@ -75,7 +100,7 @@ const TalentOne = (props) => {
               <LinkAccount onData={props.onData} />
             )}
             {props.showEdit && !props.client && showAccount && <FilterList />}
-            <ReviewsTalentOne />
+            <ReviewsTalentOne username={props.username} client={props.client} />
           </div>
           {!props.client && (
             <div className={classes.rightProfile}>
@@ -94,7 +119,11 @@ const TalentOne = (props) => {
         </div>
       </div>
       {showModal && (
-        <CreateContractModal error={true} onClick={showModalHandler} />
+        <CreateContractModal
+          error={isError}
+          onError={error?.response.data.message}
+          onClick={showModalHandler}
+        />
       )}
       {showLinksModal && <AddLinksModal onClick={showLinksModalHandler} />}
       {showModal && <BackDropModal onClick={showModalHandler} />}

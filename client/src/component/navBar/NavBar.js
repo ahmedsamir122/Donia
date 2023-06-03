@@ -13,8 +13,10 @@ import TuneIcon from "@mui/icons-material/Tune";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { queryActions } from "../../store/query";
+import { useNavigate } from "react-router-dom";
 
 const NavBar = (props) => {
+  const navigate = useNavigate();
   const [showMessage, setShowMessage] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [showAccount, setShowAccount] = useState(false);

@@ -1,8 +1,6 @@
 import NavBar from "../navBar/NavBar";
 import TalentOne from "./TalentOne";
 const TalentProfile = (props) => {
-  console.log(props.username);
-
   return (
     <div>
       <NavBar />
@@ -12,6 +10,7 @@ const TalentProfile = (props) => {
         ratingsAverage={props.onData.ratingsAverageF}
         ratingsQuantity={props.onData.ratingsQuantityF}
         client={false}
+        username={props.username}
       />
     </div>
   );

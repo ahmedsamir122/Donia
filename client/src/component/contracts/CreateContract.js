@@ -1,26 +1,22 @@
 import classes from "./CreateContract.module.css";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import { useForm } from "react-hook-form";
+import ContractDetail from "./ContractDetail";
+import ContractPreview from "./ContractPreview";
+import { useState } from "react";
 
 const CreateContract = (props) => {
-  const {
-    register,
-    control,
-    handleSubmit,
-    getValues,
-    formState: { errors, isValid },
-  } = useForm({ mode: "onSubmit" });
+  const [preview, setPreview] = useState(false);
+  const [contractData, setContractData] = useState({});
 
-  const onsubmit = async (data) => {
-    const [name, descripton, budget] = getValues([
-      "name",
-      "descripton",
-      "budget",
-    ]);
+  const dataContractHandler = (contract) => {
+    setContractData((prev) => {
+      return { ...contract };
+    });
+    setPreview(true);
+    console.log(preview);
   };
-
   return (
     <div className={classes.main}>
       <div className={classes.top}>
@@ -38,60 +34,13 @@ const CreateContract = (props) => {
           />
         </div>
       </div>
-      <div className={classes.formCon}>
-        <form className={classes.form} onSubmit={handleSubmit(onsubmit)}>
-          <div className={classes.inputCon}>
-            <input
-              type="text"
-              id="name"
-              className={classes.input}
-              placeholder="Choose a name for your contract.."
-              {...register("name", { required: true })}
-            />
-            {errors.name?.type === "required" && (
-              <p className={classes.error}>please enter your contract name</p>
-            )}
-          </div>
-          <div className={classes.inputCon}>
-            <label htmlFor="textArea" className={classes.inputName}>
-              Description
-            </label>
-            <textarea
-              id="textArea"
-              className={classes.inputText}
-              placeholder="Describe what you need here.."
-              {...register("description", { required: true })}
-            ></textarea>
-            {errors.description?.type === "required" && (
-              <p className={classes.error}>
-                please enter your contract description
-              </p>
-            )}
-          </div>
-          <div className={classes.inputCon}>
-            <input
-              type="number"
-              id="price"
-              className={classes.input}
-              placeholder="Write your budget here.."
-              {...register("budget", { required: true })}
-            />
-            {errors.budget?.type === "required" && (
-              <p className={classes.error}>please enter your budget</p>
-            )}
-          </div>
-          <div className={classes.paymentCon}>
-            <h3 className={classes.paymentTitle}>Payment method</h3>
-            <div className={classes.paymentInput}>
-              <p>BCA virtual</p>
-              <div className={classes.arrowRight}>
-                <KeyboardArrowRightIcon />
-              </div>
-            </div>
-          </div>
-          <button className={classes.button}>Submit</button>
-        </form>
-      </div>
+      {preview && (
+        <ContractPreview
+          onContract={contractData}
+          onClick={() => setPreview(false)}
+        />
+      )}
+      {!preview && <ContractDetail onData={dataContractHandler} />}
     </div>
   );
 };

@@ -32,7 +32,6 @@ const reviewCSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
-      select: false,
     },
   },
   {
@@ -55,24 +54,21 @@ reviewCSchema.statics.calcAverageRatings = async function (freelancerId) {
     },
   ]);
 
-  console.log(stats);
-
   if (stats.length > 0) {
     await User.findByIdAndUpdate(freelancerId, {
-      ratingsQuantityC: stats[0].nRating,
-      ratingsAverageC: stats[0].avgRating,
+      ratingsQuantityF: stats[0].nRating,
+      ratingsAverageF: stats[0].avgRating,
     });
   } else {
     await User.findByIdAndUpdate(freelancerId, {
-      ratingsQuantityC: 0,
-      ratingsAverageC: 4.5,
+      ratingsQuantityF: 0,
+      ratingsAverageF: 4.5,
     });
   }
 };
 
-reviewCSchema.pre("save", function (next) {
+reviewCSchema.post("save", function () {
   this.constructor.calcAverageRatings(this.freelancer);
-  next();
 });
 
 reviewCSchema.pre(/^findOneAnd/, async function (next) {

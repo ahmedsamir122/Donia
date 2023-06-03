@@ -1,4 +1,6 @@
 import axios from "axios";
+import { useMutation, useQueryClient } from "react-query";
+import { useSelector } from "react-redux";
 
 // export const URL = "http://localhost:8000";
 export const URL = "https://donia-ahmedsamir122.vercel.app";
@@ -41,6 +43,34 @@ export const updatePhotoData = (url, data, token) => {
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const useEditContractActivity = () => {
+  const queryClient = useQueryClient();
+
+  const token = useSelector((state) => state.auth.token);
+  const updateFileDataRequest = (url, data) => {
+    return updateFileData(url, data, token);
+  };
+  return useMutation(updateFileDataRequest, {
+    onSuccess: (data) => {
+      queryClient.setQueryData("oneContract", (oldData) => {
+        return {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            data: {
+              ...oldData.data.data,
+              contract: {
+                ...oldData.data.data.contract,
+                activity: data.data.data.contract.activity,
+              },
+            },
+          },
+        };
+      });
     },
   });
 };

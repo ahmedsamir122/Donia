@@ -35,13 +35,11 @@ const OneLinksSocialPc = (props) => {
 
   const deleteHandler = (e) => {
     e.stopPropagation();
-    console.log(props.id);
     const linksNames = [...user.links];
     linksNames.splice(props.id, 1);
     mutate({ links: linksNames });
   };
   const link = social[index];
-  console.log(link, social[1], props.title);
   return (
     <li className={classes.link}>
       <a href={props.title} className={classes.oneLink}>

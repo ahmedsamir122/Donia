@@ -11,6 +11,7 @@ const ClientProfile = (props) => {
         ratingsAverage={props.onData.ratingsAverageC}
         ratingsQuantity={props.onData.ratingsQuantityC}
         client={true}
+        username={props.username}
       />
     </div>
   );

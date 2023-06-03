@@ -38,14 +38,14 @@ const TopTalentOne = (props) => {
   const showPhotoModalHandler = () => {
     setShowModal((prev) => !prev);
   };
-  const addWishlistHandler = (e) => {
-    if (!userRed) {
-      navigate("/signin");
-      return;
-    }
-    dispatch(wishlistActions.toggle(props.onData.id));
-    console.log(wishlist);
-  };
+  // const addWishlistHandler = (e) => {
+  //   if (!userRed) {
+  //     navigate("/signin");
+  //     return;
+  //   }
+  //   dispatch(wishlistActions.toggle(props.onData.id));
+  //   console.log(wishlist);
+  // };
 
   useEffect(() => {
     if (wishlist.find((item) => item === props.onData.id)) {

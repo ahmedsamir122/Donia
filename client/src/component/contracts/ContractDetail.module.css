@@ -1,38 +1,3 @@
-.main {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  z-index: 4;
-  width: 70%;
-  border-radius: 8px;
-  overflow: hidden;
-  height: 444px;
-}
-.top {
-  display: flex;
-  justify-content: space-between;
-  background-color: #f7f7f7;
-  align-items: center;
-  padding: 25px 5px;
-  height: 34px;
-}
-.topTitle {
-  display: flex;
-  align-items: center;
-}
-.title {
-  margin-bottom: 0;
-}
-.arrowIcon {
-  cursor: pointer;
-  display: none !important;
-}
-.closeIcon {
-  cursor: pointer;
-  display: block;
-}
 .formCon {
   padding: 10px;
 }
@@ -43,7 +8,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 .inputName {
   font-size: 14;
@@ -59,37 +24,16 @@
   font-weight: bold;
 }
 .inputText {
-  height: 160px;
+  height: 95px;
   padding: 10px 5px;
   font-size: 17px;
+  resize: none;
 }
 .inputText:focus,
 .inputText:focus {
   outline: none;
 }
 
-.paymentCon {
-  margin-bottom: 20px;
-}
-.paymentTitle {
-  text-align: left;
-  margin-top: 30px;
-}
-.paymentInput {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 5px;
-  border: 0.5px dashed rgb(179, 175, 175);
-}
-.arrowRight {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0px;
-  border: 0.5px solid rgb(179, 175, 175);
-  border-radius: 50%;
-  cursor: pointer;
-}
 .button {
   padding: 10px;
   font-size: 18px;
