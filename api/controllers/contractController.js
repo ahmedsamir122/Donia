@@ -4,6 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel");
 const Block = require("../models/blockModel");
+require("dotenv").config();
 const stripe = require("stripe")("process.env.STRIPE_SECRET_KEY_MY");
 
 exports.getAllContracts = catchAsync(async (req, res, next) => {
