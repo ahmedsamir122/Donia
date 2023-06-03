@@ -4,9 +4,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel");
 const Block = require("../models/blockModel");
-const stripe = require("stripe")(
-  "sk_test_51NBIw5GjytymVepSb5bFdFBVblsK3Kuq39rgawy4Ep0UL8xm7YypcxcOTNccjxNLMiqpUzIHsmOxm2LFB8arbNJ300TBLlhfDq"
-);
+const stripe = require("stripe")("process.env.STRIPE_SECRET_KEY_MY");
 
 exports.getAllContracts = catchAsync(async (req, res, next) => {
   //excute the query
