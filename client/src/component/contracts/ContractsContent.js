@@ -129,7 +129,7 @@ const ContractsContent = () => {
             </div>
           )}
         </div>
-        <div className={classes.filterCon}>
+        {/* <div className={classes.filterCon}>
           <p
             className={`${classes.filter} ${allFilter && classes.activeFilter}`}
             onClick={allFilterHandler}
@@ -144,7 +144,7 @@ const ContractsContent = () => {
           >
             Active
           </p>
-        </div>
+        </div> */}
         {dataContract.length > 0 && (
           <DataTable
             client={client}
