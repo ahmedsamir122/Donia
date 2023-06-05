@@ -124,10 +124,16 @@ const SignupCard = () => {
             type="text"
             placeholder="Enter your username..."
             className={classes.input}
-            {...register("username", { required: true })}
+            {...register("username", {
+              required: true,
+              validate: (value) => !value.includes(" "),
+            })}
           />
           {errors.username?.type === "required" && (
             <p className={classes.error}>please enter your username</p>
+          )}
+          {errors.username && (
+            <p className={classes.error}>username should not contain spaces.</p>
           )}
           <input
             type="email"
