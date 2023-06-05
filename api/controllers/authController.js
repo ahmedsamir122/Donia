@@ -21,6 +21,9 @@ const generateCookie = (res, token) => {
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
+  if (req.body.username.includes(" ")) {
+    return next(new AppError("username should not contain spaces.", 401));
+  }
   const newUser = await User.create({
     username: req.body.username.trim(),
     email: req.body.email,
