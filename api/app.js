@@ -14,6 +14,8 @@ const contractRouter = require("./routes/contractRoutes");
 const reviewCRouter = require("./routes/reviewCRoutes");
 const reviewFRouter = require("./routes/reviewFRoutes");
 const userRouter = require("./routes/userRoutes");
+const messageRouter = require("./routes/messageRoutes");
+const conversationRouter = require("./routes/conversationRoutes");
 const wishListRouter = require("./routes/wishListRoutes");
 const blockRouter = require("./routes/blockRoutes");
 const contractController = require("./controllers/contractController");
@@ -64,6 +66,8 @@ app.use("/api/v1/reviewFs", reviewFRouter);
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/wishList", wishListRouter);
 app.use("/api/v1/block", blockRouter);
+app.use("/api/v1/conversations", conversationRouter);
+app.use("/api/v1/messages", messageRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`));

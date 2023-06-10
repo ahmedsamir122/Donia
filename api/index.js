@@ -31,6 +31,54 @@ const server = app.listen(port, () => {
   console.log(`app is running on port${port}...`);
 });
 
+let users = [];
+
+const adduser = (userId, socketId) => {
+  !users.some(
+    (user) => user.userId === userId && users.push({ userId, socketId })
+  );
+};
+
+const removeuser = (socketId) => {
+  users.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  return users.find((user) => user.userId === userId);
+};
+
+const io = require("socket.io")(server, {
+  pingTimeout: 6000,
+  cors: {
+    origin: "http://localhost:3000",
+    // origin:"https://donia-v1dk-ahmedsamir122.vercel.app"
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("auser connected.");
+  socket.on("addUser", (userId) => {
+    adduser(userId, socket.id);
+  });
+
+  //send and get message
+  socket.on("sendMessage", ({ senderId, recieverId, conversationId, text }) => {
+    const user = getUser(recieverId);
+    if (user) {
+      io.to(user.socketId).emit("getMessage", {
+        senderId,
+        text,
+        conversationId,
+      });
+    }
+  });
+
+  socket.on("disconnection", () => {
+    console.log("user disconnected");
+    removeuser(socket.id);
+  });
+});
+
 process.on("unhandledRejection", (err) => {
   console.log(err.name, err.message);
   console.log("UNHANDLED REJECTION");

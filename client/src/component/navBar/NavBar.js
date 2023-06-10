@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { queryActions } from "../../store/query";
 import { useNavigate } from "react-router-dom";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 const NavBar = (props) => {
   const navigate = useNavigate();
@@ -99,6 +100,12 @@ const NavBar = (props) => {
               >
                 <CiChat1 className={classes.mes} />
                 <span>1</span>
+              </li>
+              <li
+                className={classes.notContainer}
+                onClick={() => navigate("/contracts")}
+              >
+                <LibraryBooksIcon className={classes.mes} />
               </li>
               {showMessage && <MessageModal onMessage={toggleMessageHandler} />}
               <li className={classes.user} onClick={toggleAccountHandler}>

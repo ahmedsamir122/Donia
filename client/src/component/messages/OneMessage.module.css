@@ -1,0 +1,45 @@
+.oneMessageHim {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  width: 80%;
+  justify-content: flex-start;
+  margin-bottom: 15px;
+}
+.oneMessageMe {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  max-width: 80%;
+  justify-content: flex-start;
+  margin-left: auto;
+  flex-direction: row-reverse;
+  margin-bottom: 15px;
+}
+.hisMessage {
+  padding: 8px;
+  border-radius: 7px;
+  background-color: rgb(233, 229, 229);
+}
+.myMessage {
+  padding: 8px;
+  border-radius: 7px;
+  color: white;
+  background-color: #139ff0;
+}
+.text {
+  word-break: break-all;
+  font-size: 14px;
+}
+.time {
+  padding-left: 10px;
+  float: right;
+  font-size: 12px;
+  margin-top: 5px;
+}
+.img {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}

@@ -28,6 +28,7 @@ export const postDataProtect = (url, data, token) => {
     },
   });
 };
+
 export const deleteDataProtect = (url, data, token) => {
   return axios.delete(url, {
     withCredentials: true,

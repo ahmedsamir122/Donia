@@ -1,0 +1,56 @@
+.conversation {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px;
+  padding-right: 20px;
+  transition: 0.3s all ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+.conversation:hover {
+  background-color: rgb(233, 229, 229);
+}
+.active {
+  background-color: rgb(233, 229, 229);
+}
+.img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.dataUser {
+  flex: 1;
+}
+.dataTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.userName {
+  font-size: 14px;
+  color: rgb(48, 48, 48);
+}
+.date {
+  font-size: 10px;
+  color: rgb(114, 113, 113);
+}
+.textCon {
+  display: flex;
+  align-items: center;
+}
+.sender {
+  font-size: 14px;
+  color: rgb(114, 113, 113);
+  margin-right: 4px;
+}
+.text {
+  display: inline-block;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100px;
+  font-size: 12px;
+}

@@ -37,9 +37,9 @@ const router = createBrowserRouter([
   {
     path: "/messages",
     element: (
-      <ProtectedRoute>
-        <Messages />
-      </ProtectedRoute>
+      //<ProtectedRoute>
+      <Messages />
+      // </ProtectedRoute>
     ),
 
     children: [

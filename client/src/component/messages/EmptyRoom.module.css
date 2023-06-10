@@ -3,6 +3,7 @@
   color: rgb(224, 220, 220);
   padding-top: 30px;
   padding-left: 30px;
+  height: 100vh;
 }
 
 @media (max-width: 767px) {

@@ -1,9 +1,34 @@
 import { Link } from "react-router-dom";
 import classes from "./ContractContentOneMobil.module.css";
 import dateFormat from "dateformat";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { postDataProtect, URL } from "../utils/queryFunctions";
+import { useMutation } from "react-query";
 
 let y = "active";
 const ContractContentOneMobil = (props) => {
+  const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.token);
+
+  const postData = (data, id) => {
+    return postDataProtect(
+      `${URL}/api/v1/conversations/${props.onData.id}`,
+      data,
+      token
+    );
+  };
+
+  const { mutate, isError, error } = useMutation(postData, {
+    onSuccess: (data) => {
+      console.log(data);
+      navigate(`/messages/${data.data.data.conversation._id}`);
+    },
+  });
+  const chatHandler = () => {
+    mutate();
+  };
+
   return (
     <div className={classes.contract}>
       <div className={classes.topContract}>
@@ -35,14 +60,14 @@ const ContractContentOneMobil = (props) => {
             {props.onData?.client.username}
           </Link>
         )}
-        <Link className={classes.chatCon}>
+        <div className={classes.chatCon} onClick={chatHandler}>
           <div
             className={`${classes.chatPoint} ${
               y === "active" && classes.activeChat
             }`}
           ></div>
           <p className={classes.chat}>Chat</p>
-        </Link>
+        </div>
       </div>
     </div>
   );

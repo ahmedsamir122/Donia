@@ -3,11 +3,35 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Link } from "react-router-dom";
 import classes from "./ContractsTable.module.css";
 import dateFormat from "dateformat";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "react-query";
+import { postDataProtect, URL } from "../utils/queryFunctions";
+import { useSelector } from "react-redux";
 
 let x = "offer";
 let y = "active";
 
 export default function DataTable(props) {
+  const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.token);
+
+  const postData = (data, id) => {
+    return postDataProtect(
+      `${URL}/api/v1/conversations/${data.id}`,
+      data,
+      token
+    );
+  };
+
+  const { mutate, isError, error } = useMutation(postData, {
+    onSuccess: (data) => {
+      console.log(data);
+      navigate(`/messages/${data.data.data.conversation._id}`);
+    },
+  });
+  const chatHandler = (id) => {
+    mutate({ data, id });
+  };
   const columns = [
     {
       field: "name",
@@ -60,20 +84,24 @@ export default function DataTable(props) {
       },
     },
     {
-      field: "chat",
+      field: "id",
       headerName: "Chat",
       sortable: false,
       width: 130,
       renderCell: (params) => {
         return (
-          <Link className={classes.chatCon}>
+          <div
+            to="/messages"
+            className={classes.chatCon}
+            onClick={() => chatHandler(params.value)}
+          >
             <div
               className={`${classes.chatPoint} ${
                 y === "active" && classes.active
               }`}
             ></div>
             <p className={classes.chat}>Chat</p>
-          </Link>
+          </div>
         );
       },
     },
