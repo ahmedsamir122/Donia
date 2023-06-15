@@ -4,8 +4,8 @@ import BackDropModal from "../modal/BackDrop";
 import ReviewModal from "../modal/ReviewModal";
 import Loading from "../loading/Loading";
 import { useParams } from "react-router-dom";
-import { URL, getWishList } from "../utils/queryFunctions";
-import { useQuery } from "react-query";
+import { URL, getWishList, postDataProtect } from "../utils/queryFunctions";
+import { useQuery, useMutation } from "react-query";
 import { useSelector } from "react-redux";
 import dateFormat from "dateformat";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,6 @@ const OneContractContent = () => {
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
-  const { mutate } = useEditContractActivity();
 
   const showModalHandler = () => {
     setShowModal((prev) => {
@@ -39,6 +38,28 @@ const OneContractContent = () => {
       enabled: !!user, // Only execute the query if userId is truthy
     }
   );
+
+  const startChat = (data, id) => {
+    return postDataProtect(
+      `${URL}/api/v1/conversations/${params.contractId}`,
+      data,
+      token
+    );
+  };
+
+  const {
+    mutate,
+    isError: isErrorChat,
+    error: errorChat,
+  } = useMutation(startChat, {
+    onSuccess: (data) => {
+      console.log(data);
+      navigate(`/messages/${data.data.data.conversation._id}`);
+    },
+  });
+  const chatHandler = () => {
+    mutate();
+  };
 
   if (isLoading) {
     return (
@@ -163,7 +184,9 @@ const OneContractContent = () => {
                     <p className={classes.contractOption}>view review</p>
                   )}
 
-                <p className={classes.contractOption}>Messages</p>
+                <p className={classes.contractOption} onClick={chatHandler}>
+                  Send message
+                </p>
               </div>
               <div className={classes.contractClientCon}>
                 <h3 className={classes.contractClientTitle}>

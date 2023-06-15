@@ -10,7 +10,6 @@ exports.createConversation = catchAsync(async (req, res, next) => {
   const other = contract.freelancer.equals(req.user._id)
     ? contract.client
     : contract.freelancer;
-
   let conversation;
   conversation = await Conversation.findOneAndUpdate(
     { contract: req.params.contractId },

@@ -4,6 +4,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./login-slice";
 import wishlistReducer from "./wishlist";
 import blocklistReducer from "./blocklist";
+import lastMessageReducer from "./lastMessage";
 import queryReducer from "./query";
 
 const store = configureStore({
@@ -12,6 +13,7 @@ const store = configureStore({
     blocklist: blocklistReducer,
     auth: authReducer,
     query: queryReducer,
+    lastMessage: lastMessageReducer,
   },
 });
 

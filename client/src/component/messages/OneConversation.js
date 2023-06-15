@@ -3,14 +3,16 @@ import classes from "./OneConversation.module.css";
 import moment from "moment";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 const OneConversation = (props) => {
   const navigate = useNavigate();
   const params = useParams();
   const user = useSelector((state) => state.auth.user);
+  const lastMessage = useSelector((state) => state.lastMessage.lastMessage);
 
-  const other = props.conversation?.users.filter((u) => u._id !== user._id);
-  console.log(props.conversation?.latestMessage?.creadtedAt);
+  const other = props.conversation?.users?.filter((u) => u._id !== user._id);
+
   return (
     <div
       className={`${classes.conversation} ${
@@ -27,11 +29,9 @@ const OneConversation = (props) => {
           </p>
         </div>
         <div className={classes.textCon}>
-          <p className={classes.sender}>
-            {props.conversation?.latestMessage?.sender?._id === user._id
-              ? "You:"
-              : ""}
-          </p>
+          {props.conversation?.latestMessage?.sender?._id === user?._id && (
+            <p className={classes.sender}>You:</p>
+          )}
           <p className={classes.text}>
             {props.conversation.latestMessage?.content}
           </p>

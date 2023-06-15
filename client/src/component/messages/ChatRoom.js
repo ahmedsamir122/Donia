@@ -12,12 +12,16 @@ import { postDataProtect } from "../utils/queryFunctions";
 import { useEffect, useRef, useState } from "react";
 import Loading from "../loading/Loading";
 import { io } from "socket.io-client";
+import { useDispatch } from "react-redux";
+import { lastMessageActions } from "../../store/lastMessage";
 
 const ChatRoom = (props) => {
   const params = useParams();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const [other, setOther] = useState([]);
+  const [fix, setFix] = useState(false);
   const [arrivalMessage, setArrivalMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
   const [socket, setSocket] = useState(null);
@@ -25,7 +29,6 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setSocket(io(URL));
-    socket?.emit("addUser", user?._id);
     socket?.on("getMessage", (data) => {
       setArrivalMessage({
         createdAt: Date.now(),
@@ -109,10 +112,38 @@ const ChatRoom = (props) => {
 
       socket.emit("sendMessage", {
         senderId: user._id,
-        recieverId: other._id,
+        recieverId: other[0]._id,
         text: data.data.data.message.content,
         conversationId: data.data.data.message.conversation,
+        createdAt: Date.now(),
       });
+
+      let send;
+
+      if (
+        !dataFetchCurrentConversation?.data.data.conversation.latestMessage &&
+        !fix
+      ) {
+        send = {
+          ...dataFetchCurrentConversation?.data.data.conversation,
+          latestMessage: data.data.data.message,
+        };
+        setFix(true);
+      } else {
+        send = {
+          sender: {
+            _id: user._id,
+            username: user.username,
+            photo: user.photo,
+          },
+          recieverId: other[0]._id,
+          content: data.data.data.message.content,
+          conversationId: data.data.data.message.conversation,
+          createdAt: Date.now(),
+        };
+      }
+
+      dispatch(lastMessageActions.getLastMessage(send));
     },
   });
 
@@ -171,12 +202,8 @@ const ChatRoom = (props) => {
       <div className={classes.chatCon}>
         <div className={classes.messagesCon}>
           {allMessages?.map((c) => (
-            <div ref={scrollRef}>
-              <OneMessage
-                key={c._id}
-                message={c}
-                own={c.sender?._id === user._id}
-              />
+            <div ref={scrollRef} key={c._id}>
+              <OneMessage message={c} own={c.sender?._id === user._id} />
             </div>
           ))}
         </div>
