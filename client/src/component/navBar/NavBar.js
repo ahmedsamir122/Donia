@@ -89,7 +89,7 @@ const NavBar = (props) => {
             <ul className={classes.ul}>
               <li className={classes.notContainer} onClick={toggleNotesHandler}>
                 <CiBellOn className={classes.not} />
-                <span>1</span>
+                {/* <span>1</span> */}
               </li>
               {showNotes && (
                 <NotificationModal onNotification={toggleNotesHandler} />
@@ -99,7 +99,7 @@ const NavBar = (props) => {
                 onClick={toggleMessageHandler}
               >
                 <CiChat1 className={classes.mes} />
-                <span>1</span>
+                {/* <span>1</span> */}
               </li>
               <li
                 className={classes.notContainer}
