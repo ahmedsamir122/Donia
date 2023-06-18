@@ -81,7 +81,7 @@ function App() {
   const dispatch = useDispatch();
   const token = localStorage.getItem("token") || "";
   const tokenRed = useSelector((state) => state.auth.token);
-  const socket = useSelector((state) => state.socket.socket);
+  // const socket = useSelector((state) => state.socket.socket);
   const user = useSelector((state) => state.auth.user);
 
   const getMyProfile = () => {
