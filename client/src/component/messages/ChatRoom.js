@@ -28,20 +28,20 @@ const ChatRoom = (props) => {
   const socket = useSelector((state) => state.socket.socket);
   const scrollRef = useRef();
 
-  useEffect(() => {
-    socket?.on("getMessage", (data) => {
-      setArrivalMessage({
-        createdAt: Date.now(),
-        content: data.text,
-        sender: {
-          photo: other[0].photo,
-          username: other[0].username,
-          _id: other[0]._id,
-        },
-        conversation: data.conversationId,
-      });
-    });
-  }, []);
+  // useEffect(() => {
+  //   socket?.on("getMessage", (data) => {
+  //     setArrivalMessage({
+  //       createdAt: Date.now(),
+  //       content: data.text,
+  //       sender: {
+  //         photo: other[0].photo,
+  //         username: other[0].username,
+  //         _id: other[0]._id,
+  //       },
+  //       conversation: data.conversationId,
+  //     });
+  //   });
+  // }, []);
 
   useEffect(() => {
     if (arrivalMessage.conversation === params.messageId) {
