@@ -129,10 +129,16 @@ function App() {
   });
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
     dispatch(socketActions.getSocket(io(URL)));
-  }, []);
+  }, [user]);
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
     socket?.emit("addUser", user?._id);
   }, [user, socket]);
 
