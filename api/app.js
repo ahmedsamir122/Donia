@@ -39,7 +39,7 @@ app.use("/api", limiter);
 app.use(
   cors({
     credentials: true,
-    origin: "https://donia-v1dk-ahmedsamir122.vercel.app",
+    origin: "https://donia-gamma.vercel.app/",
   })
 );
 app.use(function (req, res, next) {

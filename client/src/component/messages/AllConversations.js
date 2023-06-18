@@ -4,21 +4,15 @@ import { useSelector } from "react-redux";
 import OneConversation from "./OneConversation";
 import { getWishList, URL } from "../utils/queryFunctions";
 import { useEffect, useState } from "react";
-import { io } from "socket.io-client";
 import React from "react";
 
 const AllConversations = () => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const lastMessageRed = useSelector((state) => state.lastMessage.lastMessage);
-  const [socket, setSocket] = useState(null);
   const [sortedConversations, setSortedConversation] = useState(null);
   const [newConversations, setNewConversation] = useState([]);
   console.log(lastMessageRed);
-  useEffect(() => {
-    setSocket(io(URL));
-    socket?.emit("addUser", user?._id);
-  }, [user?._id]);
 
   const fetchConversations = () => {
     return getWishList(`${URL}/api/v1/conversations/myConversations`, token);

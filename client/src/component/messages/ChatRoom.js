@@ -24,11 +24,11 @@ const ChatRoom = (props) => {
   const [fix, setFix] = useState(false);
   const [arrivalMessage, setArrivalMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
-  const [socket, setSocket] = useState(null);
+  // const [socket, setSocket] = useState(null);
+  const socket = useSelector((state) => state.socket.socket);
   const scrollRef = useRef();
 
   useEffect(() => {
-    setSocket(io(URL));
     socket?.on("getMessage", (data) => {
       setArrivalMessage({
         createdAt: Date.now(),
@@ -41,7 +41,7 @@ const ChatRoom = (props) => {
         conversation: data.conversationId,
       });
     });
-  }, [other]);
+  }, []);
 
   useEffect(() => {
     if (arrivalMessage.conversation === params.messageId) {

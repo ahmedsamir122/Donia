@@ -64,6 +64,7 @@ io.on("connection", (socket) => {
   //send and get message
   socket.on("sendMessage", ({ senderId, recieverId, conversationId, text }) => {
     const user = getUser(recieverId);
+    console.log(senderId);
     if (user) {
       io.to(user.socketId).emit("getMessage", {
         senderId,
@@ -73,7 +74,7 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("disconnection", () => {
+  socket.on("disconnect", () => {
     console.log("user disconnected");
     removeuser(socket.id);
   });

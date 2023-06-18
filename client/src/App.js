@@ -23,11 +23,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { authActions } from "./store/login-slice";
 import { wishlistActions } from "./store/wishlist";
 import { blocklistActions } from "./store/blocklist";
+import { socketActions } from "./store/socket";
 import { useQuery } from "react-query";
 import React from "react";
 import WishList from "./pages/WishList";
 import { getWishList, URL } from "./component/utils/queryFunctions";
 import Success from "./pages/Success";
+import { io } from "socket.io-client";
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -79,6 +81,8 @@ function App() {
   const dispatch = useDispatch();
   const token = localStorage.getItem("token") || "";
   const tokenRed = useSelector((state) => state.auth.token);
+  const socket = useSelector((state) => state.socket.socket);
+  const user = useSelector((state) => state.auth.user);
 
   const getMyProfile = () => {
     return getWishList(`${URL}/api/v1/users/me`, token);
@@ -123,6 +127,14 @@ function App() {
     refetchOnWindowFocus: false,
     enabled: false,
   });
+
+  useEffect(() => {
+    dispatch(socketActions.getSocket(io(URL)));
+  }, []);
+
+  useEffect(() => {
+    socket?.emit("addUser", user?._id);
+  }, [user, socket]);
 
   useEffect(() => {
     if (!token) {
