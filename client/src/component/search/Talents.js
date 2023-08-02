@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { set } from "react-hook-form";
 import TalentFetch from "./TalentsFetch";
 import { URL } from "../utils/queryFunctions";
+import FetshingAndPagination from "./FetchingAndPaginaion";
 
 const Talents = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -44,7 +45,7 @@ const Talents = (props) => {
           <div className={classes.filters}>
             <Filter />
           </div>
-          <TalentFetch />
+          <FetshingAndPagination />
         </div>
       </div>
     </div>

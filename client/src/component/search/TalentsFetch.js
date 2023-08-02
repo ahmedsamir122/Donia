@@ -7,15 +7,16 @@ import Talent from "./Talent";
 import classes from "./TalentsFetch.module.css";
 import { useSelector } from "react-redux";
 import { URL } from "../utils/queryFunctions";
+import Pagination from "@mui/material/Pagination";
 
-const TalentFetch = () => {
+const TalentFetch = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [url, setUrl] = useState("");
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
 
   const fetchTalents = () => {
-    return axios.get(`${URL}/api/v1/users?${url}`);
+    return axios.get(`${URL}/api/v1/users?${url}page=${props.page}`);
   };
 
   useEffect(() => {
@@ -44,11 +45,16 @@ const TalentFetch = () => {
     setUrl(`${q}${reviews}${rate}`);
   }, [searchParams]);
 
-  const { isLoading, data, isError, error, isFetching } = useQuery(
-    ["search", url],
+  const { isLoading, data, isError, error, isFetching, refetch } = useQuery(
+    "search",
     fetchTalents,
     { refetchOnWindowFocus: false, enabled: !!searchParams }
   );
+
+  useEffect(() => {
+    refetch();
+    props.onCountHandler(data?.data.total);
+  }, [url, props.page, refetch, data?.data.total]);
 
   if (isLoading) {
     return (

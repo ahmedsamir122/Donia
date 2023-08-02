@@ -19,6 +19,7 @@ const conversationRouter = require("./routes/conversationRoutes");
 const wishListRouter = require("./routes/wishListRoutes");
 const blockRouter = require("./routes/blockRoutes");
 const contractController = require("./controllers/contractController");
+const notificationRouter = require("./routes/notificationRoutes");
 
 const app = express();
 
@@ -35,7 +36,12 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: ["http://localhost:3000", "http://localhost:3001"],
+//   })
+// );
 app.use(
   cors({
     credentials: true,
@@ -68,6 +74,7 @@ app.use("/api/v1/wishList", wishListRouter);
 app.use("/api/v1/block", blockRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/messages", messageRouter);
+app.use("/api/v1/notification", notificationRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`));

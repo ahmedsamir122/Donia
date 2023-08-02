@@ -31,7 +31,6 @@ router
   .post(
     authController.protect,
     contractController.filterContract,
-    contractController.expiredCheck,
     contractController.openContract
   );
 
@@ -52,14 +51,14 @@ router
     contractController.createContract
   );
 
-router
-  .route("/submit/:username")
-  .post(
-    authController.protect,
-    contractController.filterContract,
-    contractController.expiredCheck,
-    contractController.createContract
-  );
+// router
+//   .route("/submit/:username")
+//   .post(
+//     authController.protect,
+//     contractController.filterContract,
+//     contractController.expiredCheck,
+//     contractController.createContract
+//   );
 
 router
   .route("/:id")
@@ -68,11 +67,7 @@ router
     contractController.expiredCheck,
     contractController.getContract
   )
-  .patch(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.updateContract
-  )
+
   .delete(
     authController.protect,
     contractController.expiredCheck,

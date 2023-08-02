@@ -1,37 +1,47 @@
 import HalfRating from "../rating/Rate";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState, useEffect } from "react";
 import classes from "./Filter.module.css";
 import ComboBox from "../inputSelect/InputSelect";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
+import { useLocation } from "react-router-dom";
+
 const Filter = (props) => {
   let [searchParams, setSearchParams] = useSearchParams();
   const [filterRate, setFilterRate] = useState([]);
   const [filterReviews, setFilterReviews] = useState([]);
   const queryRedux = useSelector((state) => state.query.query);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const filterArray = (check, input, prev) => {
-    if (check) {
-      return [...prev, input];
+  const filterRateHandler = (e) => {
+    if (e.target.checked) {
+      setFilterRate((prev) => {
+        return [...prev, e.target.value];
+      });
     } else {
-      const newArray = [...prev];
-      const item = newArray.find((el) => el === input);
-      return newArray.filter((el) => el !== item);
+      setFilterRate((prev) => {
+        const item = filterRate.find((el) => e.target.value === el);
+        return [...filterRate.filter((el) => el !== item)];
+      });
     }
   };
 
-  const filterRateHandler = (e) => {
-    setFilterRate((previous) => {
-      return filterArray(e.target.checked, e.target.value, previous);
-    });
+  const filterReviewsHandler = (e) => {
+    if (e.target.checked) {
+      setFilterReviews((prev) => {
+        return [...prev, e.target.value];
+      });
+    } else {
+      setFilterReviews((prev) => {
+        const item = filterReviews.find((el) => e.target.value === el);
+        return [...filterReviews.filter((el) => el !== item)];
+      });
+    }
   };
 
-  const filterReviewsHandler = (e) => {
-    setFilterReviews((previous) => {
-      return filterArray(e.target.checked, e.target.value, previous);
-    });
-  };
+  console.log(location.search);
 
   useEffect(() => {
     const query = {
@@ -39,19 +49,50 @@ const Filter = (props) => {
       rate: filterRate.join(","),
       reviews: filterReviews.join(","),
     };
+
+    // Remove empty query parameters
     Object.keys(query).forEach((el) => {
       if (query[el] === "") {
         delete query[el];
       }
-      setSearchParams(query);
     });
-  }, [filterRate, setSearchParams, filterReviews]);
+
+    // Update the URL using the navigate function
+
+    // navigate(
+    //   // "/",
+    //   {
+    //     search: new URLSearchParams(query).toString(),
+    //   },
+    //   { replace: true }
+    // );
+    const newsSearchParams = new URLSearchParams(query).toString();
+    navigate(`/search?${newsSearchParams}`);
+
+    console.log(query);
+  }, [filterRate, filterReviews, queryRedux, navigate]);
 
   useEffect(() => {
-    if (searchParams.get("rate") || searchParams.get("reviews")) {
-      setSearchParams(searchParams);
+    const rate = searchParams.get("rate");
+    const reviews = searchParams.get("reviews");
+    console.log(searchParams.get("rate")?.split(","));
+
+    if (rate !== null) {
+      setFilterRate(rate.split(","));
     }
-  }, [searchParams, setSearchParams]);
+    if (reviews !== null) {
+      setFilterReviews(reviews.split(","));
+    }
+    if (rate === null) {
+      setFilterRate([]);
+    }
+    if (reviews === null) {
+      setFilterReviews([]);
+    }
+  }, [location.search, searchParams]);
+
+  console.log(filterRate?.includes("0"));
+  console.log(location);
 
   return (
     <div className={classes.main}>
@@ -71,12 +112,9 @@ const Filter = (props) => {
             type="checkbox"
             id="zero"
             value="0"
-            onClick={filterRateHandler}
-            defaultChecked={
-              searchParams.has("rate")
-                ? searchParams.get("rate").includes("0")
-                : false
-            }
+            onChange={filterRateHandler}
+            checked={filterRate?.includes("0")}
+            readOnly
           />
           <label htmlFor="zero">
             <HalfRating value={0} />{" "}
@@ -87,12 +125,9 @@ const Filter = (props) => {
             type="checkbox"
             value="1"
             id="one"
-            onClick={filterRateHandler}
-            defaultChecked={
-              searchParams.has("rate")
-                ? searchParams.get("rate").includes("1")
-                : false
-            }
+            onChange={filterRateHandler}
+            checked={filterRate?.includes("1")}
+            readOnly
           />
           <label htmlFor="one">
             <HalfRating value={1} />{" "}
@@ -103,12 +138,9 @@ const Filter = (props) => {
             type="checkbox"
             id="two"
             value="2"
-            onClick={filterRateHandler}
-            defaultChecked={
-              searchParams.has("rate")
-                ? searchParams.get("rate").includes("2")
-                : false
-            }
+            onChange={filterRateHandler}
+            checked={filterRate?.includes("2")}
+            readOnly
           />
           <label htmlFor="two">
             <HalfRating value={2} />{" "}
@@ -119,12 +151,9 @@ const Filter = (props) => {
             type="checkbox"
             id="three"
             value="3"
-            onClick={filterRateHandler}
-            defaultChecked={
-              searchParams.has("rate")
-                ? searchParams.get("rate").includes("3")
-                : false
-            }
+            onChange={filterRateHandler}
+            checked={filterRate?.includes("3")}
+            readOnly
           />
           <label htmlFor="three">
             <HalfRating value={3} />{" "}
@@ -135,12 +164,9 @@ const Filter = (props) => {
             type="checkbox"
             id="four"
             value="4"
-            onClick={filterRateHandler}
-            defaultChecked={
-              searchParams.has("rate")
-                ? searchParams.get("rate").includes("4")
-                : false
-            }
+            onChange={filterRateHandler}
+            checked={filterRate?.includes("4")}
+            readOnly
           />
           <label htmlFor="four">
             <HalfRating value={4} />{" "}
@@ -151,12 +177,9 @@ const Filter = (props) => {
             type="checkbox"
             id="five"
             value="5"
-            onClick={filterRateHandler}
-            defaultChecked={
-              searchParams.has("rate")
-                ? searchParams.get("rate").includes("5")
-                : false
-            }
+            onChange={filterRateHandler}
+            checked={filterRate?.includes("5")}
+            readOnly
           />
           <label htmlFor="five">
             <HalfRating value={5} />{" "}
@@ -173,12 +196,9 @@ const Filter = (props) => {
             type="checkbox"
             value="0-4"
             id="five"
-            onClick={filterReviewsHandler}
-            defaultChecked={
-              searchParams.has("reviews")
-                ? searchParams.get("reviews").includes("0-4")
-                : false
-            }
+            onChange={filterReviewsHandler}
+            checked={filterReviews?.includes("0-4")}
+            readOnly
           />
           <label htmlFor="five" className={classes.label}>
             Less than 5
@@ -189,12 +209,9 @@ const Filter = (props) => {
             type="checkbox"
             value="5-9"
             id="ten"
-            onClick={filterReviewsHandler}
-            defaultChecked={
-              searchParams.has("reviews")
-                ? searchParams.get("reviews").includes("5-9")
-                : false
-            }
+            onChange={filterReviewsHandler}
+            checked={filterReviews?.includes("5-9")}
+            readOnly
           />
           <label htmlFor="ten" className={classes.label}>
             5 to 10
@@ -205,12 +222,9 @@ const Filter = (props) => {
             type="checkbox"
             value="10-14"
             id="fifteen"
-            onClick={filterReviewsHandler}
-            defaultChecked={
-              searchParams.has("reviews")
-                ? searchParams.get("reviews").includes("10-14")
-                : false
-            }
+            onChange={filterReviewsHandler}
+            checked={filterReviews?.includes("10-14")}
+            readOnly
           />
           <label htmlFor="fifteen" className={classes.label}>
             10 to 15{" "}
@@ -221,12 +235,9 @@ const Filter = (props) => {
             type="checkbox"
             value="15-19"
             id="twenty"
-            onClick={filterReviewsHandler}
-            defaultChecked={
-              searchParams.has("reviews")
-                ? searchParams.get("reviews").includes("15-19")
-                : false
-            }
+            onChange={filterReviewsHandler}
+            checked={filterReviews?.includes("15-19")}
+            readOnly
           />
           <label htmlFor="twenty" className={classes.label}>
             15 to 20{" "}
@@ -237,12 +248,9 @@ const Filter = (props) => {
             type="checkbox"
             value="20-49"
             id="fifty"
-            onClick={filterReviewsHandler}
-            defaultChecked={
-              searchParams.has("reviews")
-                ? searchParams.get("reviews").includes("20-49")
-                : false
-            }
+            onChange={filterReviewsHandler}
+            checked={filterReviews?.includes("20-49")}
+            readOnly
           />
           <label htmlFor="fifty" className={classes.label}>
             20 to 50{" "}
@@ -253,12 +261,9 @@ const Filter = (props) => {
             type="checkbox"
             value="50-"
             id="above"
-            onClick={filterReviewsHandler}
-            defaultChecked={
-              searchParams.has("reviews")
-                ? searchParams.get("reviews").includes("50-")
-                : false
-            }
+            onChange={filterReviewsHandler}
+            checked={filterReviews?.includes("50-")}
+            readOnly
           />
           <label htmlFor="above" className={classes.label}>
             More than 50{" "}

@@ -50,8 +50,8 @@ const getUser = (userId) => {
 const io = require("socket.io")(server, {
   pingTimeout: 6000,
   cors: {
-    // origin: "http://localhost:3000",
-    origin: "*",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    // origin: "*",
   },
 });
 

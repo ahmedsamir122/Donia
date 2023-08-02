@@ -33,31 +33,7 @@ input:focus,
 input:active {
   outline: none;
 }
-.messCon {
-  padding: 10px;
-  display: flex;
-  align-items: flex-start;
-  cursor: pointer;
-  transition: 0.3s ease;
-}
-.messCon:hover {
-  background-color: #ebe7e7;
-}
-.messContent {
-  padding-left: 10px;
-  flex: 1;
-}
-.messTop {
-  display: flex;
-  justify-content: space-between;
-}
 
-.img {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: block;
-}
 .form {
   position: relative;
   box-sizing: border-box;

@@ -73,11 +73,21 @@ exports.getAllTalents = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate();
+  const totalFeatures = new APIFeatures(
+    User.find({ perform: "talent" }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields();
+
   const users = await features.query;
+  const num = await totalFeatures.query;
 
   res.status(200).json({
     status: "success",
     results: users.length,
+    total: num.length,
     data: {
       users,
     },

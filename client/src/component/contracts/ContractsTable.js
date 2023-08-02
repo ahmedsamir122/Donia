@@ -123,8 +123,8 @@ export default function DataTable(props) {
       <DataGrid
         rows={data}
         columns={columns}
-        pageSize={5}
-        rowsPerPageOptions={[5]}
+        // pageSize={5}
+        // rowsPerPageOptions={[5]}
       />
     </div>
   );

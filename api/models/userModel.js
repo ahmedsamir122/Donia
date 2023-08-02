@@ -125,12 +125,6 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(passwordCandidate, userPassword);
 };
 
-userSchema.virtual("reviewFs", {
-  ref: "ReviewF",
-  localField: "_id",
-  foreignField: "freelancer",
-});
-
 userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   if (this.passwordChangeAt) {
     const changedTimesstamp = parseInt(

@@ -5,9 +5,12 @@
   align-items: center;
   width: 100%;
 }
+.main {
+  width: 100%;
+}
 @media (min-width: 768px) {
   .conArtists {
-    width: 80%;
+    width: 100%;
   }
 }
 
@@ -18,4 +21,7 @@
     grid-column-gap: 14px;
     grid-row-gap: 14px;
   }
+}
+.pagination {
+  padding-bottom: 25px;
 }

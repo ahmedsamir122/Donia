@@ -1,5 +1,6 @@
 const APIFeatures = require("../utils/apiFeatures");
 const Contract = require("../models/contractModel");
+const Notification = require("../models/notificationModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel");
@@ -271,6 +272,11 @@ exports.createContract = catchAsync(async (req, res, next) => {
     client: req.user._id,
   });
 
+  await Notification.create({
+    to: other.id,
+    content: `${other.username} has requested to open a contract with you`,
+  });
+
   res.status(201).json({
     status: "success",
     data: {
@@ -316,24 +322,6 @@ exports.getContract = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!contract) {
-    return next(new AppError("No contract found with that ID", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      contract,
-    },
-  });
-});
-
 exports.deleteContract = catchAsync(async (req, res, next) => {
   const contract = await Contract.findByIdAndDelete(req.params.id);
 
@@ -348,7 +336,10 @@ exports.deleteContract = catchAsync(async (req, res, next) => {
 });
 
 exports.acceptContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.id);
+  const contract = await Contract.findById(req.params.id).populate({
+    path: "freelancer",
+    select: "username",
+  });
 
   if (!contract.freelancer.equals(req.user.id)) {
     return next(new AppError("You can not accept this contract!", 403));
@@ -373,6 +364,14 @@ exports.acceptContract = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
+
+  console.log("note", contract.freelancer);
+
+  await Notification.create({
+    to: contract.freelancer,
+    content: `${contract.freelancer.username} has accepted your offer`,
+  });
+
   res.status(200).json({
     status: "success",
     data: {
@@ -382,7 +381,10 @@ exports.acceptContract = catchAsync(async (req, res, next) => {
 });
 
 exports.submitContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.id);
+  const contract = await Contract.findById(req.params.id).populate({
+    path: "freelancer",
+    select: "username",
+  });
 
   if (!contract.freelancer.equals(req.user.id)) {
     return next(new AppError("You can not accept this contract!", 400));
@@ -404,6 +406,12 @@ exports.submitContract = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
+
+  await Notification.create({
+    to: contract.freelancer,
+    content: `${contract.freelancer.username} has submitted his task`,
+  });
+
   res.status(200).json({
     status: "success",
     data: {
@@ -443,7 +451,10 @@ exports.submitContract = catchAsync(async (req, res, next) => {
 // });
 
 exports.refuseContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.id);
+  const contract = await Contract.findById(req.params.id).populate({
+    path: "freelancer",
+    select: "username",
+  });
 
   if (!contract.freelancer.equals(req.user.id)) {
     return next(new AppError("You can not refuse this contract!", 400));
@@ -461,6 +472,12 @@ exports.refuseContract = catchAsync(async (req, res, next) => {
       runValidators: true,
     }
   );
+
+  await Notification.create({
+    to: contract.freelancer,
+    content: `${contract.freelancer.username} has refused your offer`,
+  });
+
   res.status(200).json({
     status: "success",
     data: {

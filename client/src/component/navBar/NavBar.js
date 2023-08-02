@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { CiChat1 } from "react-icons/ci";
 import { CiBellOn } from "react-icons/ci";
 import { CiSearch } from "react-icons/ci";
-import img1 from "../../img/user2.jpg";
 import AccountModal from "../modal/AccountModal";
 import { Link, useSearchParams } from "react-router-dom";
 import FilterModal from "../modal/FilterModal";
@@ -15,11 +14,14 @@ import { useDispatch } from "react-redux";
 import { queryActions } from "../../store/query";
 import { useNavigate } from "react-router-dom";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import { useQuery } from "react-query";
+import { getWishList, URL } from "../utils/queryFunctions";
 
 const NavBar = (props) => {
   const navigate = useNavigate();
   const [showMessage, setShowMessage] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
+  const [noteNum, setNoteNum] = useState(0);
   const [showAccount, setShowAccount] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -27,6 +29,28 @@ const NavBar = (props) => {
   let [searchParams, setSearchParams] = useSearchParams();
 
   const user = useSelector((state) => state.auth.user);
+  const token = useSelector((state) => state.auth.token);
+
+  const fetchNotifications = () => {
+    return getWishList(`${URL}/api/v1/notification`, token);
+  };
+
+  const onSuccess = (data) => {
+    console.log(data.data.unseenResults);
+    setNoteNum(data.data.unseenResults);
+  };
+
+  const { isLoading, error, data } = useQuery(
+    "notifications",
+    fetchNotifications,
+    {
+      refetchOnWindowFocus: false,
+      enabled: !!user,
+      onSuccess,
+    }
+  );
+
+  console.log(data);
 
   const toggleMessageHandler = () => {
     setShowMessage((prev) => {
@@ -41,6 +65,7 @@ const NavBar = (props) => {
     });
     setShowAccount(false);
     setShowMessage(false);
+    setNoteNum(0);
   };
   const toggleAccountHandler = () => {
     setShowAccount((prev) => {
@@ -89,10 +114,13 @@ const NavBar = (props) => {
             <ul className={classes.ul}>
               <li className={classes.notContainer} onClick={toggleNotesHandler}>
                 <CiBellOn className={classes.not} />
-                {/* <span>1</span> */}
+                {noteNum > 0 && <span>{noteNum}</span>}
               </li>
               {showNotes && (
-                <NotificationModal onNotification={toggleNotesHandler} />
+                <NotificationModal
+                  onNotification={toggleNotesHandler}
+                  dataNotes={data.data}
+                />
               )}
               <li
                 className={classes.notContainer}

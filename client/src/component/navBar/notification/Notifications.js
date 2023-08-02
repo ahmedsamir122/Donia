@@ -1,8 +1,11 @@
 import classes from "./Notifications.module.css";
 import user from "../../../img/user.jpg";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
+import OneConversation from "../../messages/OneConversation";
+import OneNotification from "./OneNotification";
 
 const Notifications = (props) => {
+  console.log(props.dataNotes.data.notifications);
   return (
     <div className={classes.main}>
       <div className={classes.topTitle}>
@@ -11,26 +14,13 @@ const Notifications = (props) => {
         </div>
         <h2 className={classes.title}>Notification</h2>
       </div>
-      <div className={classes.messCon}>
-        <img src={user} alt="" className={classes.img} />
-        <div className={classes.messContent}>
-          <div className={classes.messTop}>
-            <div>email</div>
-            <div>date</div>
-          </div>
-          <div>You: how r u?</div>
-        </div>
-      </div>
-      <div className={classes.messCon}>
-        <img src={user} alt="" className={classes.img} />
-        <div className={classes.messContent}>
-          <div className={classes.messTop}>
-            <div>email</div>
-            <div>date</div>
-          </div>
-          <div>You: how r u?</div>
-        </div>
-      </div>
+      {props.dataNotes.data.notifications.length > 0 &&
+        props.dataNotes.data.notifications.map((note) => (
+          <OneNotification onData={note} />
+        ))}
+      {props.dataNotes.data.notifications.length === 0 && (
+        <div> there is no notifications found</div>
+      )}
     </div>
   );
 };
