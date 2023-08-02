@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
 
 // export const URL = "http://localhost:8000";
-export const URL = "https://donia-gamma.vercel.app";
+export const URL = "https://donia-gx3k-engahmedelmitwalli1-gmailcom.vercel.app";
 export const getWishList = (url, token) => {
   return axios.get(url, {
     withCredentials: true,
