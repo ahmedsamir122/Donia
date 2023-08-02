@@ -31,54 +31,54 @@ const server = app.listen(port, () => {
   console.log(`app is running on port${port}...`);
 });
 
-let users = [];
+// let users = [];
 
-const adduser = (userId, socketId) => {
-  !users.some(
-    (user) => user.userId === userId && users.push({ userId, socketId })
-  );
-};
+// const adduser = (userId, socketId) => {
+//   !users.some(
+//     (user) => user.userId === userId && users.push({ userId, socketId })
+//   );
+// };
 
-const removeuser = (socketId) => {
-  users.filter((user) => user.socketId !== socketId);
-};
+// const removeuser = (socketId) => {
+//   users.filter((user) => user.socketId !== socketId);
+// };
 
-const getUser = (userId) => {
-  return users.find((user) => user.userId === userId);
-};
+// const getUser = (userId) => {
+//   return users.find((user) => user.userId === userId);
+// };
 
-const io = require("socket.io")(server, {
-  pingTimeout: 6000,
-  cors: {
-    origin: ["http://localhost:3000", "http://localhost:3001"],
-    // origin: "*",
-  },
-});
+// const io = require("socket.io")(server, {
+//   pingTimeout: 6000,
+//   cors: {
+//     origin: ["http://localhost:3000", "http://localhost:3001"],
+//     // origin: "*",
+//   },
+// });
 
-io.on("connection", (socket) => {
-  console.log("auser connected.");
-  socket.on("addUser", (userId) => {
-    adduser(userId, socket.id);
-  });
+// io.on("connection", (socket) => {
+//   console.log("auser connected.");
+//   socket.on("addUser", (userId) => {
+//     adduser(userId, socket.id);
+//   });
 
-  //send and get message
-  socket.on("sendMessage", ({ senderId, recieverId, conversationId, text }) => {
-    const user = getUser(recieverId);
-    console.log(senderId);
-    if (user) {
-      io.to(user.socketId).emit("getMessage", {
-        senderId,
-        text,
-        conversationId,
-      });
-    }
-  });
+//send and get message
+// socket.on("sendMessage", ({ senderId, recieverId, conversationId, text }) => {
+//   const user = getUser(recieverId);
+//   console.log(senderId);
+//   if (user) {
+//     io.to(user.socketId).emit("getMessage", {
+//       senderId,
+//       text,
+//       conversationId,
+//     });
+//   }
+// });
 
-  socket.on("disconnect", () => {
-    console.log("user disconnected");
-    removeuser(socket.id);
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("user disconnected");
+//     removeuser(socket.id);
+//   });
+// });
 
 process.on("unhandledRejection", (err) => {
   console.log(err.name, err.message);
