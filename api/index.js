@@ -62,17 +62,17 @@ const server = app.listen(port, () => {
 //   });
 
 //send and get message
-// socket.on("sendMessage", ({ senderId, recieverId, conversationId, text }) => {
-//   const user = getUser(recieverId);
-//   console.log(senderId);
-//   if (user) {
-//     io.to(user.socketId).emit("getMessage", {
-//       senderId,
-//       text,
-//       conversationId,
-//     });
-//   }
-// });
+//   socket.on("sendMessage", ({ senderId, recieverId, conversationId, text }) => {
+//     const user = getUser(recieverId);
+//     console.log(senderId);
+//     if (user) {
+//       io.to(user.socketId).emit("getMessage", {
+//         senderId,
+//         text,
+//         conversationId,
+//       });
+//     }
+//   });
 
 //   socket.on("disconnect", () => {
 //     console.log("user disconnected");

@@ -29,7 +29,7 @@ import React from "react";
 import WishList from "./pages/WishList";
 import { getWishList, URL } from "./component/utils/queryFunctions";
 import Success from "./pages/Success";
-import { io } from "socket.io-client";
+// import { io } from "socket.io-client";
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -81,7 +81,7 @@ function App() {
   const dispatch = useDispatch();
   const token = localStorage.getItem("token") || "";
   const tokenRed = useSelector((state) => state.auth.token);
-  const socket = useSelector((state) => state.socket.socket);
+  // const socket = useSelector((state) => state.socket.socket);
   const user = useSelector((state) => state.auth.user);
 
   const getMyProfile = () => {
@@ -128,19 +128,19 @@ function App() {
     enabled: false,
   });
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-    dispatch(socketActions.getSocket(io(URL)));
-  }, [user]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     return;
+  //   }
+  //   dispatch(socketActions.getSocket(io(URL)));
+  // }, [user]);
 
-  useEffect(() => {
-    if (!user) {
-      return;
-    }
-    socket?.emit("addUser", user?._id);
-  }, [user, socket]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     return;
+  //   }
+  //   socket?.emit("addUser", user?._id);
+  // }, [user, socket]);
 
   useEffect(() => {
     if (!token) {
