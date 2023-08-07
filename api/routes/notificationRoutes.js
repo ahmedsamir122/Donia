@@ -9,4 +9,11 @@ router
   .get(authController.protect, notificationController.getNotifications)
   .patch(authController.protect, notificationController.seeNotifications);
 
+router
+  .route("/:id")
+  .delete(
+    authController.protect,
+    notificationController.deleteOneNotifications
+  );
+
 module.exports = router;

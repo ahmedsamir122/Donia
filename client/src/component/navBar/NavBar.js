@@ -15,7 +15,8 @@ import { queryActions } from "../../store/query";
 import { useNavigate } from "react-router-dom";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import { useQuery } from "react-query";
-import { getWishList, URL } from "../utils/queryFunctions";
+import { getWishList, URL, updateFileData } from "../utils/queryFunctions";
+import { useMutation } from "react-query";
 
 const NavBar = (props) => {
   const navigate = useNavigate();
@@ -35,10 +36,25 @@ const NavBar = (props) => {
     return getWishList(`${URL}/api/v1/notification`, token);
   };
 
+  const updateNotificationSee = () => {
+    return updateFileData(`${URL}/api/v1/notification`, null, token);
+  };
+
   const onSuccess = (data) => {
     console.log(data.data.unseenResults);
     setNoteNum(data.data.unseenResults);
   };
+
+  const {
+    mutate,
+    isError,
+    error: errorUpdateNotes,
+  } = useMutation(updateNotificationSee, {
+    onSuccess: (data) => {
+      console.log("success");
+      setNoteNum(0);
+    },
+  });
 
   const { isLoading, error, data } = useQuery(
     "notifications",
@@ -65,7 +81,7 @@ const NavBar = (props) => {
     });
     setShowAccount(false);
     setShowMessage(false);
-    setNoteNum(0);
+    mutate();
   };
   const toggleAccountHandler = () => {
     setShowAccount((prev) => {

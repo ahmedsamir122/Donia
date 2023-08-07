@@ -270,7 +270,7 @@ const Filter = (props) => {
           </label>
         </div>
       </div>
-      <div className={classes.filterCon}>
+      {/* <div className={classes.filterCon}>
         <div className={classes.filterTop}>
           <h2 className={classes.filterName}>City</h2>
           <h2 className={classes.filterClear}>clear</h2>
@@ -278,7 +278,7 @@ const Filter = (props) => {
         <div className={classes.filterBottom}>
           <ComboBox />
         </div>
-      </div>
+      </div> */}
       <div className={classes.filterButton}>
         <button>See results</button>
       </div>

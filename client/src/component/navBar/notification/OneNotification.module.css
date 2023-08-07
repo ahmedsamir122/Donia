@@ -1,25 +1,28 @@
 .messCon {
   padding: 10px;
-  display: flex;
-  align-items: flex-start;
-  cursor: pointer;
   transition: 0.3s ease;
+  cursor: default;
+  position: relative;
 }
 .messCon:hover {
   background-color: #ebe7e7;
 }
-.messContent {
-  padding-left: 10px;
-  flex: 1;
-}
-.messTop {
-  display: flex;
-  justify-content: space-between;
-}
 
-.img {
-  width: 30px;
-  height: 30px;
+.button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 5px;
+  border: 1px solid black;
   border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  display: none;
+}
+.messCon:hover .button {
   display: block;
+}
+.timeAgo {
+  font-size: 13px;
+  color: #139ff0;
 }
