@@ -26,7 +26,7 @@ const MeProfile = (props) => {
   };
   return (
     <div>
-      <NavBar />
+      {/* <NavBar /> */}
       <TalentOne
         onData={user}
         showEdit={props.showEdit}

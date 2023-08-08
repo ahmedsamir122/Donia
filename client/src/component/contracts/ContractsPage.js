@@ -4,7 +4,7 @@ import ContractsContent from "./ContractsContent";
 const ContractPage = () => {
   return (
     <React.Fragment>
-      <NavBar />
+      {/* <NavBar /> */}
       <ContractsContent />
     </React.Fragment>
   );

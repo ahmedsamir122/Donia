@@ -4,7 +4,7 @@ import JobsContent from "./JobsContent";
 const JobsPage = () => {
   return (
     <React.Fragment>
-      <NavBar />
+      {/* <NavBar /> */}
       <section className="container">
         <JobsContent />
       </section>

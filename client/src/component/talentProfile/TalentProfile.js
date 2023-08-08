@@ -3,7 +3,7 @@ import TalentOne from "./TalentOne";
 const TalentProfile = (props) => {
   return (
     <div>
-      <NavBar />
+      {/* <NavBar /> */}
       <TalentOne
         onData={props.onData}
         showEdit={props.showEdit}

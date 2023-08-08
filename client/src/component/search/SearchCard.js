@@ -4,7 +4,7 @@ import Talents from "./Talents";
 const SearchCard = () => {
   return (
     <React.Fragment>
-      <NavBar />
+      {/* <NavBar /> */}
       <Talents />
     </React.Fragment>
   );

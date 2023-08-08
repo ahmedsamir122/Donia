@@ -4,7 +4,7 @@ import TalentOne from "./TalentOne";
 const ClientProfile = (props) => {
   return (
     <div>
-      <NavBar />
+      {/* <NavBar /> */}
       <TalentOne
         onData={props.onData}
         showEdit={props.showEdit}

@@ -4,7 +4,7 @@ import WishListContent from "./WishListContent";
 const WishListCard = () => {
   return (
     <React.Fragment>
-      <NavBar />
+      {/* <NavBar /> */}
       <WishListContent />
     </React.Fragment>
   );

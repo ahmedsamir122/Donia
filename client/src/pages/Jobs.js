@@ -5,7 +5,7 @@ const Jobs = () => {
   return (
     <React.Fragment>
       <JobsPage />
-      <Outlet />
+      {/* <Outlet /> */}
     </React.Fragment>
   );
 };

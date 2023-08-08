@@ -4,7 +4,7 @@ import MessageContent from "./MessagesContent";
 const MessagesPage = () => {
   return (
     <>
-      <NavBar />
+      {/* <NavBar /> */}
       <MessageContent />
     </>
   );

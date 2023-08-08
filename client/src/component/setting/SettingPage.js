@@ -4,7 +4,7 @@ import SettingContent from "./SettingContent";
 const SettingPage = () => {
   return (
     <React.Fragment>
-      <NavBar />
+      {/* <NavBar /> */}
       <SettingContent />
     </React.Fragment>
   );

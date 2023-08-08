@@ -29,53 +29,9 @@ import React from "react";
 import WishList from "./pages/WishList";
 import { getWishList, URL } from "./component/utils/queryFunctions";
 import Success from "./pages/Success";
+import NavBar from "./component/navBar/NavBar";
+import { Outlet } from "react-router-dom";
 // import { io } from "socket.io-client";
-
-const router = createBrowserRouter([
-  { path: "/", element: <Home /> },
-  { path: "/signup", element: <SignUp /> },
-  { path: "/signin", element: <SignIn /> },
-  { path: "/contracts", element: <Contracts /> },
-  {
-    path: "/messages",
-    element: (
-      <ProtectedRoute>
-        <Messages />
-      </ProtectedRoute>
-    ),
-
-    children: [
-      { path: "/messages/", element: <EmptyRoom /> },
-      { path: "/messages/:messageId", element: <ChatRoom /> },
-    ],
-  },
-  {
-    path: "/settings",
-    element: <Setting />,
-    children: [
-      { path: "/settings", element: <General /> },
-      { path: "/settings/generalInfo/", element: <General /> },
-      { path: "/settings/phoneNumber/", element: <PhoneNumber /> },
-      { path: "/settings/password/", element: <Password /> },
-      { path: "/settings/blockedList/", element: <BlockedList /> },
-      { path: "/settings/typeAccount/", element: <Type /> },
-      { path: "/settings/deleteAccount/", element: <DeleteAccount /> },
-    ],
-  },
-  { path: "/contracts/:contractId", element: <OneContract /> },
-  {
-    path: "/:username",
-    element: <Talent />,
-  },
-  {
-    path: "/u/:usernameClient",
-    element: <Client />,
-  },
-  { path: "/search", element: <Search /> },
-  { path: "/wishList", element: <WishList /> },
-  { path: "/talent", element: <Talent /> },
-  { path: "/success", element: <Success /> },
-]);
 
 function App() {
   const dispatch = useDispatch();
@@ -83,6 +39,58 @@ function App() {
   const tokenRed = useSelector((state) => state.auth.token);
   // const socket = useSelector((state) => state.socket.socket);
   const user = useSelector((state) => state.auth.user);
+
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <NavBar />,
+      children: [
+        { path: "/", element: <Home /> },
+        { path: "/signup", element: <SignUp /> },
+        { path: "/signin", element: <SignIn /> },
+        { path: "/contracts", element: <Contracts /> },
+        {
+          path: "/messages",
+          element: (
+            <ProtectedRoute>
+              <Messages />
+            </ProtectedRoute>
+          ),
+
+          children: [
+            { path: "/messages/", element: <EmptyRoom /> },
+            { path: "/messages/:messageId", element: <ChatRoom /> },
+          ],
+        },
+        {
+          path: "/settings",
+          element: <Setting />,
+          children: [
+            { path: "/settings", element: <General /> },
+            { path: "/settings/generalInfo/", element: <General /> },
+            { path: "/settings/phoneNumber/", element: <PhoneNumber /> },
+            { path: "/settings/password/", element: <Password /> },
+            { path: "/settings/blockedList/", element: <BlockedList /> },
+            { path: "/settings/typeAccount/", element: <Type /> },
+            { path: "/settings/deleteAccount/", element: <DeleteAccount /> },
+          ],
+        },
+        { path: "/contracts/:contractId", element: <OneContract /> },
+        {
+          path: "/:username",
+          element: <Talent />,
+        },
+        {
+          path: "/u/:usernameClient",
+          element: <Client />,
+        },
+        { path: "/search", element: <Search /> },
+        { path: "/wishList", element: <WishList /> },
+        { path: "/talent", element: <Talent /> },
+        { path: "/success", element: <Success /> },
+      ],
+    },
+  ]);
 
   const getMyProfile = () => {
     return getWishList(`${URL}/api/v1/users/me`, token);
@@ -127,20 +135,6 @@ function App() {
     refetchOnWindowFocus: false,
     enabled: false,
   });
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     return;
-  //   }
-  //   dispatch(socketActions.getSocket(io(URL)));
-  // }, [user]);
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     return;
-  //   }
-  //   socket?.emit("addUser", user?._id);
-  // }, [user, socket]);
 
   useEffect(() => {
     if (!token) {

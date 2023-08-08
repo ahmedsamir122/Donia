@@ -2,8 +2,8 @@ import axios from "axios";
 import { useMutation, useQueryClient } from "react-query";
 import { useSelector } from "react-redux";
 
-// export const URL = "http://localhost:8000";
-export const URL = "https://donia-gx3k-engahmedelmitwalli1-gmailcom.vercel.app";
+export const URL = "http://localhost:8000";
+// export const URL = "https://donia-gx3k-engahmedelmitwalli1-gmailcom.vercel.app";
 export const getWishList = (url, token) => {
   return axios.get(url, {
     withCredentials: true,
@@ -75,3 +75,7 @@ export const useEditContractActivity = () => {
     },
   });
 };
+
+   // "start:port1": "react-scripts start",
+    // "start:port2": "PORT=3001 react-scripts start",
+    // "start:both": "concurrently \"npm run start:port1\" \"npm run start:port2\"",

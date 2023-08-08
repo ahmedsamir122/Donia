@@ -4,7 +4,7 @@ import { CiChat1 } from "react-icons/ci";
 import { CiBellOn } from "react-icons/ci";
 import { CiSearch } from "react-icons/ci";
 import AccountModal from "../modal/AccountModal";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, Outlet, useSearchParams } from "react-router-dom";
 import FilterModal from "../modal/FilterModal";
 import NotificationModal from "../modal/NotificationModal";
 import MessageModal from "../modal/MessageModal";
@@ -111,62 +111,81 @@ const NavBar = (props) => {
   };
 
   return (
-    <header>
-      <div className="container">
-        <div className={classes.main}>
-          <Link className={classes.logo} to="/">
-            Donia
-          </Link>
-          <form className={classes.form} onSubmit={submitHandler}>
-            <input type="search" defaultValue={""} onChange={inputHandler} />
-            <button className={classes.button}>
-              <CiSearch className={classes.iconSearch} />
-            </button>
-            <div className={classes.filterButton} onClick={toggleFilterHandler}>
-              <TuneIcon />
-            </div>
-          </form>
-          {user && (
-            <ul className={classes.ul}>
-              <li className={classes.notContainer} onClick={toggleNotesHandler}>
-                <CiBellOn className={classes.not} />
-                {noteNum > 0 && <span>{noteNum}</span>}
-              </li>
-              {showNotes && (
-                <NotificationModal
-                  onNotification={toggleNotesHandler}
-                  dataNotes={data.data}
+    <>
+      {user && (
+        <header>
+          <div className="container">
+            <div className={classes.main}>
+              <Link className={classes.logo} to="/">
+                Donia
+              </Link>
+              <form className={classes.form} onSubmit={submitHandler}>
+                <input
+                  type="search"
+                  defaultValue={""}
+                  onChange={inputHandler}
                 />
+                <button className={classes.button}>
+                  <CiSearch className={classes.iconSearch} />
+                </button>
+                <div
+                  className={classes.filterButton}
+                  onClick={toggleFilterHandler}
+                >
+                  <TuneIcon />
+                </div>
+              </form>
+              {user && (
+                <ul className={classes.ul}>
+                  <li
+                    className={classes.notContainer}
+                    onClick={toggleNotesHandler}
+                  >
+                    <CiBellOn className={classes.not} />
+                    {noteNum > 0 && <span>{noteNum}</span>}
+                  </li>
+                  {showNotes && (
+                    <NotificationModal
+                      onNotification={toggleNotesHandler}
+                      dataNotes={data.data}
+                    />
+                  )}
+                  <li
+                    className={classes.notContainer}
+                    onClick={toggleMessageHandler}
+                  >
+                    <CiChat1 className={classes.mes} />
+                    {/* <span>1</span> */}
+                  </li>
+                  <li
+                    className={classes.notContainer}
+                    onClick={() => navigate("/contracts")}
+                  >
+                    <LibraryBooksIcon className={classes.mes} />
+                  </li>
+                  {showMessage && (
+                    <MessageModal onMessage={toggleMessageHandler} />
+                  )}
+                  <li className={classes.user} onClick={toggleAccountHandler}>
+                    <img src={user.photo} alt="" className={classes.img} />
+                  </li>
+                  {showAccount && (
+                    <AccountModal onAccount={toggleAccountHandler} />
+                  )}
+                </ul>
               )}
-              <li
-                className={classes.notContainer}
-                onClick={toggleMessageHandler}
-              >
-                <CiChat1 className={classes.mes} />
-                {/* <span>1</span> */}
-              </li>
-              <li
-                className={classes.notContainer}
-                onClick={() => navigate("/contracts")}
-              >
-                <LibraryBooksIcon className={classes.mes} />
-              </li>
-              {showMessage && <MessageModal onMessage={toggleMessageHandler} />}
-              <li className={classes.user} onClick={toggleAccountHandler}>
-                <img src={user.photo} alt="" className={classes.img} />
-              </li>
-              {showAccount && <AccountModal onAccount={toggleAccountHandler} />}
-            </ul>
-          )}
-          {!user && (
-            <Link to="/signin" className={classes.login}>
-              login
-            </Link>
-          )}
-        </div>
-      </div>
-      {showFilter && <FilterModal onFilter={toggleFilterHandler} />}
-    </header>
+              {!user && (
+                <Link to="/signin" className={classes.login}>
+                  login
+                </Link>
+              )}
+            </div>
+          </div>
+          {showFilter && <FilterModal onFilter={toggleFilterHandler} />}
+        </header>
+      )}
+      <Outlet />
+    </>
   );
 };
 
