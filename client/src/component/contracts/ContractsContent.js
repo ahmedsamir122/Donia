@@ -8,6 +8,7 @@ import { URL, getWishList } from "../utils/queryFunctions";
 import { useEffect } from "react";
 import ContractContentOneMobil from "./ContractContentOneMobil";
 import Loading from "../loading/Loading";
+import ContractsTableHtml from "./ContractsTableHtml";
 
 const ContractsContent = () => {
   const [talent, setTalent] = useState(true);
@@ -145,13 +146,21 @@ const ContractsContent = () => {
             Active
           </p>
         </div> */}
-        {dataContract.length > 0 && (
+        {/* {dataContract.length > 0 && (
           <DataTable
             client={client}
             onData={dataContract}
             onClick={showReviewHandler}
           />
+        )} */}
+        {dataContract.length > 0 && (
+          <ContractsTableHtml
+            client={client}
+            onData={dataContract}
+            onClick={showReviewHandler}
+          />
         )}
+
         {dataContract.length === 0 && <p>your contract list is empty</p>}
         <div className={classes.dataCon}>
           {dataContract.length > 0 &&

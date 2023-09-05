@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
@@ -31,10 +35,12 @@ import { getWishList, URL } from "./component/utils/queryFunctions";
 import Success from "./pages/Success";
 import NavBar from "./component/navBar/NavBar";
 import { Outlet } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 // import { io } from "socket.io-client";
 
 function App() {
   const dispatch = useDispatch();
+  // const navigate = useNavigate();
   const token = localStorage.getItem("token") || "";
   const tokenRed = useSelector((state) => state.auth.token);
   // const socket = useSelector((state) => state.socket.socket);
@@ -107,6 +113,7 @@ function App() {
   const {
     isLoading: loadingProfile,
     error: errorProfile,
+    isError: isErrorProfile,
     data: dataProfile,
     refetch: refetchProfil,
   } = useQuery("myProfil", getMyProfile, {
@@ -119,6 +126,7 @@ function App() {
   const {
     isLoading: loadingWishList,
     error: errorWishList,
+    isError: isErrorWishList,
     data: dataWishList,
     refetch: refetchWishList,
   } = useQuery("wishList", fetchWishList, {
@@ -129,6 +137,7 @@ function App() {
   const {
     isLoading: loadingBlockList,
     error: errorBlockList,
+    isError: isErrorBlockList,
     data: dataBlockList,
     refetch: refetchBlockList,
   } = useQuery("blockList", fetchBlockList, {
@@ -172,6 +181,12 @@ function App() {
     dataWishList?.data.data.allWishList,
     dataBlockList?.data.data.allBlockList,
   ]);
+
+  if (isErrorProfile || isErrorBlockList || isErrorWishList) {
+    localStorage.removeItem("token");
+    // navigate("/");
+    return;
+  }
 
   return <RouterProvider router={router} />;
 }
