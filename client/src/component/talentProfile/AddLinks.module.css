@@ -92,10 +92,4 @@
   .formCon {
     height: calc(100vh - 34px);
   }
-  .buttonFilter {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    margin-bottom: 0px;
-  }
 }
