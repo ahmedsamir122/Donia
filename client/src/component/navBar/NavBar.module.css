@@ -67,9 +67,22 @@
   cursor: pointer;
 }
 
+/* .lang{
+
+} */
+
 @media (max-width: 767px) {
   .button {
     right: 40px;
+  }
+}
+@media (min-width: 767px) and (max-width: 990px) {
+  .logo {
+    margin-right: 16px;
+  }
+
+  .form {
+    width: 300px;
   }
 }
 .not,

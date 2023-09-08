@@ -30,28 +30,50 @@ const Account = (props) => {
         </div>
         <h2 className={classes.title}>Account</h2>
       </div>
-      <div className={classes.messCon}>
+      <Link
+        className={classes.messCon}
+        to={`/${user.username}`}
+        onClick={() => props.onAccount()}
+      >
         <img src={user.photo} alt="" className={classes.img} />
-        <Link to={`/${user.username}`} className={classes.messContent}>
-          <div>{user.username}</div>
-        </Link>
-      </div>
-      <Link to={`/${user.username}`} className={classes.viewProfile}>
+        <span className={classes.username}>{user.username}</span>
+      </Link>
+      <Link
+        to={`/${user.username}`}
+        className={classes.viewProfile}
+        onClick={() => props.onAccount()}
+      >
         View Profile
       </Link>
-      <Link className={classes.item} to="/settings">
+      <Link
+        className={classes.item}
+        to="/settings"
+        onClick={() => props.onAccount()}
+      >
         <SettingsIcon className={classes.icon} />
         <div className={classes.iconName}>Setting & privacy</div>
       </Link>
-      <Link className={classes.item} to="/contracts">
+      <Link
+        className={classes.item}
+        to="/contracts"
+        onClick={() => props.onAccount()}
+      >
         <LibraryBooksIcon className={classes.icon} />
         <div className={classes.iconName}>Contracts</div>
       </Link>
-      <Link className={classes.item} to="/wishList">
+      <Link
+        className={classes.item}
+        to="/wishList"
+        onClick={() => props.onAccount()}
+      >
         <AiOutlineHeart className={classes.icon} />
         <div className={classes.iconName}>My Wishlist</div>
       </Link>
-      <Link className={classes.item} to="/help">
+      <Link
+        className={classes.item}
+        to="/help"
+        onClick={() => props.onAccount()}
+      >
         <HelpIcon className={classes.icon} />
         <div className={classes.iconName}>Help</div>
       </Link>

@@ -1,7 +1,5 @@
 import classes from "./Notifications.module.css";
-import user from "../../../img/user.jpg";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
-import OneConversation from "../../messages/OneConversation";
 import OneNotification from "./OneNotification";
 
 const Notifications = (props) => {

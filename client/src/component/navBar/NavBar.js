@@ -17,7 +17,7 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import { useQuery } from "react-query";
 import { getWishList, URL, updateFileData } from "../utils/queryFunctions";
 import { useMutation } from "react-query";
-
+import { useTranslation } from "react-i18next";
 const NavBar = (props) => {
   const navigate = useNavigate();
   const [showMessage, setShowMessage] = useState(false);
@@ -28,6 +28,7 @@ const NavBar = (props) => {
   const [searchInput, setSearchInput] = useState("");
   const dispatch = useDispatch();
   let [searchParams, setSearchParams] = useSearchParams();
+  const { t, i18n } = useTranslation();
 
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
@@ -110,6 +111,15 @@ const NavBar = (props) => {
     dispatch(queryActions.addQuery(searchInput));
   };
 
+  const changeLanguageHandler = (e) => {
+    if (e.target.value === "En") {
+      i18n.changeLanguage("en");
+    }
+    if (e.target.value === "Bah") {
+      i18n.changeLanguage("bah");
+    }
+  };
+
   return (
     <>
       {user && (
@@ -117,7 +127,7 @@ const NavBar = (props) => {
           <div className="container">
             <div className={classes.main}>
               <Link className={classes.logo} to="/">
-                Donia
+                {t("test")}
               </Link>
               <form className={classes.form} onSubmit={submitHandler}>
                 <input
@@ -137,6 +147,12 @@ const NavBar = (props) => {
               </form>
               {user && (
                 <ul className={classes.ul}>
+                  <li className={classes.lang}>
+                    <select onChange={changeLanguageHandler}>
+                      <option value="En">EN</option>
+                      <option value="Bah">BAH</option>
+                    </select>
+                  </li>
                   <li
                     className={classes.notContainer}
                     onClick={toggleNotesHandler}
