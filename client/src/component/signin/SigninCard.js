@@ -20,7 +20,7 @@ const SigninCard = () => {
 
   const { mutate, isError, error } = useMutation(postData, {
     onSuccess: (data) => {
-      console.log(data.data.data.user);
+      console.log(data.data.token);
       localStorage.setItem("token", data.data.token);
       // dispatch(authActions.login(data.data.data.user));
       dispatch(authActions.getToken(data.data.token));

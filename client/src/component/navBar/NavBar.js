@@ -18,6 +18,10 @@ import { useQuery } from "react-query";
 import { getWishList, URL, updateFileData } from "../utils/queryFunctions";
 import { useMutation } from "react-query";
 import { useTranslation } from "react-i18next";
+import { authActions } from "../../store/login-slice";
+import { blocklistActions } from "../../store/blocklist";
+import { wishlistActions } from "../../store/wishlist";
+import NavBarHome from "./NavBarHome";
 const NavBar = (props) => {
   const navigate = useNavigate();
   const [showMessage, setShowMessage] = useState(false);
@@ -32,6 +36,103 @@ const NavBar = (props) => {
 
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
+  const tokenLocal = localStorage.getItem("token") || "";
+
+  const getMyProfile = () => {
+    return getWishList(`${URL}/api/v1/users/me`, tokenLocal);
+  };
+
+  const fetchWishList = () => {
+    return getWishList(`${URL}/api/v1/wishList`, tokenLocal);
+  };
+
+  const fetchBlockList = () => {
+    return getWishList(`${URL}/api/v1/block`, tokenLocal);
+  };
+
+  const {
+    isLoading: loadingProfile,
+    error: errorProfile,
+    isError: isErrorProfile,
+    data: dataProfile,
+    refetch: refetchProfil,
+  } = useQuery("myProfil", getMyProfile, {
+    enabled: false, // Only execute the query if userId is truthy
+
+    // enabled: !!token, // Only execute the query if userId is truthy
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    isLoading: loadingWishList,
+    error: errorWishList,
+    isError: isErrorWishList,
+    data: dataWishList,
+    refetch: refetchWishList,
+  } = useQuery("wishList", fetchWishList, {
+    enabled: false, // Only execute the query if userId is truthy
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    isLoading: loadingBlockList,
+    error: errorBlockList,
+    isError: isErrorBlockList,
+    data: dataBlockList,
+    refetch: refetchBlockList,
+  } = useQuery("blockList", fetchBlockList, {
+    refetchOnWindowFocus: false,
+    enabled: false,
+  });
+
+  useEffect(() => {
+    if (!tokenLocal) {
+      return;
+    }
+
+    if (tokenLocal && loadingProfile) {
+      return;
+    }
+
+    refetchProfil();
+    refetchWishList();
+    refetchBlockList();
+  }, [
+    token,
+    tokenLocal,
+    isErrorProfile,
+    refetchBlockList,
+    refetchWishList,
+    refetchProfil,
+  ]);
+  useEffect(() => {
+    if (!tokenLocal || !dataProfile?.data.data?.user) {
+      return;
+    }
+    const wishlistRed = dataWishList?.data.data.allWishList.map((item) => ({
+      user: item.other.id,
+      photo: item.other.photo,
+      username: item.other.username,
+    }));
+
+    const blocklistRed = dataBlockList?.data.data.allBlockUsers.map((item) => ({
+      user: item.other.id,
+      photo: item.other.photo,
+      username: item.other.username,
+    }));
+
+    dispatch(authActions.getToken(tokenLocal));
+    dispatch(authActions.login(dataProfile?.data.data.user));
+    dispatch(wishlistActions.replaceWishList(wishlistRed || []));
+    dispatch(blocklistActions.replaceBlockList(blocklistRed || []));
+  }, [
+    dataProfile?.data.data?.user,
+    token,
+    dispatch,
+    tokenLocal,
+    dataWishList?.data.data.allWishList,
+    dataBlockList?.data.data.allBlockList,
+  ]);
 
   const fetchNotifications = () => {
     return getWishList(`${URL}/api/v1/notification`, token);
@@ -200,6 +301,7 @@ const NavBar = (props) => {
           {showFilter && <FilterModal onFilter={toggleFilterHandler} />}
         </header>
       )}
+      {!user && <NavBarHome />}
       <Outlet />
     </>
   );

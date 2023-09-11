@@ -7,7 +7,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   return (
     <section className={classes.main}>
-      <div className="container">
+      {/* <div className="container">
         <header className={classes.top}>
           <div>
             <Link className={classes.logo} to="/">
@@ -20,7 +20,7 @@ const HomePage = () => {
             </Link>
           </div>
         </header>
-      </div>
+      </div> */}
 
       <div className={classes.bottom}>
         <img className={classes.img} src={background} alt="" />

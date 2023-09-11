@@ -1,0 +1,29 @@
+.top {
+  height: 76px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.logo {
+  text-decoration: none;
+  line-height: 21px;
+  font-size: 22px;
+  font-weight: bold;
+  font-style: italic;
+  color: black;
+}
+
+.login {
+  font-weight: bold;
+  font-size: 18px;
+  padding-right: 20px;
+  cursor: pointer;
+  color: #1772eb;
+  text-decoration: none;
+}
+.login:hover {
+  text-decoration: underline;
+  color: #139ff0;
+}
