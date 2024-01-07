@@ -24,6 +24,10 @@ const SigninCard = () => {
       localStorage.setItem("token", data.data.token);
       // dispatch(authActions.login(data.data.data.user));
       dispatch(authActions.getToken(data.data.token));
+
+      const expiration = new Date();
+      expiration.setHours(expiration.getHours() + 48);
+      localStorage.setItem("expiration", expiration.toISOString());
       navigate("/");
     },
   });

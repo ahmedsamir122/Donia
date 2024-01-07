@@ -18,6 +18,14 @@ exports.getAllContracts = catchAsync(async (req, res, next) => {
       .populate({
         path: "reviewCs",
         select: "review rating",
+      })
+      .populate({
+        path: "freelancer",
+        select: "username",
+      })
+      .populate({
+        path: "client",
+        select: "username",
       }),
     req.query
   )
@@ -104,6 +112,51 @@ exports.getMyContractsC = catchAsync(async (req, res, next) => {
     .populate({
       path: "freelancer",
       select: "username",
+    })
+    .populate("reviewCs")
+    .populate("reviewFs");
+
+  res.status(200).json({
+    status: "success",
+    results: contracts.length,
+    data: {
+      contracts,
+    },
+  });
+});
+
+exports.getPublicContractsFAdmin = catchAsync(async (req, res, next) => {
+  const talent = await User.findOne({ username: req.params.username });
+  const contracts = await Contract.find({ freelancer: talent._id })
+    .populate({
+      path: "client",
+      select: "username photo",
+    })
+    .populate({
+      path: "freelancer",
+      select: "username photo",
+    })
+    .populate("reviewCs")
+    .populate("reviewFs");
+
+  res.status(200).json({
+    status: "success",
+    results: contracts.length,
+    data: {
+      contracts,
+    },
+  });
+});
+exports.getPublicContractsCAdmin = catchAsync(async (req, res, next) => {
+  const talent = await User.findOne({ username: req.params.username });
+  const contracts = await Contract.find({ client: talent._id })
+    .populate({
+      path: "client",
+      select: "username photo",
+    })
+    .populate({
+      path: "freelancer",
+      select: "username photo",
     })
     .populate("reviewCs")
     .populate("reviewFs");
@@ -217,8 +270,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
     mode: "payment",
     // success_url: `${req.protocol}://${req.get("host")}/success`,
-    // success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
-    success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    // success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
     // cancel_url: `${req.protocol}://${req.get("host")}/${req.params.username}`,
     cancel_url: `https://donia-v1dk-ahmedsamir122.vercel.app/${req.params.username}`,
     customer_email: req.user.email,

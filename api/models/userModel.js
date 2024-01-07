@@ -81,6 +81,18 @@ const userSchema = new mongoose.Schema(
       enum: ["admin", "user", "supervisor"],
       default: "user",
     },
+    status: {
+      type: String,
+      enum: [
+        "active",
+        "three-days",
+        "one-week",
+        "two-week",
+        "one-month",
+        "diactive",
+      ],
+      default: "active",
+    },
     links: [String],
     phone: {
       type: Number,
@@ -90,6 +102,7 @@ const userSchema = new mongoose.Schema(
       default: Date.now(),
       select: false,
     },
+    blockUntill: Date,
     passwordChangeAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,

@@ -5,12 +5,27 @@ const authController = require("../controllers/authController");
 
 const router = express.Router();
 
+router.route("/").get(contractController.getAllContracts);
 router
   .route("/public-contractsF/:username")
   .get(contractController.getPublicContractsF);
 router
+  .route("/public-admin-contractsF/:username")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    contractController.getPublicContractsFAdmin
+  );
+router
   .route("/public-contractsC/:username")
   .get(contractController.getPublicContractsC);
+router
+  .route("/public-admin-contractsC/:username")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    contractController.getPublicContractsCAdmin
+  );
 router
   .route("/my-contractsF")
   .get(

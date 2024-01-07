@@ -11,6 +11,7 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 
 const contractRouter = require("./routes/contractRoutes");
+const reportRouter = require("./routes/reportRoutes");
 const reviewCRouter = require("./routes/reviewCRoutes");
 const reviewFRouter = require("./routes/reviewFRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -67,6 +68,7 @@ app.use(mongoSanitize());
 app.use(xss());
 
 app.use("/api/v1/contracts", contractRouter);
+app.use("/api/v1/reports", reportRouter);
 app.use("/api/v1/reviewCs", reviewCRouter);
 app.use("/api/v1/reviewFs", reviewFRouter);
 app.use("/api/v1/users", userRouter);

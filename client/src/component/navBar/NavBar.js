@@ -37,6 +37,7 @@ const NavBar = (props) => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const tokenLocal = localStorage.getItem("token") || "";
+  const tokenExpiration = localStorage.getItem("expiration");
 
   const getMyProfile = () => {
     return getWishList(`${URL}/api/v1/users/me`, tokenLocal);
@@ -90,9 +91,15 @@ const NavBar = (props) => {
       return;
     }
 
-    if (tokenLocal && loadingProfile) {
-      return;
-    }
+    const dateExpiration = new Date(tokenExpiration);
+    const now = new Date();
+    const duration = dateExpiration.getTime() - now.getTime();
+
+    setTimeout(() => {
+      localStorage.removeItem("token");
+      dispatch(authActions.login(""));
+      navigate("/");
+    }, duration);
 
     refetchProfil();
     refetchWishList();
