@@ -7,6 +7,7 @@ const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("cloudinary").v2;
 const hasDuplicateValues = require("../utils/hasDuplicateValues");
+const filterObj = require("../utils/filterObj");
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -36,16 +37,6 @@ const limits = {
 const upload = multer({ storage: storage, fileFilter: multerFilter, limits });
 
 exports.uploadUserPhoto = upload.single("photo");
-
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) {
-      newObj[el] = obj[el];
-    }
-  });
-  return newObj;
-};
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   //excute the query

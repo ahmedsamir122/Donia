@@ -7,8 +7,7 @@ const router = express.Router();
 router
   .route("/")
   .get(authController.protect, reportController.getReports)
-  .post(authController.protect, reportController.createReport)
-  .patch(authController.protect, reportController.updateReport);
+  .post(authController.protect, reportController.createReport);
 
 router
   .route("/:id")
@@ -16,6 +15,11 @@ router
     authController.protect,
     authController.restrictTo("admin"),
     reportController.getOneReport
+  )
+  .patch(
+    authController.protect,
+    authController.restrictTo("admin"),
+    reportController.updateReport
   );
 
 module.exports = router;

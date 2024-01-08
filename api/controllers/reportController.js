@@ -4,6 +4,7 @@ const AppError = require("../utils/appError");
 const Contract = require("../models/contractModel");
 const Report = require("../models/reportModel");
 const User = require("../models/userModel");
+const filterObj = require("../utils/filterObj");
 
 exports.getReports = catchAsync(async (req, res, next) => {
   console.log(typeof req.user._id, req.user._id);
@@ -45,21 +46,11 @@ exports.createReport = catchAsync(async (req, res, next) => {
   });
 });
 exports.updateReport = catchAsync(async (req, res, next) => {
-  // const notifications = await Notification.find({
-  //   to: req.user._id,
-  //   isSeen: false,
-  // });
+  const filteredBody = filterObj(req.body, "status", "descriptionِAdmin");
 
-  const updateQuery = {
-    $set: { isSeen: true },
-  };
-
-  const newNotifications = await Notification.updateMany(
-    {
-      to: req.user._id,
-      isSeen: false,
-    },
-    updateQuery,
+  const newReport = await Report.findByIdAndUpdate(
+    req.params.id,
+    filteredBody,
     {
       new: true,
       runValidators: true,
@@ -68,9 +59,8 @@ exports.updateReport = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    results: newNotifications.length,
     data: {
-      newNotifications,
+      newReport,
     },
   });
 });
