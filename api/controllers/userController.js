@@ -93,6 +93,30 @@ exports.getAllTalents = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  //   excute the query
+  const features = new APIFeatures(User.find({ perform: "talent" }), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const totalFeatures = new APIFeatures(User.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields();
+
+  const users = await features.query;
+  const num = await totalFeatures.query;
+
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    total: num.length,
+    data: {
+      users,
+    },
+  });
+});
 
 exports.createUser = catchAsync(async (req, res, next) => {
   res.status(200).json({
@@ -169,6 +193,46 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.file) filteredBody.photo = req.file.path;
 
   const newUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: newUser,
+    },
+  });
+});
+exports.blockUser = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError("This route is not for the password updates.", 400)
+    );
+  }
+
+  const user = await User.findOne({
+    username: req.params.username,
+  });
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  const filteredBody = filterObj(req.body, "status");
+  if (req.body.status === "3d")
+    filteredBody.blockUntill = Date.now() + 3 * 24 * 60 * 60 * 1000;
+  if (req.body.status === "1w")
+    filteredBody.blockUntill = Date.now() + 7 * 24 * 60 * 60 * 1000;
+  if (req.body.status === "2w")
+    filteredBody.blockUntill = Date.now() + 14 * 24 * 60 * 60 * 1000;
+  if (req.body.status === "1m")
+    filteredBody.blockUntill = Date.now() + 30 * 24 * 60 * 60 * 1000;
+  if (req.body.status === "active" || req.body.status === "diactive")
+    filteredBody.blockUntill = undefined;
+
+  console.log(req.user.id, filteredBody);
+
+  const newUser = await User.findByIdAndUpdate(user.id, filteredBody, {
     new: true,
     runValidators: true,
   });

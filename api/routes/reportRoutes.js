@@ -10,4 +10,12 @@ router
   .post(authController.protect, reportController.createReport)
   .patch(authController.protect, reportController.updateReport);
 
+router
+  .route("/:id")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    reportController.getOneReport
+  );
+
 module.exports = router;

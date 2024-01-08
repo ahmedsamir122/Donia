@@ -24,6 +24,9 @@ const reportSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    descriptionِAdmin: {
+      type: String,
+    },
     admin: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

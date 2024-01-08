@@ -8,7 +8,10 @@ const User = require("../models/userModel");
 exports.getReports = catchAsync(async (req, res, next) => {
   console.log(typeof req.user._id, req.user._id);
 
-  const reports = await Report.find({ admin: req.user.id });
+  const reports = await Report.find({ admin: req.user.id }).populate({
+    path: "complainer",
+    select: "username",
+  });
 
   res.status(200).json({
     status: "success",
@@ -32,10 +35,7 @@ exports.createReport = catchAsync(async (req, res, next) => {
     req.body.admin = admins[index + 1];
   }
 
-  const newReport = await Report.create({
-    ...req.body,
-    complainer: req.user.id,
-  });
+  const newReport = await Report.create(req.body);
 
   res.status(200).json({
     status: "success",
@@ -71,6 +71,24 @@ exports.updateReport = catchAsync(async (req, res, next) => {
     results: newNotifications.length,
     data: {
       newNotifications,
+    },
+  });
+});
+
+exports.getOneReport = catchAsync(async (req, res, next) => {
+  const report = await Report.findById(req.params.id).populate({
+    path: "complainer",
+    select: "username",
+  });
+
+  if (!report) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      report,
     },
   });
 });

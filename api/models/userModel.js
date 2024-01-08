@@ -83,14 +83,7 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: [
-        "active",
-        "three-days",
-        "one-week",
-        "two-week",
-        "one-month",
-        "diactive",
-      ],
+      enum: ["active", "3d", "1w", "2w", "1m", "diactive"],
       default: "active",
     },
     links: [String],

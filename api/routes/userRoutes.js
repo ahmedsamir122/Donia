@@ -28,7 +28,21 @@ router
   .route("/")
   .get(userController.getAllTalents)
   .post(userController.createUser);
+router
+  .route("/getAllUsers")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    userController.getAllUsers
+  );
 
+router
+  .route("/blockUser/:username")
+  .patch(
+    authController.protect,
+    authController.restrictTo("admin"),
+    userController.blockUser
+  );
 router
   .route("/:username")
   .get(userController.getUser)
