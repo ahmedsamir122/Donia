@@ -11,6 +11,7 @@ const messageSchema = new mongoose.Schema({
   },
   content: {
     type: String,
+    maxLength: [200, "the content must have less or eqaul than 200 characters"],
   },
   createdAt: {
     type: Date,

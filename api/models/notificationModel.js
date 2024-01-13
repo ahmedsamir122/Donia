@@ -6,6 +6,10 @@ const notificationSchema = new mongoose.Schema(
   {
     content: {
       type: String,
+      maxLength: [
+        50,
+        "the notification must have less or eqaul than 50 characters",
+      ],
     },
     from: {
       type: mongoose.Schema.ObjectId,

@@ -23,10 +23,12 @@ const reportSchema = new mongoose.Schema(
     },
     description: {
       type: String,
+      maxLength: [
+        150,
+        "the report must have less or eqaul than 150 characters",
+      ],
     },
-    descriptionِAdmin: {
-      type: String,
-    },
+
     admin: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -34,9 +36,10 @@ const reportSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "progress", "closed"],
+      enum: ["active", "closed"],
       default: "active",
     },
+    notes: [{ type: mongoose.Schema.ObjectId, ref: "Note" }],
     createdAt: {
       type: Date,
       default: Date.now,

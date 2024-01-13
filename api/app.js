@@ -21,6 +21,7 @@ const wishListRouter = require("./routes/wishListRoutes");
 const blockRouter = require("./routes/blockRoutes");
 const contractController = require("./controllers/contractController");
 const notificationRouter = require("./routes/notificationRoutes");
+const noteRouter = require("./routes/noteRoutes");
 
 const app = express();
 
@@ -77,6 +78,7 @@ app.use("/api/v1/block", blockRouter);
 app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/notification", notificationRouter);
+app.use("/api/v1/notes", noteRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`));

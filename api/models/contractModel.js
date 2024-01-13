@@ -26,6 +26,10 @@ const contractSchema = new mongoose.Schema(
     task: {
       type: String,
       required: [true, "the contract must have a task"],
+      maxLength: [
+        150,
+        "the contract must have less or eqaul than 150 characters",
+      ],
     },
     createdAt: {
       type: Date,
