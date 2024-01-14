@@ -1,0 +1,62 @@
+.container {
+  padding: 0.5rem 1.5rem;
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5rem;
+}
+.header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.cards {
+  display: flex;
+  justify-content: space-between;
+}
+.card {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  color: black;
+  flex-basis: 23%;
+}
+.card h5 {
+  color: #8898aa;
+  font-size: 0.8rem;
+  font-family: inherit;
+  font-weight: 600;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.card span {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+.card .logo {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  padding: 12px;
+  color: white;
+  border-radius: 50%;
+}
+
+.card .icon {
+  font-size: 1.25rem;
+}
+
+.bColor {
+  background: linear-gradient(87deg, #11cdef, #1171ef);
+}
+.gColor {
+  background: linear-gradient(87deg, #2dce89, #2dcecc);
+}
+.oColor {
+  background: linear-gradient(87deg, #fb6340, #fbb140);
+}
+.rColor {
+  background: linear-gradient(87deg, #f5365c, #f56036);
+}

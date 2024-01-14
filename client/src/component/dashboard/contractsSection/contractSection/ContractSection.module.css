@@ -1,0 +1,92 @@
+.container {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+.columnContainer {
+  flex-basis: 65%;
+}
+.cards {
+  display: flex;
+
+  border-radius: 1rem;
+  color: black;
+  background-color: white;
+  height: fit-content;
+  padding: 1rem 0rem;
+  margin-bottom: 2rem;
+}
+.card {
+  flex-basis: 33%;
+  border-right: 1px solid #777;
+  padding-left: 1.5rem;
+}
+.card:last-child {
+  border: none;
+}
+.card h3 {
+  text-align: start;
+  color: #8898aa;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.card p {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: black;
+}
+.usersCards {
+  flex-basis: 30%;
+}
+.userCard {
+  padding: 1rem 1.5rem;
+  border: 1px solid white;
+  border-radius: 0.5rem;
+  color: black;
+  background-color: white;
+  margin-bottom: 5rem;
+}
+.userCard h4 {
+  color: #8898aa;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.contractDetails {
+  width: 100%;
+}
+.contractDetails h2 {
+  margin-bottom: 1rem;
+}
+.contractDetails p {
+  margin-bottom: 1rem;
+}
+.contractDetails h4 {
+  margin-bottom: 0.7rem;
+}
+.info {
+  display: flex;
+  margin-top: 0.5rem;
+}
+.info h3 {
+  margin-top: 0.3rem;
+  margin-left: 0.5rem;
+}
+.reviewsHeader {
+  margin-top: 2.5rem;
+}
+.reviews {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+.reviews .review {
+  min-width: 40%;
+}
+.reviews .review h4 {
+  margin-bottom: 0.5rem;
+}
+.reviews .review p {
+  margin-top: 0.3rem;
+  padding-left: 1rem;
+}
