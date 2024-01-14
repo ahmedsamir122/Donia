@@ -6,6 +6,7 @@ const reviewCSchema = new mongoose.Schema(
     review: {
       type: String,
       default: "No feedback given...",
+      maxLength: [150, "the review must have less or eqaul than 50 characters"],
     },
     rating: {
       type: Number,

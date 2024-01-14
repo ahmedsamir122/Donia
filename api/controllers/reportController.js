@@ -66,11 +66,19 @@ exports.updateReport = catchAsync(async (req, res, next) => {
 });
 
 exports.getOneReport = catchAsync(async (req, res, next) => {
-  const report = await Report.findById(req.params.id).populate({
-    path: "complainer",
-    select: "username",
-  });
-
+  const report = await Report.findById(req.params.id)
+    .populate({
+      path: "complainer",
+      select: "username",
+    })
+    .populate({
+      path: "notes",
+      populate: {
+        path: "writer",
+        select: "username", // Select only the 'username' field
+      },
+      select: "description createdAt",
+    });
   if (!report) {
     return next(new AppError("No user found with that ID", 404));
   }
@@ -79,6 +87,45 @@ exports.getOneReport = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       report,
+    },
+  });
+});
+exports.getAdminStats = catchAsync(async (req, res, next) => {
+  const stats = await Report.aggregate([
+    {
+      $group: {
+        _id: "$admin",
+        totalReports: { $sum: 1 },
+        activeReports: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "active"] }, 1, 0],
+          },
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "users", // Assuming your User collection is named "users"
+        localField: "_id",
+        foreignField: "_id",
+        as: "adminDetails",
+      },
+    },
+    {
+      $project: {
+        _id: 1,
+        totalReports: 1,
+        progressReports: 1,
+        activeReports: 1,
+        admin: { $arrayElemAt: ["$adminDetails.username", 0] },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      stats,
     },
   });
 });

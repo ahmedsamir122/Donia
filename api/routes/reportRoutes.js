@@ -10,6 +10,13 @@ router
   .post(authController.protect, reportController.createReport);
 
 router
+  .route("/admin-stats")
+  .get(
+    authController.protect,
+    authController.restrictTo("supervisor"),
+    reportController.getAdminStats
+  );
+router
   .route("/:id")
   .get(
     authController.protect,
