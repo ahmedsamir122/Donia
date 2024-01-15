@@ -35,10 +35,13 @@ exports.getAllContracts = catchAsync(async (req, res, next) => {
     .paginate();
   const contracts = await features.query;
 
+  const count = await Contract.countDocuments();
+
   //send the response
   res.status(200).json({
     status: "success",
     results: contracts.length,
+    totalNum: count,
     data: {
       contracts,
     },

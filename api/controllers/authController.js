@@ -126,6 +126,23 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (currentUser.status !== "active" && currentUser.blockUntill > Date.now()) {
+    return next(
+      new AppError(
+        `your account is blocked untill ${currentUser.blockUntill}.`,
+        401
+      )
+    );
+  }
+  if (currentUser.status === "diactive") {
+    return next(new AppError(`your account is blocked .`, 401));
+  }
+  if (currentUser.status !== "active" && currentUser.blockUntill < Date.now()) {
+    currentUser.status = "active";
+    currentUser.blockUntill = undefined;
+    currentUser.save({ validateBeforeSave: false });
+  }
+
   req.user = currentUser;
   next();
 });
