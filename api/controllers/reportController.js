@@ -9,14 +9,29 @@ const filterObj = require("../utils/filterObj");
 exports.getReports = catchAsync(async (req, res, next) => {
   console.log(typeof req.user._id, req.user._id);
 
-  const reports = await Report.find({ admin: req.user.id }).populate({
-    path: "complainer",
-    select: "username",
-  });
+  // const reports = await Report.find({ admin: req.user.id }).populate({
+  //   path: "complainer",
+  //   select: "username",
+  // });
+
+  const features = new APIFeatures(
+    Report.find({ admin: req.user.id }).populate({
+      path: "complainer",
+      select: "username",
+    }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const reports = await features.query;
+  const count = await Report.countDocuments({ admin: req.user.id });
 
   res.status(200).json({
     status: "success",
     reports: reports.length,
+    totalNum: count,
     data: {
       reports,
     },
