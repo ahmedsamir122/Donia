@@ -43,6 +43,7 @@ router
     authController.restrictTo("admin"),
     userController.blockUser
   );
+
 router
   .route("/:username")
   .get(userController.getUser)
