@@ -17,14 +17,14 @@ import withReactContent from "sweetalert2-react-content";
 import { URL } from "../../../utils/queryFunctions";
 import Loading from "../../../loading/Loading";
 import { useEffect, useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
 import TableComponent from "../../tableComponent/TableComponent";
 
 const UsersTable = () => {
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = useState(0);
   const [rows, setRows] = useState([]);
   const [url, setUrl] = useState("");
-  const [rowsPerPage, setRowsPerPage] = React.useState(8);
+  const [rowsPerPage, setRowsPerPage] = useState(8);
   const navigate = useNavigate();
 
   const fetchTalents = () => {
@@ -52,6 +52,7 @@ const UsersTable = () => {
 
   useEffect(() => {
     refetch();
+    navigate(`/dashboard/users/?page=${page + 1}&limit=8`);
   }, [url, page, data?.data.results]);
 
   function createData(username, country, email, type) {

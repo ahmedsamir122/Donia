@@ -42,6 +42,7 @@ const ReportsTable = () => {
         setRows(
           fetchedData.data.data.reports.map((report) =>
             createData(
+              report.id,
               report.type,
               report.complainerAbout,
               report.complainer.username,
@@ -96,8 +97,8 @@ const ReportsTable = () => {
     refetch();
   }, [url, page, refetch, data?.data.reports]);
 
-  function createData(type, complainerAbout, complainer, status) {
-    return { type, complainerAbout, complainer, status };
+  function createData(id, type, complainerAbout, complainer, status) {
+    return { id, type, complainerAbout, complainer, status };
   }
 
   if (isLoading) {
@@ -113,6 +114,7 @@ const ReportsTable = () => {
   }
 
   const columns = [
+    { id: "id", label: "ID", minWidth: 170 },
     { id: "type", label: "Type", minWidth: 170 },
     { id: "complainerAbout", label: "ComplainerAbout", minWidth: 170 },
     {

@@ -21,7 +21,6 @@ import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 
 const TableComponent = (props) => {
-  const [rowsPerPage, setRowsPerPage] = React.useState(8);
   const columns = props.columns;
 
   return (
@@ -34,39 +33,48 @@ const TableComponent = (props) => {
                 {props.columns.map((column) => {
                   return <TableCell>{column.label}</TableCell>;
                 })}
-                <TableCell>View</TableCell>
+                {props.pT === "Notes" ? "" : <TableCell>View</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
-              {props.rows.map((row) => {
-                return (
-                  <TableRow
-                    hover
-                    role="checkbox"
-                    tabIndex={-1}
-                    key={row.username}
-                  >
-                    {columns.map((column) => {
-                      const value = row[column.id];
-                      return (
-                        <TableCell key={column.id} align={column.align}>
-                          {value}
+              {props.rows
+                .slice(
+                  props.pT === "Notes" ? props.page * props.rowsPerPage : 0,
+                  props.pT === "Notes"
+                    ? props.page * props.rowsPerPage + props.rowsPerPage
+                    : props.rows.length
+                )
+                .map((row) => {
+                  return (
+                    <TableRow
+                      hover
+                      role="checkbox"
+                      tabIndex={-1}
+                      key={row.username}
+                    >
+                      {columns.map((column) => {
+                        const value = row[column.id];
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {value}
+                          </TableCell>
+                        );
+                      })}
+                      {props.pT === "Notes" ? (
+                        ""
+                      ) : (
+                        <TableCell>
+                          <VisibilityIcon
+                            className={classes.view}
+                            onClick={() =>
+                              props.handleUserClick(row.username || row.id)
+                            }
+                          />
                         </TableCell>
-                      );
-                    })}
-                    <TableCell>
-                      <VisibilityIcon
-                        className={classes.view}
-                        onClick={() =>
-                          props.handleUserClick(
-                            row.username || row.id || row.complainerAbout
-                          )
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+                      )}
+                    </TableRow>
+                  );
+                })}
             </TableBody>
           </Table>
         </TableContainer>
