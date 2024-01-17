@@ -10,6 +10,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import TableComponent from "../../tableComponent/TableComponent";
 import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
+import NewReportComponent from "../../newReportComponent/NewReportComponent";
 
 const ReportsTable = () => {
   const [page, setPage] = React.useState(0);
@@ -20,12 +21,6 @@ const ReportsTable = () => {
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
   const tokenLocal = localStorage.getItem("token") || "";
-
-  const postData = (data) => {
-    return axios.post(`${URL}/api/v1/reports/`, data, {
-      headers: { Authorization: `Bearer ${tokenLocal}` },
-    });
-  };
 
   const fetchReports = () => {
     return axios.get(`${URL}/api/v1/reports?page=${page + 1}&limit=8`, {
@@ -54,48 +49,14 @@ const ReportsTable = () => {
     }
   );
 
-  const {
-    mutate,
-    isError: mutationError,
-    error: mutationErrorMsg,
-  } = useMutation(postData, {
-    onSuccess: (data) => {
-      console.log(data);
-    },
-  });
-
-  const {
-    register,
-    control,
-    handleSubmit,
-    getValues,
-    formState: { errors, isValid },
-  } = useForm({ mode: "onSubmit" });
-
-  const onsubmit = async (data) => {
-    console.log(error);
-    const [type, complainerAbout, complainer, description] = getValues([
-      "type",
-      "complainerAbout",
-      "complainer",
-      "description",
-    ]);
-
-    mutate({
-      type,
-      complainerAbout,
-      complainer,
-      description,
-    });
-  };
-
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
   useEffect(() => {
     refetch();
-  }, [url, page, refetch, data?.data.reports]);
+    navigate(`/dashboard/reports/?page=${page + 1}&limit=8`);
+  }, [url, page, refetch, data?.data.totalNum]);
 
   function createData(id, type, complainerAbout, complainer, status) {
     return { id, type, complainerAbout, complainer, status };
@@ -143,58 +104,13 @@ const ReportsTable = () => {
   };
 
   const renderContent = () => {
-    if (!tableVisible)
-      return (
-        <form onSubmit={handleSubmit(onsubmit)}>
-          <h2>Submit a Report</h2>
-          <label>Enter Complainer ID</label>
-
-          <input
-            type="text"
-            id="complainer"
-            {...register("complainer", { required: true })}
-            className={classes.textInput}
-          />
-
-          <label>Enter Contract ID</label>
-
-          <input
-            type="text"
-            id="contractId"
-            {...register("complainerAbout", { required: true })}
-            className={classes.textInput}
-          />
-
-          <label>Choose Type</label>
-
-          <select
-            id="type"
-            {...register("type", { required: true })}
-            className={classes.typeGroup}
-          >
-            <option value="user">Client</option>
-            <option value="talent">Talent</option>
-            <option value="review">Review</option>
-          </select>
-          <p>
-            <label>Write a description of problem:</label>
-          </p>
-          <textarea
-            {...register("description", { required: true })}
-            id="description"
-            className={classes.description}
-            rows="10"
-            cols="94"
-          ></textarea>
-          <button className={classes.submitBtn}>Submit</button>
-        </form>
-      );
+    if (!tableVisible) return <NewReportComponent />;
     else
       return (
         <TableComponent
           columns={columns}
           rows={rows}
-          count={data.data.reports}
+          count={data.data.totalNum}
           page={page}
           handleChangePage={handleChangePage}
           handleUserClick={handleUserClick}

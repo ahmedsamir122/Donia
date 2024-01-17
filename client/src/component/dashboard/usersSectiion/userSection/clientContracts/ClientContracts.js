@@ -15,10 +15,17 @@ const ClientContracts = () => {
   const [page, setPage] = React.useState(0);
   const [url, setUrl] = useState("");
   const [rows, setRows] = useState([]);
+  const [rowsPerPage, setRowsPerPage] = React.useState(7);
   const navigate = useNavigate();
+  const tokenLocal = localStorage.getItem("token") || "";
 
   const fetchClientContracts = () => {
-    return axios.get(`${URL}/api/v1/contracts/public-contractsC/${username}`);
+    return axios.get(
+      `${URL}/api/v1/contracts/public-admin-contractsF/${username}`,
+      {
+        headers: { Authorization: `Bearer ${tokenLocal}` },
+      }
+    );
   };
 
   const { isLoading, data, isError, error, isFetching, refetch } = useQuery(
@@ -84,6 +91,8 @@ const ClientContracts = () => {
         page={page}
         handleChangePage={handleChangePage}
         handleUserClick={handleUserClick}
+        rowsPerPage={rowsPerPage}
+        pT={"UserContracts"}
       />
     </>
   );

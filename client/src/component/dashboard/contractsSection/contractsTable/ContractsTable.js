@@ -48,7 +48,8 @@ const ContractsTable = () => {
 
   useEffect(() => {
     refetch();
-  }, [url, page, data?.data.results]);
+    navigate(`/dashboard/contracts/?page=${page + 1}&limit=8`);
+  }, [url, page, data?.data.totalNum]);
 
   function createData(id, name, task, freelancer, client, status) {
     return { id, name, task, freelancer, client, status };
@@ -118,7 +119,7 @@ const ContractsTable = () => {
         <TableComponent
           columns={columns}
           rows={rows}
-          count={data.data.results}
+          count={data.data.totalNum}
           page={page}
           handleChangePage={handleChangePage}
           handleUserClick={handleUserClick}

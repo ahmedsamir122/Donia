@@ -91,42 +91,52 @@ const UserSection = () => {
     SetClient(false);
     setTalent(false);
   };
+  const renderUserStatus = () => {
+    if (data.data.data.user.status === "3d") return "Blocked For Three Days";
+    if (data.data.data.user.status === "1w") return "Blocked For One Week";
+    if (data.data.data.user.status === "2w") return "Blocked For Two Weeks";
+    if (data.data.data.user.status === "1m") return "Blocked For One Month";
+    if (data.data.data.user.status === "diactive") return "Diactive";
+    if (data.data.data.user.status === "active") return "Active";
+  };
 
   const showSwal = () => {
-    withReactContent(Swal)
-      .fire({
-        title: "Are you sure?",
-        text: `You will ${
-          duration.options[duration.selectedIndex].text
-        } this User`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, Sure",
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          updateStatus()
-            .then(() => {
-              Swal.fire({
-                title: "Success",
-                text: `${
-                  duration.options[duration.selectedIndex].text
-                } this User`,
-                icon: "success",
-              });
-              refetch();
-            })
-            .catch((error) => {
-              Swal.fire({
-                title: "Error",
-                text: `Failed to block user. ${error.message}`,
-                icon: "error",
-              });
-            });
-        }
-      });
+    document.querySelector("#duration").value === data.data.data.user.status
+      ? withReactContent(Swal).fire("This is The Currrent Status")
+      : withReactContent(Swal)
+          .fire({
+            title: "Are you sure?",
+            text: `You will ${
+              duration.options[duration.selectedIndex].text
+            } this User`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, Sure",
+          })
+          .then((result) => {
+            if (result.isConfirmed) {
+              updateStatus()
+                .then(() => {
+                  Swal.fire({
+                    title: "Success",
+                    text: `${
+                      duration.options[duration.selectedIndex].text
+                    } this User`,
+                    icon: "success",
+                  });
+                  refetch();
+                })
+                .catch((error) => {
+                  Swal.fire({
+                    title: "Error",
+                    text: `Failed to block user. ${error.message}`,
+                    icon: "error",
+                  });
+                });
+            }
+          });
   };
 
   return (
@@ -213,7 +223,7 @@ const UserSection = () => {
             <div>
               <h6>Status</h6>
             </div>
-            <div>{data.data.data.user.status}</div>
+            <div>{renderUserStatus()}</div>
           </div>
         </div>
       </div>

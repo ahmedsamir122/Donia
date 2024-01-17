@@ -3,6 +3,10 @@
   display: flex;
   justify-content: space-between;
 }
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+}
 .columnContainer {
   flex-basis: 65%;
 }
@@ -69,8 +73,13 @@
   margin-top: 0.5rem;
 }
 .info h3 {
-  margin-top: 0.3rem;
   margin-left: 0.5rem;
+  margin-bottom: 0.1rem;
+  text-align: left;
+}
+.info p {
+  margin-left: 0.5rem;
+  color: #777;
 }
 .reviewsHeader {
   margin-top: 2.5rem;
@@ -89,4 +98,12 @@
 .reviews .review p {
   margin-top: 0.3rem;
   padding-left: 1rem;
+}
+.reportBtn {
+  padding: 1rem;
+  background-color: transparent;
+  color: white;
+  border: 1px solid white;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }
