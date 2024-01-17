@@ -17,6 +17,13 @@ router
     reportController.getAdminStats
   );
 router
+  .route("/userReports/:username")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin", "supervisor"),
+    reportController.getReportsOneUser
+  );
+router
   .route("/:id")
   .get(
     authController.protect,

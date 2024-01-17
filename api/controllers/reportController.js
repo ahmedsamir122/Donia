@@ -7,8 +7,6 @@ const User = require("../models/userModel");
 const filterObj = require("../utils/filterObj");
 
 exports.getReports = catchAsync(async (req, res, next) => {
-  console.log(typeof req.user._id, req.user._id);
-
   // const reports = await Report.find({ admin: req.user.id }).populate({
   //   path: "complainer",
   //   select: "username",
@@ -26,12 +24,54 @@ exports.getReports = catchAsync(async (req, res, next) => {
     .limitFields()
     .paginate();
   const reports = await features.query;
-  const count = await Report.countDocuments({ admin: req.user.id });
+  const count = await Report.countDocuments({
+    admin: req.user.id,
+    status: "active",
+  });
+  const totalCount = await Report.countDocuments({
+    admin: req.user.id,
+  });
 
   res.status(200).json({
     status: "success",
-    reports: reports.length,
-    totalNum: count,
+    activeReports: count,
+    totalReports: totalCount,
+    data: {
+      reports,
+    },
+  });
+});
+exports.getReportsOneUser = catchAsync(async (req, res, next) => {
+  // const reports = await Report.find({ admin: req.user.id }).populate({
+  //   path: "complainer",
+  //   select: "username",
+  // });
+  const user = await User.findOne({ username: req.params.username });
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  const features = new APIFeatures(
+    Report.find({ complainer: user.id }).populate({
+      path: "complainer",
+      select: "username",
+    }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const reports = await features.query;
+
+  const totalCount = await Report.countDocuments({
+    complainer: user.id,
+  });
+
+  res.status(200).json({
+    status: "success",
+    totalReports: totalCount,
     data: {
       reports,
     },
