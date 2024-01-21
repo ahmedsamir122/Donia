@@ -58,6 +58,13 @@ const UsersTable = () => {
   function createData(username, country, email, type) {
     return { username, country, email, type };
   }
+  if (isLoading) {
+    return (
+      <div className={classes.mainLoading}>
+        <Loading />
+      </div>
+    );
+  }
 
   if (isError || !data) {
     return <div>{error?.Msg}</div>;
