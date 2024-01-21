@@ -68,24 +68,13 @@ const NewReportComponent = (props) => {
         {...register("complainer", { required: true })}
         className={classes.textInput}
       />
-
-      <label>Enter Contract ID</label>
-      {props.contractId ? (
-        <input
-          type="text"
-          id="contractId"
-          value={props.contractId}
-          {...register("complainerAbout", { required: true })}
-          className={classes.textInput}
-        />
-      ) : (
-        <input
-          type="text"
-          id="contractId"
-          {...register("complainerAbout", { required: true })}
-          className={classes.textInput}
-        />
-      )}
+      <input
+        type="text"
+        id="contractId"
+        value={props.contractId}
+        {...register("complainerAbout", { required: true })}
+        className={` ${classes.textInput} ${classes.hidden}`}
+      />
 
       <label>Choose Type</label>
 

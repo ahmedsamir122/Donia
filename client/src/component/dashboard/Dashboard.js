@@ -7,8 +7,32 @@ import SummarizeIcon from "@mui/icons-material/Summarize";
 import DashboardSection from "./dashboardSection/DashboardSection";
 import UsersSectiion from "./usersSectiion/UsersSectiion";
 import { Link, Routes, Route, Outlet } from "react-router-dom";
-
+import { URL } from "../utils/queryFunctions";
+import { reportsActions } from "../../store/reports";
+import { useDispatch, useSelector } from "react-redux";
+import axios from "axios";
+import { useQuery } from "react-query";
 const Dashboard = () => {
+  const tokenLocal = localStorage.getItem("token") || "";
+  const dispatch = useDispatch();
+  const activeReports = useSelector((state) => state.reports.activeReports);
+
+  const fetchReports = () => {
+    return axios.get(`${URL}/api/v1/reports/`, {
+      headers: { Authorization: `Bearer ${tokenLocal}` },
+    });
+  };
+  const { isLoading, data, isError, error, isFetching, refetch } = useQuery(
+    "reports",
+    fetchReports,
+    {
+      refetchOnWindowFocus: false,
+      onSuccess: (fetchedData) => {
+        dispatch(reportsActions.updateActiveReports(fetchedData.data));
+      },
+    }
+  );
+
   return (
     <div className={classes.container}>
       <div className={classes.sideNav}>
@@ -35,6 +59,11 @@ const Dashboard = () => {
           <li>
             <ReportIcon className={classes.black} />
             <Link to="/dashboard/reports/">Reports</Link>
+            {activeReports ? (
+              <span className={classes.activeReports}>{activeReports}</span>
+            ) : (
+              ""
+            )}
           </li>
         </ul>
       </div>

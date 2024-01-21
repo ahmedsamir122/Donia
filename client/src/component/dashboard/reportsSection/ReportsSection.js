@@ -4,9 +4,9 @@ import { Outlet } from "react-router-dom";
 
 const ReportsSection = () => {
   return (
-    <div className={classes.container}>
+    <>
       <Outlet />
-    </div>
+    </>
   );
 };
 export default ReportsSection;

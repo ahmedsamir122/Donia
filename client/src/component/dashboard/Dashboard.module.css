@@ -41,3 +41,14 @@
 .black {
   color: black;
 }
+.activeReports {
+  display: inline-block;
+  margin-left: 2rem;
+}
+.mainLoading {
+  height: calc(100vh - 76px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}

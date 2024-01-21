@@ -53,18 +53,10 @@ const UsersTable = () => {
   useEffect(() => {
     refetch();
     navigate(`/dashboard/users/?page=${page + 1}&limit=8`);
-  }, [url, page, data?.data.results]);
+  }, [page]);
 
   function createData(username, country, email, type) {
     return { username, country, email, type };
-  }
-
-  if (isLoading) {
-    return (
-      <div className={classes.mainLoading}>
-        <Loading />
-      </div>
-    );
   }
 
   if (isError || !data) {
@@ -121,7 +113,7 @@ const UsersTable = () => {
   };
 
   return (
-    <div className={classes.container}>
+    <>
       <Outlet />
       <div className={classes.header}>
         <h2>Users</h2>
@@ -148,7 +140,7 @@ const UsersTable = () => {
           pT={"users"}
         />
       }
-    </div>
+    </>
   );
 };
 export default UsersTable;

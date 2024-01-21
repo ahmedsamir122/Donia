@@ -3,12 +3,18 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
+import { useSelector } from "react-redux";
 
 const DashboardSection = () => {
+  const activeReports = useSelector((state) => state.reports.activeReports);
+  const totalReports = useSelector((state) => state.reports.totalReports);
+  const completeReports = useSelector((state) => state.reports.completeReports);
+  const user = useSelector((state) => state.auth.user);
+
   return (
-    <div className={classes.container}>
+    <>
       <div className={classes.header}>
-        <h2>DASHBOARD</h2>
+        <h2>Dashboard</h2>
         <p>Welcome Ahmed</p>
       </div>
 
@@ -16,7 +22,7 @@ const DashboardSection = () => {
         <div className={classes.card}>
           <div className={classes.cardInfo}>
             <h5>Total Reports</h5>
-            <span>100</span>
+            <span>{totalReports}</span>
           </div>
           <div className={`${classes.logo} ${classes.bColor}`}>
             <BarChartIcon className={classes.icon} />
@@ -25,7 +31,7 @@ const DashboardSection = () => {
         <div className={classes.card}>
           <div className={classes.cardInfo}>
             <h5>Completed</h5>
-            <span>20</span>
+            <span>{completeReports}</span>
           </div>
           <div className={`${classes.logo} ${classes.gColor}`}>
             <TaskAltIcon className={classes.icon} />
@@ -34,23 +40,14 @@ const DashboardSection = () => {
         <div className={classes.card}>
           <div className={classes.cardInfo}>
             <h5>Workiing On</h5>
-            <span>10</span>
+            <span>{activeReports}</span>
           </div>
           <div className={`${classes.logo} ${classes.oColor}`}>
             <HourglassBottomIcon className={classes.icon} />
           </div>
         </div>
-        <div className={classes.card}>
-          <div className={classes.cardInfo}>
-            <h5>Not Started</h5>
-            <span>70</span>
-          </div>
-          <div className={`${classes.logo} ${classes.rColor}`}>
-            <FormatListBulletedIcon className={classes.icon} />
-          </div>
-        </div>
       </div>
-    </div>
+    </>
   );
 };
 export default DashboardSection;

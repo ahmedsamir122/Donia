@@ -39,10 +39,10 @@ const TableComponent = (props) => {
             <TableBody>
               {props.rows
                 .slice(
-                  props.pT === "Notes" || props.pT === "UserContracts"
+                  props.pT === "Notes" || props.pT === "UserProfile"
                     ? props.page * props.rowsPerPage
                     : 0,
-                  props.pT === "Notes" || props.pT === "UserContracts"
+                  props.pT === "Notes" || props.pT === "UserProfile"
                     ? props.page * props.rowsPerPage + props.rowsPerPage
                     : props.rows.length
                 )

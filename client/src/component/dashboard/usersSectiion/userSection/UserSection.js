@@ -12,11 +12,13 @@ import Avatar from "@mui/material/Avatar";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useSelector } from "react-redux";
+import UserReports from "./userReports/UserReports";
 
 const UserSection = () => {
   const { username } = useParams();
   const [client, SetClient] = useState(false);
   const [talent, setTalent] = useState(false);
+  const [reports, setReports] = useState(false);
   const token = useSelector((state) => state.auth.token);
   const tokenLocal = localStorage.getItem("token") || "";
   let duration = "";
@@ -82,14 +84,22 @@ const UserSection = () => {
   const handleContractClientBtn = () => {
     SetClient(true);
     setTalent(false);
+    setReports(false);
   };
   const handleContractTalentBtn = () => {
     SetClient(false);
+    setReports(false);
     setTalent(true);
   };
   const handleUserDataBtn = () => {
     SetClient(false);
     setTalent(false);
+    setReports(false);
+  };
+  const handleUserReportsBtn = () => {
+    SetClient(false);
+    setTalent(false);
+    setReports(true);
   };
   const renderUserStatus = () => {
     if (data.data.data.user.status === "3d") return "Blocked For Three Days";
@@ -145,7 +155,9 @@ const UserSection = () => {
         {data.data.data.user.username} ({data.data.data.user.status})
       </h2>
       <div className={classes.btns}>
-        <button className={classes.btn}>Show User Reports</button>
+        <button className={classes.btn} onClick={handleUserReportsBtn}>
+          Show User Reports
+        </button>
         <button className={classes.btn} onClick={handleUserDataBtn}>
           Show User Data
         </button>
@@ -154,9 +166,10 @@ const UserSection = () => {
       </div>
       {client && <ClientContracts />}
       {talent && <TalentContacts />}
+      {reports && <UserReports />}
       <div
         className={`${classes.profile}  ${
-          (talent || client) && classes.hidden
+          (talent || client || reports) && classes.hidden
         }`}
       >
         <div className={classes.userSide}>

@@ -56,7 +56,7 @@ const ReportsTable = () => {
   useEffect(() => {
     refetch();
     navigate(`/dashboard/reports/?page=${page + 1}&limit=8`);
-  }, [url, page, refetch, data?.data.totalNum]);
+  }, [page]);
 
   function createData(id, type, complainerAbout, complainer, status) {
     return { id, type, complainerAbout, complainer, status };
@@ -93,52 +93,34 @@ const ReportsTable = () => {
   const handleUserClick = (id) => {
     navigate(`/dashboard/reports/${id}`);
   };
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      navigate(`/dashboard/contracts/${document.querySelector("input").value}`);
-    }
-  };
 
-  const handleNewReport = () => {
+  /* const handleNewReport = () => {
     setTableVisible(!tableVisible);
-  };
+  };*/
 
   const renderContent = () => {
-    if (!tableVisible) return <NewReportComponent />;
-    else
-      return (
-        <TableComponent
-          columns={columns}
-          rows={rows}
-          count={data.data.totalNum}
-          page={page}
-          handleChangePage={handleChangePage}
-          handleUserClick={handleUserClick}
-          rowsPerPage={rowsPerPage}
-          pT={"Reports"}
-        />
-      );
+    return (
+      <TableComponent
+        columns={columns}
+        rows={rows}
+        count={data.data.totalReports}
+        page={page}
+        handleChangePage={handleChangePage}
+        handleUserClick={handleUserClick}
+        rowsPerPage={rowsPerPage}
+        pT={"Reports"}
+      />
+    );
   };
 
   return (
-    <div className={classes.container}>
+    <>
       <Outlet />
       <div className={classes.header}>
         <h2>Reports</h2>
-        <div>
-          {tableVisible ? (
-            <button className={classes.reportBtn} onClick={handleNewReport}>
-              Create New Report
-            </button>
-          ) : (
-            <button className={classes.reportBtn} onClick={handleNewReport}>
-              Close
-            </button>
-          )}
-        </div>
       </div>
       {renderContent()}
-    </div>
+    </>
   );
 };
 export default ReportsTable;

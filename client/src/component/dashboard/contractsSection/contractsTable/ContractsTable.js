@@ -49,7 +49,7 @@ const ContractsTable = () => {
   useEffect(() => {
     refetch();
     navigate(`/dashboard/contracts/?page=${page + 1}&limit=8`);
-  }, [url, page, data?.data.totalNum]);
+  }, [page]);
 
   function createData(id, name, task, freelancer, client, status) {
     return { id, name, task, freelancer, client, status };
@@ -102,7 +102,7 @@ const ContractsTable = () => {
   };
 
   return (
-    <div className={classes.container}>
+    <>
       <Outlet />
       <div className={classes.header}>
         <h2>Contracts</h2>
@@ -127,7 +127,7 @@ const ContractsTable = () => {
           pT={"Contracts"}
         />
       }
-    </div>
+    </>
   );
 };
 export default ContractsTable;

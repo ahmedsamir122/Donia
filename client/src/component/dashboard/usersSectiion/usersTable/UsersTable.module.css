@@ -1,6 +1,3 @@
-.container {
-  padding: 0.5rem 1.5rem;
-}
 .header {
   display: flex;
   justify-content: space-between;
@@ -36,13 +33,7 @@
 .block {
   cursor: pointer;
 }
-.mainLoading {
-  height: calc(100vh - 76px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
+
 .view {
   cursor: pointer;
 }

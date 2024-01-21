@@ -29,7 +29,16 @@ const TalentContacts = () => {
   const { isLoading, data, isError, error, isFetching, refetch } = useQuery(
     "talent",
     fetchTalentContacts,
-    { refetchOnWindowFocus: false }
+    {
+      refetchOnWindowFocus: false,
+      onSuccess: (fetchedData) => {
+        setRows(
+          fetchedData.data.data.contracts.map((contract) =>
+            createData(contract.id, contract.client.username)
+          )
+        );
+      },
+    }
   );
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -37,20 +46,8 @@ const TalentContacts = () => {
   const handleUserClick = (id) => {
     navigate(`/dashboard/contracts/${id}`);
   };
-  useEffect(() => {
-    if (data) {
-      setRows(
-        data.data.data.contracts.map((user) =>
-          createData(user.id, user.client.username)
-        )
-      );
-      console.log(rows);
-    }
 
-    refetch();
-  }, [url, page, refetch, data?.data.results]);
-
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <div className={classes.mainLoading}>
         <Loading />
@@ -90,7 +87,7 @@ const TalentContacts = () => {
           handleChangePage={handleChangePage}
           handleUserClick={handleUserClick}
           rowsPerPage={rowsPerPage}
-          pT={"UserContracts"}
+          pT={"UserProfile"}
         />
       </>
     </>
