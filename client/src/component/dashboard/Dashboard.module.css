@@ -1,0 +1,52 @@
+.container {
+  height: 100vh;
+  display: flex;
+}
+.sideNav {
+  width: 17%;
+  padding: 1.5rem;
+}
+.sideNav a {
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.5);
+}
+.sideNav .logo {
+  display: block;
+  text-align: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  text-decoration: none;
+}
+.sideNav li {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem 0;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.5);
+}
+.sideNav a:hover {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.mainContent {
+  width: 83%;
+  padding: 1.5rem;
+  background-color: #2dce89;
+  color: white;
+}
+
+.black {
+  color: black;
+}
+.activeReports {
+  display: inline-block;
+  margin-left: 2rem;
+}
+.mainLoading {
+  height: calc(100vh - 76px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
