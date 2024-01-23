@@ -14,8 +14,9 @@ const generateCookie = (res, token) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    domain: "donia-gamma.vercel.app/",
-    sameSite: "None", // Add this line
+    domain: ".vercel.app",
+    sameSite: "None",
+    // domain: "localhost",
   };
   // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
   res.cookie("refresh", token, cookieOptions);
