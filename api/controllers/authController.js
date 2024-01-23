@@ -18,7 +18,7 @@ const generateCookie = (res, token) => {
     sameSite: "None",
     // domain: "localhost",
   };
-  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
   res.cookie("refresh", token, cookieOptions);
 };
 
