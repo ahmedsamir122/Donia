@@ -16,8 +16,6 @@ const Dashboard = () => {
   const tokenLocal = localStorage.getItem("token") || "";
   const dispatch = useDispatch();
   const activeReports = useSelector((state) => state.reports.activeReports);
-  let prevoius = "";
-  let current = "";
 
   const fetchReports = () => {
     return axios.get(`${URL}/api/v1/reports/`, {
