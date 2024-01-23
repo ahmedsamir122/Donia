@@ -7,6 +7,7 @@ import blocklistReducer from "./blocklist";
 import lastMessageReducer from "./lastMessage";
 import socketReducer from "./socket";
 import queryReducer from "./query";
+import reportsReducer from "./reports";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     query: queryReducer,
     lastMessage: lastMessageReducer,
     socket: socketReducer,
+    reports: reportsReducer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: false, // Disable the serializable check

@@ -22,6 +22,19 @@ import React from "react";
 import WishList from "./pages/WishList";
 import Success from "./pages/Success";
 import NavBar from "./component/navBar/NavBar";
+import Dashboard from "./component/dashboard/Dashboard";
+import DashboardSection from "./component/dashboard/dashboardSection/DashboardSection";
+import UsersSectiion from "./component/dashboard/usersSectiion/UsersSectiion";
+import UserSection from "./component/dashboard/usersSectiion/userSection/UserSection";
+import UsersTable from "./component/dashboard/usersSectiion/usersTable/UsersTable";
+import ContractsSection from "./component/dashboard/contractsSection/ContractsSection";
+import ContractsTable from "./component/dashboard/contractsSection/contractsTable/ContractsTable";
+import ContractSection from "./component/dashboard/contractsSection/contractSection/ContractSection";
+import ReviewsSection from "./component/dashboard/reviewsSection/ReviewsSection";
+import ReviewsTable from "./component/dashboard/reviewsSection/reviewsTable/ReviewsTable";
+import ReportsSection from "./component/dashboard/reportsSection/ReportsSection";
+import ReportsTable from "./component/dashboard/reportsSection/reportsTable/ReportsTable";
+import ReportSection from "./component/dashboard/reportsSection/reportSection/ReportSection";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +87,69 @@ const router = createBrowserRouter([
   },
   { path: "/signup", element: <SignUp /> },
   { path: "/signin", element: <SignIn /> },
+  {
+    path: "/dashboard",
+    element: <Dashboard />,
+    children: [
+      { path: "/dashboard/dashboard/", element: <DashboardSection /> },
+      {
+        path: "/dashboard/contracts/",
+        element: <ContractsSection />,
+        children: [
+          {
+            path: "/dashboard/contracts/:id",
+            element: <ContractSection />,
+          },
+          {
+            path: "/dashboard/contracts/",
+            element: <ContractsTable />,
+          },
+        ],
+      },
+      {
+        path: "/dashboard/users/",
+        element: <UsersSectiion />,
+        children: [
+          {
+            path: "/dashboard/users/:username",
+            element: <UserSection />,
+          },
+          {
+            path: "/dashboard/users/",
+            element: <UsersTable />,
+          },
+        ],
+      },
+      {
+        path: "/dashboard/reviews/",
+        element: <ReviewsSection />,
+        children: [
+          /*{
+          path: "/dashboard/users/:username",
+          element: <UserSection />,
+        },*/
+          {
+            path: "/dashboard/reviews/",
+            element: <ReviewsTable />,
+          },
+        ],
+      },
+      {
+        path: "/dashboard/reports/",
+        element: <ReportsSection />,
+        children: [
+          {
+            path: "/dashboard/reports/:id",
+            element: <ReportSection />,
+          },
+          {
+            path: "/dashboard/reports/",
+            element: <ReportsTable />,
+          },
+        ],
+      },
+    ],
+  },
 ]);
 
 function App() {
