@@ -111,6 +111,9 @@ const NavBar = (props) => {
     refetchBlockList,
     refetchWishList,
     refetchProfil,
+    dispatch,
+    navigate,
+    tokenExpiration,
   ]);
   useEffect(() => {
     if (!tokenLocal || !dataProfile?.data.data?.user) {
@@ -139,6 +142,7 @@ const NavBar = (props) => {
     tokenLocal,
     dataWishList?.data.data.allWishList,
     dataBlockList?.data.data.allBlockList,
+    dataBlockList?.data.data.allBlockUsers,
   ]);
 
   const fetchNotifications = () => {

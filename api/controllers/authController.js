@@ -14,10 +14,10 @@ const generateCookie = (res, token) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    domain: "http://localhost:3000",
+    // domain: "localhost",
   };
-  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
-  res.cookie("jwt", token, cookieOptions);
+  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+  res.cookie("refresh", token, cookieOptions);
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
@@ -35,7 +35,11 @@ exports.signup = catchAsync(async (req, res, next) => {
     perform: req.body.perform,
   });
 
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_REFRESH, {
+    expiresIn: process.env.JWT_EXPIRES_IN_REFRESH,
+  });
+
+  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
@@ -44,7 +48,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   generateCookie(res, token);
   res.status(201).json({
     status: "success",
-    token,
+    token: accessToken,
     data: {
       user: newUser,
     },
@@ -64,21 +68,67 @@ exports.signin = catchAsync(async (req, res, next) => {
     return next(new AppError("Incorrect email or password", 401));
   }
 
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_REFRESH, {
+    expiresIn: process.env.JWT_EXPIRES_IN_REFRESH,
+  });
+  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
-
   generateCookie(res, token);
 
-  const cookieHeader = req.headers["cookie"];
-  // console.log(cookieHeader);
   user.password = undefined;
   res.status(200).json({
     status: "success",
-    token,
+    token: accessToken,
     data: {
       user,
     },
+  });
+});
+exports.getAccessToken = catchAsync(async (req, res, next) => {
+  let token;
+  if (req.cookies.refresh) {
+    token = req.cookies.refresh;
+  }
+
+  if (!token) {
+    return next(
+      new AppError("You aren't logged in! Please log in to get access.", 401)
+    );
+  }
+
+  const decoded = await promisify(jwt.verify)(
+    token,
+    process.env.JWT_SECRET_REFRESH
+  );
+
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
+    return next(
+      new AppError(
+        "The user belongs to this token does no longer exists .",
+        401
+      )
+    );
+  }
+
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError("User recently changed password! please log in again.", 401)
+    );
+  }
+
+  const accessToken = jwt.sign(
+    { id: currentUser._id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    token: accessToken,
   });
 });
 
@@ -98,9 +148,9 @@ exports.protect = catchAsync(async (req, res, next) => {
   ) {
     token = req.headers.authorization.split(" ")[1];
   }
-  if (req.cookies.jwt) {
-    token = req.cookies.jwt;
-  }
+  // if (req.cookies.jwt) {
+  //   token = req.cookies.jwt;
+  // }
 
   if (!token) {
     return next(
