@@ -16,6 +16,8 @@ const Dashboard = () => {
   const tokenLocal = localStorage.getItem("token") || "";
   const dispatch = useDispatch();
   const activeReports = useSelector((state) => state.reports.activeReports);
+  let prevoius = "";
+  let current = "";
 
   const fetchReports = () => {
     return axios.get(`${URL}/api/v1/reports/`, {
@@ -33,9 +35,27 @@ const Dashboard = () => {
     }
   );
 
+  const handleBtnClick = (e) => {
+    const isLinkWithinListItem =
+      e.target.tagName.toLowerCase() === "a" && e.target.closest("li");
+
+    if (isLinkWithinListItem) {
+      document.querySelectorAll(`.${classes.sideNav} li a`).forEach((item) => {
+        item.style.color = "";
+      });
+
+      e.target.style.color = "rgba(0, 0, 0, 0.9)";
+    }
+  };
+
   return (
     <div className={classes.container}>
-      <div className={classes.sideNav}>
+      <div
+        className={classes.sideNav}
+        onClick={(e) => {
+          handleBtnClick(e);
+        }}
+      >
         <Link className={classes.logo} to="/dashboard/">
           Logo
         </Link>

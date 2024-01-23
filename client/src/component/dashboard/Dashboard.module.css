@@ -28,9 +28,7 @@
 .sideNav a:hover {
   color: rgba(0, 0, 0, 0.7);
 }
-.sideNav a:focus {
-  color: rgba(0, 0, 0, 0.9);
-}
+
 .mainContent {
   width: 83%;
   padding: 1.5rem;
