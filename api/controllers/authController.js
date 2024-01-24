@@ -16,9 +16,10 @@ const generateCookie = (res, token) => {
     httpOnly: true,
     domain: ".vercel.app",
     sameSite: "None",
+    secure: true,
     // domain: "localhost",
   };
-  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
   res.cookie("refresh", token, cookieOptions);
 };
 
