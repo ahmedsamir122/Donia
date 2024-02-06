@@ -16,6 +16,13 @@ router
   .route("/getOne/:conversationId")
   .get(authController.protect, conversationController.getCurrentConversation);
 router
+  .route("/getOne-admin/:conversationId")
+  .get(
+    authController.protect,
+    authController.restrictTo("admin"),
+    conversationController.getOneConversationAdmin
+  );
+router
   .route("/close/:conversationId")
   .patch(authController.protect, conversationController.closeConversation);
 

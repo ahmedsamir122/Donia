@@ -10,7 +10,7 @@ const OneMessage = (props) => {
         props.own ? `${classes.oneMessageMe}` : `${classes.oneMessageHim}`
       }
     >
-      {props.message.sender._id !== user._id && (
+      {props.message.sender?._id !== user?._id && (
         <img src={props.message.sender.photo} alt="" className={classes.img} />
       )}
       <div

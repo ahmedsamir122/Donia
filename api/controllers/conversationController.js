@@ -47,6 +47,29 @@ exports.getCurrentConversation = catchAsync(async (req, res, next) => {
     select: "username photo",
   });
 
+  const isUserInConversation = currentConversation.users.some(
+    (user) => user.id === req.user.id
+  );
+
+  if (!isUserInConversation) {
+    return next(new AppError("You cannot get this conversation data", 400));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      conversation: currentConversation,
+    },
+  });
+});
+exports.getOneConversationAdmin = catchAsync(async (req, res, next) => {
+  const currentConversation = await Conversation.findById(
+    req.params.conversationId
+  ).populate({
+    path: "users",
+    select: "username photo",
+  });
+
   res.status(200).json({
     status: "success",
     data: {

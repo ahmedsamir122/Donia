@@ -1,5 +1,6 @@
 const APIFeatures = require("../utils/apiFeatures");
 const Contract = require("../models/contractModel");
+const Conversation = require("../models/conversation");
 const Notification = require("../models/notificationModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
@@ -364,14 +365,19 @@ exports.getContract = catchAsync(async (req, res, next) => {
     return next(new AppError("No contract found with that ID", 404));
   }
 
-  const checkArray = [contract.client.id, contract.freelancer.id, req.user.id];
+  const checkArray = [contract.client.id, contract.freelancer.id];
 
   if (!checkArray.some((el) => el === req.user.id)) {
     return next(new AppError("you can only get your contracts", 400));
   }
 
+  const conversation = await Conversation.findOne({
+    contract: req.params.id,
+  });
+
   res.status(200).json({
     status: "success",
+    conversation: conversation._id,
     data: {
       contract,
     },

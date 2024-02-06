@@ -14,12 +14,11 @@ const generateCookie = (res, token) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
-    domain: ".vercel.app",
-    sameSite: "None",
-    secure: true,
-    // domain: "localhost",
+    // domain: ".vercel.app",
+    // sameSite: "None",
+    // secure: process.env.NODE_ENV === "production",
+    domain: "localhost",
   };
-  // if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
   res.cookie("refresh", token, cookieOptions);
 };
 
@@ -136,8 +135,9 @@ exports.getAccessToken = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = catchAsync(async (req, res, next) => {
-  res.cookie("jwt", "loggedout", {
+  res.cookie("refresh", "loggedout", {
     expires: new Date(Date.now() + 10 * 1000),
+    domain: "localhost",
   });
   res.status(200).json({ status: "success" });
 });
