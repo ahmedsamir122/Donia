@@ -12,6 +12,8 @@ import { reportsActions } from "../../store/reports";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { useQuery } from "react-query";
+import { authActions } from "../../store/login-slice";
+import { useEffect } from "react";
 const Dashboard = () => {
   const tokenLocal = localStorage.getItem("token") || "";
   const dispatch = useDispatch();
@@ -22,16 +24,24 @@ const Dashboard = () => {
       headers: { Authorization: `Bearer ${tokenLocal}` },
     });
   };
-  const { isLoading, data, isError, error, isFetching, refetch } = useQuery(
-    "reports",
-    fetchReports,
-    {
-      refetchOnWindowFocus: false,
-      onSuccess: (fetchedData) => {
-        dispatch(reportsActions.updateActiveReports(fetchedData.data));
-      },
-    }
-  );
+
+  const fetchUser = () => {
+    return axios.get(`${URL}/api/v1/users/me`, {
+      headers: { Authorization: `Bearer ${tokenLocal}` },
+    });
+  };
+  const {} = useQuery("reports", fetchReports, {
+    refetchOnWindowFocus: false,
+    onSuccess: (fetchedData) => {
+      dispatch(reportsActions.updateActiveReports(fetchedData.data));
+    },
+  });
+  const {} = useQuery("user", fetchUser, {
+    refetchOnWindowFocus: false,
+    onSuccess: (fetchedData) => {
+      dispatch(authActions.login(fetchedData.data.data.user));
+    },
+  });
 
   const handleBtnClick = (e) => {
     const isLinkWithinListItem =
@@ -44,6 +54,10 @@ const Dashboard = () => {
 
       e.target.style.color = "rgba(0, 0, 0, 0.9)";
     }
+  };
+
+  const handleLogoutBtn = () => {
+    localStorage.clear();
   };
 
   return (
@@ -60,7 +74,7 @@ const Dashboard = () => {
         <ul>
           <li>
             <ComputerIcon className={classes.black} />
-            <Link to="/dashboard/dashboard/">Dashboard</Link>
+            <Link to="/dashboard/">Dashboard</Link>
           </li>
           <li>
             <PersonIcon className={classes.black} />
@@ -83,6 +97,13 @@ const Dashboard = () => {
               ""
             )}
           </li>
+          <Link
+            className={classes.logoutBtn}
+            to="/signin"
+            onClick={handleLogoutBtn}
+          >
+            Sign Out
+          </Link>
         </ul>
       </div>
       <div className={classes.mainContent}>
