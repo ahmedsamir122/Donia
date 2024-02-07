@@ -9,10 +9,6 @@ router
   .get(authController.protect, conversationController.getMyConversations);
 
 router
-  .route("/:contractId")
-  .post(authController.protect, conversationController.createConversation);
-
-router
   .route("/getOne/:conversationId")
   .get(authController.protect, conversationController.getCurrentConversation);
 router
@@ -25,5 +21,9 @@ router
 router
   .route("/close/:conversationId")
   .patch(authController.protect, conversationController.closeConversation);
+
+router
+  .route("/:contractId")
+  .post(authController.protect, conversationController.createConversation);
 
 module.exports = router;

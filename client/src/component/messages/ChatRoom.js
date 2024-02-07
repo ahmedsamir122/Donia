@@ -27,9 +27,9 @@ const ChatRoom = (props) => {
   const [allMessages, setAllMessages] = useState([]);
   // const [socket, setSocket] = useState(null);
   // const socket = useSelector((state) => state.socket.socket);
-  const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
-    cluster: process.env.REACT_APP_PUSHER_CLUSTER,
-  });
+  // const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
+  //   cluster: process.env.REACT_APP_PUSHER_CLUSTER,
+  // });
   const scrollRef = useRef();
 
   // useEffect(() => {
@@ -47,30 +47,30 @@ const ChatRoom = (props) => {
   //   });
   // }, []);
 
-  useEffect(() => {
-    var channel = pusher.subscribe(`channel-${user?.id}`);
-    channel.bind(`event-${user?.id}`, function (data) {
-      alert(JSON.stringify(data));
-      console.log(data);
-      if (data?.conversation === params.messageId) {
-        setAllMessages((prev) => {
-          return [...prev, data?.message];
-        });
-      }
-    });
-    return () => {
-      channel.unsubscribe(`channel-${user?.id}`);
-      pusher.disconnect();
-    };
-  }, [user]);
-
   // useEffect(() => {
-  //   if (arrivalMessage.conversation === params.messageId) {
-  //     setAllMessages((prev) => {
-  //       return [...prev, arrivalMessage];
-  //     });
-  //   }
-  // }, [arrivalMessage, params.messageId]);
+  //   var channel = pusher.subscribe(`channel-${user?.id}`);
+  //   channel.bind(`event-${user?.id}`, function (data) {
+  //     alert(JSON.stringify(data));
+  //     console.log(data);
+  //     if (data?.conversation === params.messageId) {
+  //       setAllMessages((prev) => {
+  //         return [...prev, data?.message];
+  //       });
+  //     }
+  //   });
+  //   return () => {
+  //     channel.unsubscribe(`channel-${user?.id}`);
+  //     pusher.disconnect();
+  //   };
+  // }, [user]);
+
+  useEffect(() => {
+    if (arrivalMessage.conversation === params.messageId) {
+      setAllMessages((prev) => {
+        return [...prev, arrivalMessage];
+      });
+    }
+  }, [arrivalMessage, params.messageId]);
 
   const fetchCurrentConversation = () => {
     return getWishList(
@@ -102,6 +102,7 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setAllMessages(dataFetch?.data.data.messages);
+    console.log(dataFetch?.data.data.messages);
   }, [dataFetch?.data.data.messages]);
 
   const {
