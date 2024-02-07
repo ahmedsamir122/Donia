@@ -9,36 +9,29 @@ const Pusher = require("pusher");
 exports.sendMessage = catchAsync(async (req, res, next) => {
   const message = await Message.create({
     sender: req.user._id,
-    conversation: req.params.conversationId,
+    conversation: req.params.Id,
     content: req.body.content,
   });
 
   const conversation = await Conversation.findByIdAndUpdate(
-    req.params.conversationId,
+    req.params.Id,
     {
       latestMessage: message,
+    },
+    {
+      new: true,
+      runValidators: true,
     }
   );
-  const [reciever_id] = conversation.users.filter((u) => req.user._id !== u);
+  const [reciever_id] = conversation?.users.filter((u) =>
+    req.user._id.equals(u) ? false : true
+  );
   await message
     .populate({
       path: "sender",
       select: "username photo",
     })
     .execPopulate();
-
-  const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID,
-    key: process.env.PUSHER_KEY,
-    secret: process.env.PUSHER_SECRET,
-    cluster: process.env.PUSHER_CLUSTER,
-    useTLS: true,
-  });
-
-  pusher.trigger(`channel-${reciever_id}`, `event-${reciever_id}`, {
-    message: req.body.content,
-    conversation: req.params.conversationId,
-  });
 
   res.status(201).json({
     status: "success",
@@ -55,12 +48,16 @@ exports.getMessages = catchAsync(async (req, res, next) => {
 
   const currentConversation = await Conversation.findById(req.params.Id);
 
-  const isUserInConversation = currentConversation.users.some(
-    (user) => user === req.user.id
-  );
+  if (messages.length > 0) {
+    const isUserInConversation = currentConversation.users.some((userId) =>
+      userId.equals(req.user._id)
+    );
 
-  if (!isUserInConversation) {
-    return next(new AppError("You cannot get this conversation data", 400));
+    console.log(currentConversation.users, req.user.id);
+
+    if (!isUserInConversation) {
+      return next(new AppError("You cannot get this conversation data", 400));
+    }
   }
 
   res.status(200).json({
