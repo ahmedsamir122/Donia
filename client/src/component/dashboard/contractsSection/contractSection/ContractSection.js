@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { URL } from "../../../utils/queryFunctions";
 import Loading from "../../../loading/Loading";
@@ -9,18 +9,30 @@ import { useSelector } from "react-redux";
 import dateFormat from "dateformat";
 import Avatar from "@mui/material/Avatar";
 import Rating from "@mui/material/Rating";
+import DeleteIcon from "@mui/icons-material/Delete";
 import NewReportComponent from "../../newReportComponent/NewReportComponent";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 const ContractSection = () => {
   const { id } = useParams();
   const token = useSelector((state) => state.auth.token);
   const [contractVisible, setContractVisible] = useState(true);
   const tokenLocal = localStorage.getItem("token") || "";
+  const navigate = useNavigate();
 
   const fetchUser = () => {
     return axios.get(`${URL}/api/v1/contracts/${id}`, {
       headers: { Authorization: `Bearer ${tokenLocal}` },
     });
+  };
+  const deleteReview = (type) => {
+    return axios.delete(
+      `${URL}/api/v1/${type}/${data.data.data.contract[type][0]?.id}`,
+      {
+        headers: { Authorization: `Bearer ${tokenLocal}` },
+      }
+    );
   };
 
   const { isLoading, data, isError, error, isFetching, refetch } = useQuery(
@@ -43,6 +55,48 @@ const ContractSection = () => {
   if (isError || !data) {
     return <div>{error?.response.data.message}</div>;
   }
+  const handleMessagesBtn = () => {
+    navigate(`/dashboard/contracts/messaages/${data.data.conversation}`);
+  };
+
+  const showSwal = (type) => {
+    withReactContent(Swal)
+      .fire({
+        title: "Are you sure?",
+        text: `You will delete Review this User`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, Sure",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          deleteReview(type)
+            .then(() => {
+              Swal.fire({
+                title: "Success",
+                text: `Review Deleted`,
+                icon: "success",
+              });
+              refetch();
+            })
+            .catch((error) => {
+              Swal.fire({
+                title: "Error",
+                text: `Failed to Delete Review`,
+                icon: "error",
+              });
+            });
+        }
+      });
+  };
+
+  const handleReviewDelete = (type) => {
+    if (data.data.data.contract[type][0].id) {
+      showSwal(type);
+    }
+  };
 
   return (
     <>
@@ -105,7 +159,12 @@ const ContractSection = () => {
             <h2 className={classes.reviewsHeader}>Reviews</h2>
             <div className={classes.reviews}>
               <div className={classes.review}>
-                <h4>Client Review</h4>
+                <div className={classes.reviewHeader}>
+                  <h4>Client Review</h4>
+                  <button onClick={() => handleReviewDelete("reviewCs")}>
+                    <DeleteIcon />
+                  </button>
+                </div>
                 <Rating
                   name="read-only"
                   value={data.data.data.contract.reviewCs[0]?.rating}
@@ -114,7 +173,12 @@ const ContractSection = () => {
                 <p>{data.data.data.contract.reviewCs[0]?.review}</p>
               </div>
               <div className={classes.review}>
-                <h4>Talent Review</h4>
+                <div className={classes.reviewHeader}>
+                  <h4>Talent Review</h4>
+                  <button onClick={() => handleReviewDelete("reviewFs")}>
+                    <DeleteIcon />
+                  </button>
+                </div>
                 <Rating
                   name="read-only"
                   value={data.data.data.contract.reviewFs[0]?.rating}
@@ -152,6 +216,11 @@ const ContractSection = () => {
                   <p>{data.data.data.contract.freelancer.id}</p>
                 </div>
               </div>
+            </div>
+            <div className={classes.chatBtnContainer}>
+              <button className={classes.chatBtn} onClick={handleMessagesBtn}>
+                Show Chat
+              </button>
             </div>
           </div>
         </div>

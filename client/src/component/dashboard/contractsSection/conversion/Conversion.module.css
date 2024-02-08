@@ -1,0 +1,49 @@
+.chatContainer {
+  background-color: white;
+  width: 70%;
+  margin: 1rem auto;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  max-height: 90%;
+  overflow: scroll;
+}
+.chatCard {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  max-width: 60%;
+}
+.chatCard img {
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+}
+.chatCard .chat {
+  position: relative;
+  background-color: #ececec;
+  border-radius: 0.3rem;
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  color: black;
+}
+.chatCard .chatHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+}
+.chatCard .chatHeader h5 {
+  margin-right: 0.8rem;
+}
+.right {
+  margin-left: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.right .chat {
+  background-color: #589ffb;
+  color: white;
+  margin-right: 0.5rem;
+}
