@@ -35,6 +35,7 @@ import ReviewsTable from "./component/dashboard/reviewsSection/reviewsTable/Revi
 import ReportsSection from "./component/dashboard/reportsSection/ReportsSection";
 import ReportsTable from "./component/dashboard/reportsSection/reportsTable/ReportsTable";
 import ReportSection from "./component/dashboard/reportsSection/reportSection/ReportSection";
+import Conversion from "./component/dashboard/contractsSection/conversion/Conversion";
 
 const router = createBrowserRouter([
   {
@@ -91,7 +92,7 @@ const router = createBrowserRouter([
     path: "/dashboard",
     element: <Dashboard />,
     children: [
-      { path: "/dashboard/dashboard/", element: <DashboardSection /> },
+      { path: "/dashboard/", element: <DashboardSection /> },
       {
         path: "/dashboard/contracts/",
         element: <ContractsSection />,
@@ -99,6 +100,10 @@ const router = createBrowserRouter([
           {
             path: "/dashboard/contracts/:id",
             element: <ContractSection />,
+          },
+          {
+            path: "/dashboard/contracts/messaages/:id",
+            element: <Conversion />,
           },
           {
             path: "/dashboard/contracts/",
