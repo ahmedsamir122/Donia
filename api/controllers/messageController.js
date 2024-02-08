@@ -6,6 +6,13 @@ const Message = require("../models/message");
 const Conversation = require("../models/conversation");
 const Pusher = require("pusher");
 
+const pusher = new Pusher({
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET,
+  cluster: process.env.PUSHER_CLUSTER,
+});
+
 exports.sendMessage = catchAsync(async (req, res, next) => {
   const message = await Message.create({
     sender: req.user._id,
@@ -33,6 +40,11 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
     })
     .execPopulate();
 
+  pusher.trigger(`channel-${reciever_id}`, `event-${reciever_id}`, {
+    message: req.body.content,
+    conversation: req.params.Id,
+  });
+
   res.status(201).json({
     status: "success",
     data: {
@@ -52,8 +64,6 @@ exports.getMessages = catchAsync(async (req, res, next) => {
     const isUserInConversation = currentConversation.users.some((userId) =>
       userId.equals(req.user._id)
     );
-
-    console.log(currentConversation.users, req.user.id);
 
     if (!isUserInConversation) {
       return next(new AppError("You cannot get this conversation data", 400));
