@@ -225,11 +225,11 @@ const ChatRoom = (props) => {
       } else {
         send = {
           sender: {
-            _id: user._id,
+            _id: other[0]?.id,
             username: user.username,
             photo: user.photo,
           },
-          recieverId: other[0]._id,
+          recieverId: user?.id,
           content: data.message,
           conversationId: params.messageId,
           createdAt: Date.now(),
