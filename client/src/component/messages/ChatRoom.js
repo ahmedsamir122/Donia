@@ -16,6 +16,10 @@ import { useDispatch } from "react-redux";
 import { lastMessageActions } from "../../store/lastMessage";
 import Pusher from "pusher-js";
 
+const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
+  cluster: process.env.REACT_APP_PUSHER_CLUSTER,
+});
+
 const ChatRoom = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
@@ -27,9 +31,7 @@ const ChatRoom = (props) => {
   const [allMessages, setAllMessages] = useState([]);
   // const [socket, setSocket] = useState(null);
   // const socket = useSelector((state) => state.socket.socket);
-  // const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
-  //   cluster: process.env.REACT_APP_PUSHER_CLUSTER,
-  // });
+
   const scrollRef = useRef();
 
   // useEffect(() => {
@@ -46,23 +48,6 @@ const ChatRoom = (props) => {
   //     });
   //   });
   // }, []);
-
-  // useEffect(() => {
-  //   var channel = pusher.subscribe(`channel-${user?.id}`);
-  //   channel.bind(`event-${user?.id}`, function (data) {
-  //     alert(JSON.stringify(data));
-  //     console.log(data);
-  //     if (data?.conversation === params.messageId) {
-  //       setAllMessages((prev) => {
-  //         return [...prev, data?.message];
-  //       });
-  //     }
-  //   });
-  //   return () => {
-  //     channel.unsubscribe(`channel-${user?.id}`);
-  //     pusher.disconnect();
-  //   };
-  // }, [user]);
 
   useEffect(() => {
     if (arrivalMessage.conversation === params.messageId) {
@@ -102,7 +87,6 @@ const ChatRoom = (props) => {
 
   useEffect(() => {
     setAllMessages(dataFetch?.data.data.messages);
-    console.log(dataFetch?.data.data.messages);
   }, [dataFetch?.data.data.messages]);
 
   const {
@@ -122,8 +106,6 @@ const ChatRoom = (props) => {
     reset,
     formState: { errors, isValid },
   } = useForm({ mode: "onChange" });
-
-  console.log(dataFetchCurrentConversation?.data.data.conversation);
 
   const { mutate, isError, error } = useMutation(sendMessage, {
     onSuccess: (data) => {
@@ -198,6 +180,69 @@ const ChatRoom = (props) => {
   useEffect(() => {
     scrollRef?.current?.scrollIntoView({ behavior: "smooth" });
   }, [allMessages]);
+
+  useEffect(() => {
+    var channel = pusher.subscribe(`channel-${user?.id}`);
+    channel.bind(`event-${user?.id}`, function (data) {
+      console.log(data);
+      if (data?.conversation === params.messageId) {
+        setAllMessages((prev) => {
+          return [
+            ...prev,
+            {
+              createdAt: Date.now(),
+              content: data.message,
+              sender: {
+                photo: other[0]?.photo,
+                username: other[0]?.username,
+                _id: other[0]?._id,
+              },
+              conversation: params.messageId,
+            },
+          ];
+        });
+      }
+      let send;
+
+      if (
+        !dataFetchCurrentConversation?.data.data.conversation.latestMessage &&
+        !fix
+      ) {
+        send = {
+          ...dataFetchCurrentConversation?.data.data.conversation,
+          latestMessage: {
+            createdAt: Date.now(),
+            content: data.message,
+            sender: {
+              photo: other[0]?.photo,
+              username: other[0]?.username,
+              _id: other[0]?._id,
+            },
+            conversation: params.messageId,
+          },
+        };
+        setFix(true);
+      } else {
+        send = {
+          sender: {
+            _id: user._id,
+            username: user.username,
+            photo: user.photo,
+          },
+          recieverId: other[0]._id,
+          content: data.message,
+          conversationId: params.messageId,
+          createdAt: Date.now(),
+        };
+      }
+
+      dispatch(lastMessageActions.getLastMessage(send));
+    });
+    return () => {
+      channel.unsubscribe(`channel-${user?.id}`);
+      // pusher.disconnect();
+    };
+  }, [user, params.messageId]);
   if (isLoadingFetch || isLoadingCurrentConversation) {
     return (
       <div className={classes.loading}>
@@ -224,7 +269,7 @@ const ChatRoom = (props) => {
       <div className={classes.chatCon}>
         <div className={classes.messagesCon}>
           {allMessages?.map((c) => (
-            <div ref={scrollRef} key={c._id}>
+            <div ref={scrollRef} key={c.id}>
               <OneMessage message={c} own={c.sender?._id === user._id} />
             </div>
           ))}
