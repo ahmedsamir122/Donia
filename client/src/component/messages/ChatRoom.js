@@ -182,6 +182,10 @@ const ChatRoom = (props) => {
   }, [allMessages]);
 
   useEffect(() => {
+    const userId = user?.id;
+    if (!userId) {
+      return; // Wait until user ID is available
+    }
     var channel = pusher.subscribe(`channel-${user?.id}`);
     channel.bind(`event-${user?.id}`, function (data) {
       console.log(data);
@@ -238,10 +242,10 @@ const ChatRoom = (props) => {
 
       dispatch(lastMessageActions.getLastMessage(send));
     });
-    return () => {
-      channel.unsubscribe(`channel-${user?.id}`);
-      // pusher.disconnect();
-    };
+    // return () => {
+    //   channel.unsubscribe(`channel-${user?.id}`);
+    //   // pusher.disconnect();
+    // };
   }, [user, params.messageId]);
   if (isLoadingFetch || isLoadingCurrentConversation) {
     return (
