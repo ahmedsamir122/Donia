@@ -367,8 +367,10 @@ exports.getContract = catchAsync(async (req, res, next) => {
 
   const checkArray = [contract.client.id, contract.freelancer.id];
 
-  if (!checkArray.some((el) => el === req.user.id)) {
-    return next(new AppError("you can only get your contracts", 400));
+  if (req.user.role !== "admin" || req.user.role !== "supervisor") {
+    if (!checkArray.some((el) => el === req.user.id)) {
+      return next(new AppError("you can only get your contracts", 400));
+    }
   }
 
   const conversation = await Conversation.findOne({
