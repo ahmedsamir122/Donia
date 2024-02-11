@@ -379,7 +379,7 @@ exports.getContract = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    conversation: conversation._id,
+    conversation: conversation?._id,
     data: {
       contract,
     },
