@@ -7,6 +7,7 @@
   border-radius: 5px;
   overflow: auto;
   table-layout: fixed;
+  margin-bottom: 20px;
 }
 .headRow {
   height: 50px;
@@ -46,7 +47,7 @@
 .chatBody {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   color: rgba(32, 32, 32, 0.753);
   text-decoration: none;
   padding: 4px;
@@ -57,15 +58,8 @@
   margin-right: auto;
   width: 60px;
 }
-
-.chatPoint {
-  background-color: grey;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-}
-.active {
-  background-color: green;
+.chat {
+  color: #139ff0;
 }
 .contractName {
   text-decoration: none;

@@ -10,16 +10,29 @@ import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeft
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { authActions } from "../../../store/login-slice";
+import { useMutation } from "react-query";
+import axios from "axios";
+import { URL } from "../../utils/queryFunctions";
+
+const logOut = () => {
+  return axios.get(`${URL}/api/v1/users/logout`);
+};
 
 const Account = (props) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
 
+  const { mutate, isError, error } = useMutation(logOut, {
+    onSuccess: (data) => {
+      localStorage.removeItem("token");
+      dispatch(authActions.logout());
+      navigate("/");
+    },
+  });
+
   const logoutHandler = () => {
-    dispatch(authActions.logout());
-    localStorage.removeItem("token");
-    navigate("/");
+    mutate();
   };
 
   return (

@@ -5,30 +5,14 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 import { postDataProtect, URL } from "../utils/queryFunctions";
 import { useSelector } from "react-redux";
+import Pagination from "@mui/material/Pagination";
+import { useState } from "react";
 
 const ContractsTableHtml = (props) => {
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
+  const [page, setPage] = useState(1);
 
-  const postData = (data, id) => {
-    return postDataProtect(
-      `${URL}/api/v1/conversations/${data.id}`,
-      data,
-      token
-    );
-  };
-
-  const { mutate, isError, error } = useMutation(postData, {
-    onSuccess: (data) => {
-      console.log(data);
-      navigate(`/messages/${data.data.data.conversation._id}`);
-    },
-  });
-  const chatHandler = (id) => {
-    mutate({ id });
-  };
-
-  console.log(props.onData);
   return (
     <div>
       <table className={classes.table}>
@@ -75,13 +59,8 @@ const ContractsTableHtml = (props) => {
               <td className={`${classes.bodyCell} `}>
                 <div
                   className={`${classes.chatBody}`}
-                  onClick={() => chatHandler(con.id)}
+                  onClick={() => navigate(`/messages/${props.onConversation}`)}
                 >
-                  <div
-                    className={`${classes.chatPoint} ${
-                      con.activity === "active" && classes.active
-                    }`}
-                  ></div>
                   <p className={classes.chat}>Chat</p>
                 </div>
               </td>

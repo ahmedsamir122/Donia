@@ -49,6 +49,7 @@
 
 .filterButton {
   display: none;
+  cursor: pointer;
 }
 
 @media (max-width: 767px) {

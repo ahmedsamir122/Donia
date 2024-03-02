@@ -94,17 +94,28 @@ exports.getPublicContractsC = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyContractsF = catchAsync(async (req, res, next) => {
-  const contracts = await Contract.find({ freelancer: req.user._id })
-    .populate({
-      path: "client",
-      select: "username",
-    })
-    .populate("reviewCs")
-    .populate("reviewFs");
+  const features = new APIFeatures(
+    Contract.find({ freelancer: req.user._id })
+      .populate({
+        path: "client",
+        select: "username",
+      })
+      .populate("reviewCs")
+      .populate("reviewFs"),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const contracts = await features.query;
+
+  const count = await Contract.countDocuments({ freelancer: req.user._id });
 
   res.status(200).json({
     status: "success",
     results: contracts.length,
+    totalNum: count,
     data: {
       contracts,
     },
@@ -112,17 +123,28 @@ exports.getMyContractsF = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyContractsC = catchAsync(async (req, res, next) => {
-  const contracts = await Contract.find({ client: req.user._id })
-    .populate({
-      path: "freelancer",
-      select: "username",
-    })
-    .populate("reviewCs")
-    .populate("reviewFs");
+  const features = new APIFeatures(
+    Contract.find({ client: req.user._id })
+      .populate({
+        path: "freelancer",
+        select: "username",
+      })
+      .populate("reviewCs")
+      .populate("reviewFs"),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const contracts = await features.query;
+
+  const count = await Contract.countDocuments({ client: req.user._id });
 
   res.status(200).json({
     status: "success",
     results: contracts.length,
+    totalNum: count,
     data: {
       contracts,
     },
@@ -334,12 +356,14 @@ exports.createContract = catchAsync(async (req, res, next) => {
     content: `${other.username} has requested to open a contract with you`,
   });
 
-  res.status(201).json({
-    status: "success",
-    data: {
-      contract: newContract,
-    },
-  });
+  // res.status(201).json({
+  //   status: "success",
+  //   data: {
+  //     contract: newContract,
+  //   },
+  // });
+  req.contract = newContract;
+  next();
 });
 
 exports.getContract = catchAsync(async (req, res, next) => {

@@ -16,12 +16,12 @@ const pusher = new Pusher({
 exports.sendMessage = catchAsync(async (req, res, next) => {
   const message = await Message.create({
     sender: req.user._id,
-    conversation: req.params.Id,
+    conversation: req.params.conversationId,
     content: req.body.content,
   });
 
   const conversation = await Conversation.findByIdAndUpdate(
-    req.params.Id,
+    req.params.conversationId,
     {
       latestMessage: message,
     },
@@ -42,7 +42,12 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
 
   pusher.trigger(`channel-${reciever_id}`, `event-${reciever_id}`, {
     message: req.body.content,
-    conversation: req.params.Id,
+    conversation: req.params.conversationId,
+    sender: {
+      id: req.user.id,
+      username: message.sender.username,
+      photo: message.sender.photo,
+    },
   });
 
   res.status(201).json({
@@ -55,10 +60,12 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
 
 exports.getMessages = catchAsync(async (req, res, next) => {
   const messages = await Message.find({
-    conversation: req.params.Id,
+    conversation: req.params.conversationId,
   });
 
-  const currentConversation = await Conversation.findById(req.params.Id);
+  const currentConversation = await Conversation.findById(
+    req.params.conversationId
+  );
 
   if (messages.length > 0) {
     const isUserInConversation = currentConversation.users.some((userId) =>

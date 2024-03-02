@@ -12,24 +12,34 @@ import TuneIcon from "@mui/icons-material/Tune";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { queryActions } from "../../store/query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import { useQuery } from "react-query";
 import { getWishList, URL, updateFileData } from "../utils/queryFunctions";
 import { useMutation } from "react-query";
 import { useTranslation } from "react-i18next";
 import { authActions } from "../../store/login-slice";
+import { pusherActions } from "../../store/pusher";
 import { blocklistActions } from "../../store/blocklist";
 import { wishlistActions } from "../../store/wishlist";
-import NavBarHome from "./NavBarHome";
+import Pusher from "pusher-js";
+import Backdrop from "./Backdrop";
+
 const NavBar = (props) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [showMessage, setShowMessage] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
   const [noteNum, setNoteNum] = useState(0);
   const [showAccount, setShowAccount] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
   const [searchInput, setSearchInput] = useState("");
+  const [showNavbar, setShowNavbar] = useState(false);
+  const [notificationData, setNotificationData] = useState([]);
+  const [hasNextPageNotifications, sethasNextPageNotifications] =
+    useState(true);
+  const [pageNotification, setPageNotification] = useState(1);
   const dispatch = useDispatch();
   let [searchParams, setSearchParams] = useSearchParams();
   const { t, i18n } = useTranslation();
@@ -85,6 +95,16 @@ const NavBar = (props) => {
     refetchOnWindowFocus: false,
     enabled: false,
   });
+
+  useEffect(() => {
+    const currentURL = location.pathname;
+    console.log("Current URL:", currentURL);
+
+    if (currentURL.includes("search")) {
+      setShowNavbar(true);
+    } else setShowNavbar(false);
+    // Perform any other actions based on the URL change
+  }, [location]);
 
   useEffect(() => {
     if (!tokenLocal) {
@@ -146,7 +166,10 @@ const NavBar = (props) => {
   ]);
 
   const fetchNotifications = () => {
-    return getWishList(`${URL}/api/v1/notification`, token);
+    return getWishList(
+      `${URL}/api/v1/notification?page=${pageNotification}&limit=2`,
+      tokenLocal
+    );
   };
 
   const updateNotificationSee = () => {
@@ -169,26 +192,55 @@ const NavBar = (props) => {
     },
   });
 
-  const { isLoading, error, data } = useQuery(
-    "notifications",
-    fetchNotifications,
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!user,
-      onSuccess,
+  const {
+    isLoading,
+    error,
+    data,
+    refetch: refetchNotifications,
+    isFetching,
+  } = useQuery("notifications", fetchNotifications, {
+    refetchOnWindowFocus: false,
+    enabled: !!user,
+    onSuccess: (data) => {
+      console.log(data);
+      setNotificationData((prev) => [
+        ...prev,
+        ...data?.data?.data?.notifications,
+      ]);
+    },
+  });
+
+  const pageNotifictionHandler = () => {
+    setPageNotification((prev) => {
+      const totalPageNotification = Math.ceil(data?.data?.totalResults / 2);
+      if (pageNotification === totalPageNotification) {
+        return prev;
+      } else {
+        return prev + 1;
+      }
+    });
+  };
+
+  useEffect(() => {
+    const totalPageNotification = Math.ceil(data?.data?.totalResults / 2);
+
+    if (pageNotification === totalPageNotification) {
+      sethasNextPageNotifications(false);
+      return;
     }
-  );
+    refetchNotifications();
+  }, [pageNotification, refetchNotifications, data?.data?.totalResults]);
 
-  console.log(data);
-
-  const toggleMessageHandler = () => {
+  const toggleMessageHandler = (e) => {
+    e.stopPropagation();
     setShowMessage((prev) => {
       return !prev;
     });
     setShowAccount(false);
     setShowNotes(false);
   };
-  const toggleNotesHandler = () => {
+  const toggleNotesHandler = (e) => {
+    e.stopPropagation();
     setShowNotes((prev) => {
       return !prev;
     });
@@ -196,7 +248,8 @@ const NavBar = (props) => {
     setShowMessage(false);
     mutate();
   };
-  const toggleAccountHandler = () => {
+  const toggleAccountHandler = (e) => {
+    e.stopPropagation();
     setShowAccount((prev) => {
       return !prev;
     });
@@ -217,10 +270,27 @@ const NavBar = (props) => {
     dispatch(queryActions.addQuery(""));
   }, []);
 
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
+      cluster: process.env.REACT_APP_PUSHER_CLUSTER,
+      authEndpoint: `${URL}/api/v1/pusher/auth`,
+      auth: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    });
+    dispatch(pusherActions.getPusher(pusher));
+  }, [tokenLocal, dispatch, token]);
+
   const submitHandler = (e) => {
     e.preventDefault();
     setSearchParams({ q: searchInput });
     dispatch(queryActions.addQuery(searchInput));
+    navigate("/");
   };
 
   const changeLanguageHandler = (e) => {
@@ -232,15 +302,22 @@ const NavBar = (props) => {
     }
   };
 
+  const hideLinks = () => {
+    console.log("header");
+    setShowMessage(false);
+    setShowAccount(false);
+    setShowNotes(false);
+  };
+
   return (
     <>
-      {user && (
-        <header>
-          <div className="container">
-            <div className={classes.main}>
-              <Link className={classes.logo} to="/">
-                {t("test")}
-              </Link>
+      <header className={classes.header} onClick={hideLinks}>
+        <div className="container">
+          <div className={classes.main}>
+            <Link className={classes.logo} to="/">
+              {t("test")}
+            </Link>
+            {(user || showNavbar) && (
               <form className={classes.form} onSubmit={submitHandler}>
                 <input
                   type="search"
@@ -257,62 +334,68 @@ const NavBar = (props) => {
                   <TuneIcon />
                 </div>
               </form>
-              {user && (
-                <ul className={classes.ul}>
-                  <li className={classes.lang}>
-                    <select onChange={changeLanguageHandler}>
-                      <option value="En">EN</option>
-                      <option value="Bah">BAH</option>
-                    </select>
-                  </li>
-                  <li
-                    className={classes.notContainer}
-                    onClick={toggleNotesHandler}
-                  >
-                    <CiBellOn className={classes.not} />
-                    {noteNum > 0 && <span>{noteNum}</span>}
-                  </li>
-                  {showNotes && (
-                    <NotificationModal
-                      onNotification={toggleNotesHandler}
-                      dataNotes={data.data}
-                    />
-                  )}
-                  <li
-                    className={classes.notContainer}
-                    onClick={toggleMessageHandler}
-                  >
-                    <CiChat1 className={classes.mes} />
-                    {/* <span>1</span> */}
-                  </li>
-                  <li
-                    className={classes.notContainer}
-                    onClick={() => navigate("/contracts")}
-                  >
-                    <LibraryBooksIcon className={classes.mes} />
-                  </li>
-                  {showMessage && (
-                    <MessageModal onMessage={toggleMessageHandler} />
-                  )}
-                  <li className={classes.user} onClick={toggleAccountHandler}>
-                    <img src={user.photo} alt="" className={classes.img} />
-                  </li>
-                  {showAccount && (
-                    <AccountModal onAccount={toggleAccountHandler} />
-                  )}
-                </ul>
-              )}
-              {!user && (
-                <Link to="/signin" className={classes.login}>
-                  login
-                </Link>
-              )}
-            </div>
+            )}
+            {user && (
+              <ul className={classes.ul}>
+                <li className={classes.lang}>
+                  <select onChange={changeLanguageHandler}>
+                    <option value="En">EN</option>
+                    <option value="Bah">BAH</option>
+                  </select>
+                </li>
+                <li
+                  className={classes.notContainer}
+                  onClick={toggleNotesHandler}
+                >
+                  <CiBellOn className={classes.not} />
+                  {noteNum > 0 && noteNum < 100 && <span>{noteNum}</span>}
+                  {noteNum > 99 && <span>+99</span>}
+                </li>
+                {showNotes && (
+                  <NotificationModal
+                    onNotification={toggleNotesHandler}
+                    dataNotes={notificationData}
+                    loading={isFetching}
+                    onPageHandler={pageNotifictionHandler}
+                    hasNextPage={hasNextPageNotifications}
+                  />
+                )}
+                <li
+                  className={classes.notContainer}
+                  onClick={toggleMessageHandler}
+                >
+                  <CiChat1 className={classes.mes} />
+                  {/* <span>1</span> */}
+                </li>
+                <li
+                  className={classes.notContainer}
+                  onClick={() => navigate("/contracts")}
+                >
+                  <LibraryBooksIcon className={classes.mes} />
+                </li>
+                {showMessage && (
+                  <MessageModal onMessage={toggleMessageHandler} />
+                )}
+                <li className={classes.user} onClick={toggleAccountHandler}>
+                  <img src={user.photo} alt="" className={classes.img} />
+                </li>
+                {showAccount && (
+                  <AccountModal onAccount={toggleAccountHandler} />
+                )}
+              </ul>
+            )}
+            {!user && (
+              <Link to="/signin" className={classes.login}>
+                login
+              </Link>
+            )}
           </div>
-          {showFilter && <FilterModal onFilter={toggleFilterHandler} />}
-        </header>
+        </div>
+        {showFilter && <FilterModal onFilter={toggleFilterHandler} />}
+      </header>
+      {(showNotes || showMessage || showAccount) && (
+        <Backdrop onHideHandler={hideLinks} />
       )}
-      {!user && <NavBarHome />}
       <Outlet />
     </>
   );

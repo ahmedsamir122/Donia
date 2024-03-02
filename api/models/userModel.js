@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: [true, "Please write your email"],
-      unique: [true, "this username already exists"],
+      unique: [true, "this email already exists"],
       lowercase: true,
       validate: [validator.isEmail, "Please write avalid email"],
     },
@@ -46,7 +46,7 @@ const userSchema = new mongoose.Schema(
         validator: function (el) {
           return this.password === el;
         },
-        message: "Password aren't the same!",
+        message: "Password isn't the same!",
       },
     },
     perform: {

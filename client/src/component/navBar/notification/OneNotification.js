@@ -38,13 +38,13 @@ const OneNotification = (props) => {
     },
   });
 
-  const deleteNotificationHandler = () => {
+  const deleteNotificationHandler = (e) => {
+    e.stopPropagation();
     mutate();
   };
-  console.log(props.onData.id);
 
   return (
-    <div className={classes.messCon}>
+    <div className={classes.messCon} ref={props.innerRef}>
       {props.onData.content}
       <button className={classes.button} onClick={deleteNotificationHandler}>
         X

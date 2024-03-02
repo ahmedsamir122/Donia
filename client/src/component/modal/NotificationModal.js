@@ -8,6 +8,9 @@ const NotificationCard = (props) => {
       <Notifications
         onNotification={props.onNotification}
         dataNotes={props.dataNotes}
+        loading={props.loading}
+        onPageHandler={props.onPageHandler}
+        hasNextPage={props.hasNextPage}
       />
     </React.Fragment>
   );
@@ -19,6 +22,9 @@ const NotificationModal = (props) => {
         <NotificationCard
           onNotification={props.onNotification}
           dataNotes={props.dataNotes}
+          loading={props.loading}
+          onPageHandler={props.onPageHandler}
+          hasNextPage={props.hasNextPage}
         />,
         document.getElementById("Notification")
       )}

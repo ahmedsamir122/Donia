@@ -11,10 +11,10 @@ const conversationSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  contract: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Contract",
-  },
+  // contract: {
+  //   type: mongoose.Schema.ObjectId,
+  //   ref: "Contract",
+  // },
   latestMessage: {
     type: mongoose.Schema.ObjectId,
     ref: "Message",

@@ -1,9 +1,26 @@
 import classes from "./Notifications.module.css";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import OneNotification from "./OneNotification";
+import { useInView } from "react-intersection-observer";
+import { useEffect, useRef } from "react";
+import Loading from "../../loading/Loading";
 
 const Notifications = (props) => {
-  console.log(props.dataNotes.data.notifications);
+  const { ref, inView } = useInView();
+  const wasInView = useRef(false);
+
+  useEffect(() => {
+    if (inView && !wasInView.current && props.hasNextPage) {
+      props.onPageHandler();
+      wasInView.current = true;
+    }
+    // Cleanup function
+    return () => {
+      wasInView.current = inView;
+    };
+  }, [inView, props]);
+
+  console.log(props.loading);
   return (
     <div className={classes.main}>
       <div className={classes.topTitle}>
@@ -12,12 +29,20 @@ const Notifications = (props) => {
         </div>
         <h2 className={classes.title}>Notification</h2>
       </div>
-      {props.dataNotes.data.notifications.length > 0 &&
-        props.dataNotes.data.notifications.map((note) => (
-          <OneNotification onData={note} />
-        ))}
-      {props.dataNotes.data.notifications.length === 0 && (
+      {props.dataNotes.length > 0 &&
+        props.dataNotes.map((note, index) => {
+          if (props.dataNotes.length === index + 1) {
+            return <OneNotification onData={note} innerRef={ref} />;
+          }
+          return <OneNotification onData={note} />;
+        })}
+      {props.dataNotes.length === 0 && (
         <div> there is no notifications found</div>
+      )}
+      {props.loading && (
+        <div>
+          <Loading />
+        </div>
       )}
     </div>
   );

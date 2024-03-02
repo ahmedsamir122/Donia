@@ -8,6 +8,7 @@ import lastMessageReducer from "./lastMessage";
 import socketReducer from "./socket";
 import queryReducer from "./query";
 import reportsReducer from "./reports";
+import pusherReducer from "./pusher";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     lastMessage: lastMessageReducer,
     socket: socketReducer,
     reports: reportsReducer,
+    pusher: pusherReducer,
   },
   middleware: getDefaultMiddleware({
     serializableCheck: false, // Disable the serializable check

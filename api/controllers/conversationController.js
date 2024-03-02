@@ -4,37 +4,69 @@ const AppError = require("../utils/appError");
 const Contract = require("../models/contractModel");
 const Conversation = require("../models/conversation");
 
-exports.createConversation = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.contractId);
+// exports.createConversation = catchAsync(async (req, res, next) => {
+//   const contract = await Contract.findById(req.params.contractId);
 
+//   const other = contract.freelancer.equals(req.user._id)
+//     ? contract.client
+//     : contract.freelancer;
+//   let conversation;
+//   conversation = await Conversation.findOneAndUpdate(
+//     { contract: req.params.contractId },
+//     {
+//       $setOnInsert: {
+//         users: [req.user._id, other],
+//         contract: req.params.contractId,
+//         closed: false,
+//       },
+//     },
+//     { upsert: true, new: true }
+//   ).populate({
+//     path: "users",
+//     select: "username photo",
+//   });
+
+//   if (conversation.closed) {
+//     conversation.closed = false;
+//     await conversation.save();
+//   }
+
+//   res.status(201).json({
+//     status: "success",
+//     data: {
+//       conversation,
+//     },
+//   });
+// });
+exports.createConversation = catchAsync(async (req, res, next) => {
+  const contract = await Contract.findById(req.contract._id);
   const other = contract.freelancer.equals(req.user._id)
     ? contract.client
     : contract.freelancer;
-  let conversation;
-  conversation = await Conversation.findOneAndUpdate(
-    { contract: req.params.contractId },
-    {
-      $setOnInsert: {
-        users: [req.user._id, other],
-        contract: req.params.contractId,
-        closed: false,
-      },
+
+  const users = [req.user.id, other];
+
+  const conversation = await Conversation.findOne({
+    users: {
+      $all: users,
     },
-    { upsert: true, new: true }
-  ).populate({
-    path: "users",
-    select: "username photo",
-  });
+  }).exec();
+
+  if (!conversation) {
+    conversation = await Conversation.create({ users });
+  }
+  contract.conversation = conversation._id;
+  await contract.save();
 
   if (conversation.closed) {
     conversation.closed = false;
     await conversation.save();
   }
-
   res.status(201).json({
     status: "success",
     data: {
       conversation,
+      contract,
     },
   });
 });
@@ -78,11 +110,15 @@ exports.getOneConversationAdmin = catchAsync(async (req, res, next) => {
   });
 });
 exports.getMyConversations = catchAsync(async (req, res, next) => {
-  const conversations = await Conversation.find({
-    closed: false,
+  const usernameQuery = req.query.username;
+  const baseQuery = {
     users: { $elemMatch: { $eq: req.user._id } },
     latestMessage: { $exists: true },
-  })
+  };
+
+  // Conditionally include the 'users' filter if the 'username' query parameter is present
+
+  let conversations = await Conversation.find(baseQuery)
     .populate({
       path: "users",
       select: "username photo",
@@ -91,6 +127,17 @@ exports.getMyConversations = catchAsync(async (req, res, next) => {
       path: "latestMessage",
       select: "sender createdAt content",
     });
+
+  if (usernameQuery) {
+    conversations = conversations.filter((conv) =>
+      conv.users.some(
+        (user) =>
+          user.username.match(new RegExp(usernameQuery, "gi")) &&
+          user._id.toString() !== req.user._id.toString()
+      )
+    );
+  }
+
   res.status(200).json({
     status: "success",
     results: conversations.length,
@@ -101,7 +148,7 @@ exports.getMyConversations = catchAsync(async (req, res, next) => {
 });
 
 exports.closeConversation = catchAsync(async (req, res, next) => {
-  const conversation = await Conversation.findByIdAndUpdate(
+  await Conversation.findByIdAndUpdate(
     req.params.conversationId,
     { closed: true },
     {
@@ -111,8 +158,42 @@ exports.closeConversation = catchAsync(async (req, res, next) => {
   );
   res.status(200).json({
     status: "success",
-    data: {
-      conversation,
-    },
+    // data: {
+    //   conversation,
+    // },
+  });
+});
+
+exports.checkOneOfUsers = catchAsync(async (req, res, next) => {
+  const conversation = await Conversation.findById(req.params.conversationId);
+
+  const isUserInConversation = conversation.users.some((user) =>
+    user.equals(req.user.id)
+  );
+  if (!isUserInConversation) {
+    return next(new AppError("You arenot one of this conversation", 400));
+  }
+  next();
+});
+
+exports.deleteConversation = catchAsync(async (req, res, next) => {
+  await Message.deleteMany({ conversation: req.params.conversationId }).exec();
+  const conversation = await Conversation.findByIdAndDelete(
+    req.params.conversationId
+  );
+  res.status(200).json({
+    status: "success",
+    data: null,
+  });
+});
+
+exports.updateConversation = catchAsync(async (req, res, next) => {
+  await Message.deleteMany({ conversation: req.params.conversationId }).exec();
+  const conversation = await Conversation.findByIdAndDelete(
+    req.params.conversationId
+  );
+  res.status(200).json({
+    status: "success",
+    data: null,
   });
 });

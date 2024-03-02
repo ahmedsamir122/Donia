@@ -10,7 +10,11 @@ router
 
 router
   .route("/getOne/:conversationId")
-  .get(authController.protect, conversationController.getCurrentConversation);
+  .get(
+    authController.protect,
+    conversationController.checkOneOfUsers,
+    conversationController.getCurrentConversation
+  );
 router
   .route("/getOne-admin/:conversationId")
   .get(
@@ -20,7 +24,11 @@ router
   );
 router
   .route("/close/:conversationId")
-  .patch(authController.protect, conversationController.closeConversation);
+  .patch(
+    authController.protect,
+    conversationController.checkOneOfUsers,
+    conversationController.closeConversation
+  );
 
 router
   .route("/:contractId")

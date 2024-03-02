@@ -6,16 +6,19 @@ import { getWishList, URL } from "../utils/queryFunctions";
 import { useEffect, useState } from "react";
 import React from "react";
 
-const AllConversations = () => {
+const AllConversations = (props) => {
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const lastMessageRed = useSelector((state) => state.lastMessage.lastMessage);
+  const [q, setQ] = useState("");
   const [sortedConversations, setSortedConversation] = useState(null);
   const [newConversations, setNewConversation] = useState([]);
-  console.log(lastMessageRed);
 
   const fetchConversations = () => {
-    return getWishList(`${URL}/api/v1/conversations/myConversations`, token);
+    return getWishList(
+      `${URL}/api/v1/conversations/myConversations${q}`,
+      token
+    );
   };
   const onSuccess = (data) => {
     setNewConversation(() => {
@@ -32,21 +35,31 @@ const AllConversations = () => {
       onSuccess, // Only execute the query if userId is truthy
     }
   );
-
+  useEffect(() => {
+    setQ(props.searchName ? `?username=${props.searchName}` : "");
+  }, [props.searchName]);
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    refetch();
+    setNewConversation(data?.data?.data?.conversations);
+  }, [q, token]);
   useEffect(() => {
     console.log("new", newConversations);
     if (!user || !newConversations) {
       return;
     }
 
-    const index = newConversations.findIndex(
-      (c) => c._id === lastMessageRed.conversationId
-    );
+    const index = newConversations.findIndex((c) => {
+      return c._id === lastMessageRed?.latestMessage?.conversationId;
+    });
+    console.log(index, newConversations, lastMessageRed);
     if (index >= 0) {
       const updatedConversations = [...newConversations];
       updatedConversations[index] = {
         ...updatedConversations[index],
-        latestMessage: lastMessageRed,
+        latestMessage: lastMessageRed.latestMessage,
       };
       setNewConversation(updatedConversations);
     }
@@ -56,13 +69,34 @@ const AllConversations = () => {
         if (lastMessageRed.conversationId) {
           return [...prev];
         }
-        return [...prev, lastMessageRed];
+        return [
+          ...prev,
+          {
+            users: [
+              {
+                photo: lastMessageRed?.sender?.photo,
+                _id: lastMessageRed?.sender?._id,
+                username: lastMessageRed?.sender?.username,
+              },
+              {
+                photo:
+                  "https://res.cloudinary.com/dxgixa7am/image/upload/v1684210075/Donia/cgikrnwmqzxo1cgdizmw.jpg",
+                _id: lastMessageRed.recieverId,
+                username: "Ahmedfullsamir_20",
+              },
+            ],
+            closed: false,
+            createdAt: lastMessageRed.createdAt,
+            _id: lastMessageRed.conversationId,
+            latestMessage: lastMessageRed,
+          },
+        ];
       });
     }
   }, [data?.data.data.conversations, lastMessageRed, user]);
 
   useEffect(() => {
-    if (newConversations.length > 1) {
+    if (newConversations?.length > 1) {
       setSortedConversation(
         newConversations.sort(
           (a, b) =>
@@ -72,6 +106,9 @@ const AllConversations = () => {
       );
     } else {
       setSortedConversation(() => {
+        if (newConversations?.length === 0 || !newConversations) {
+          return;
+        }
         return [...newConversations];
       });
     }

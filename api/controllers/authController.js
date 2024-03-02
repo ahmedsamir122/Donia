@@ -17,7 +17,7 @@ const generateCookie = (res, token) => {
     // domain: ".vercel.app",
     // sameSite: "None",
     // secure: process.env.NODE_ENV === "production",
-    domain: "localhost",
+    // domain: "localhost",
   };
   res.cookie("refresh", token, cookieOptions);
 };
@@ -41,7 +41,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     expiresIn: process.env.JWT_EXPIRES_IN_REFRESH,
   });
 
-  const accessToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+  const accessToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
@@ -135,10 +135,24 @@ exports.getAccessToken = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = catchAsync(async (req, res, next) => {
-  res.cookie("refresh", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000),
-    domain: "localhost",
-  });
+  // const expirationTime = new Date();
+  // expirationTime.setSeconds(expirationTime.getSeconds() + 2);
+
+  // res.cookie("refresh", "loggedout", {
+  //   expires: expirationTime,
+  //   // domain: "localhost",
+  //   httpOnly: true,
+  // });
+
+  const cookieOptions = {
+    expires: new Date(Date.now() + 2 * 1000),
+    httpOnly: true,
+    // domain: ".vercel.app",
+    // sameSite: "None",
+    // secure: process.env.NODE_ENV === "production",
+    // domain: "localhost",
+  };
+  res.cookie("refresh", "loggedout", cookieOptions);
   res.status(200).json({ status: "success" });
 });
 

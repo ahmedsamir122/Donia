@@ -1,5 +1,6 @@
 const express = require("express");
 const messageController = require("../controllers/messageController");
+const conversationController = require("../controllers/conversationController");
 const authController = require("../controllers/authController");
 
 const router = express.Router();
@@ -12,8 +13,16 @@ router
     messageController.getMessagesAdmin
   );
 router
-  .route("/:Id")
-  .get(authController.protect, messageController.getMessages)
-  .post(authController.protect, messageController.sendMessage);
+  .route("/:conversationId")
+  .get(
+    authController.protect,
+    conversationController.checkOneOfUsers,
+    messageController.getMessages
+  )
+  .post(
+    authController.protect,
+    conversationController.checkOneOfUsers,
+    messageController.sendMessage
+  );
 
 module.exports = router;

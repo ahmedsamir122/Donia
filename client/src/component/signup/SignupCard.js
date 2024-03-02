@@ -31,10 +31,13 @@ const SignupCard = () => {
 
   const { mutate, isError, error } = useMutation(postData, {
     onSuccess: (data) => {
-      console.log(data.data.data.user);
+      console.log(data.data.data.user, data.data.token);
       localStorage.setItem("token", data.data.token);
-      // dispatch(authActions.login(data.data.data.user));
+      dispatch(authActions.login(data.data.data.user));
       dispatch(authActions.getToken(data.data.token));
+      const expiration = new Date();
+      expiration.setHours(expiration.getHours() + 48);
+      localStorage.setItem("expiration", expiration.toISOString());
       navigate("/");
     },
   });
@@ -89,7 +92,7 @@ const SignupCard = () => {
       phone,
     });
   };
-
+  console.log(error?.response?.data?.message);
   return (
     <div className={classes.main}>
       <div className={classes.card}>
@@ -135,14 +138,29 @@ const SignupCard = () => {
           {errors.username && (
             <p className={classes.error}>username should not contain spaces.</p>
           )}
+          {error?.response?.data?.message.includes("username") && (
+            <p className={classes.error}>{error?.response.data.message}</p>
+          )}
           <input
             type="email"
             placeholder="Enter your email..."
             className={classes.input}
-            {...register("email", { required: true })}
+            {...register("email", {
+              required: true,
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Please enter a valid email address",
+              },
+            })}
           />
           {errors.email?.type === "required" && (
             <p className={classes.error}>please enter your email address</p>
+          )}
+          {errors.email?.type === "pattern" && (
+            <p className={classes.error}>{errors.email?.message}</p>
+          )}
+          {error?.response?.data?.message.includes("email") && (
+            <p className={classes.error}>{error?.response.data.message}</p>
           )}
           <PhoneInputWithCountry
             international
@@ -193,10 +211,13 @@ const SignupCard = () => {
             type="password"
             placeholder="Password..."
             className={classes.input}
-            {...register("password", { required: true })}
+            {...register("password", { required: true, minLength: 8 })}
           />
           {errors.password?.type === "required" && (
             <p className={classes.error}>please enter your password</p>
+          )}
+          {errors.password?.type === "minLength" && (
+            <p className={classes.error}>the minimum length of password is 8</p>
           )}
           <input
             type="password"

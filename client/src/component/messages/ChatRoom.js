@@ -14,21 +14,32 @@ import Loading from "../loading/Loading";
 // import { io } from "socket.io-client";
 import { useDispatch } from "react-redux";
 import { lastMessageActions } from "../../store/lastMessage";
-import Pusher from "pusher-js";
+// import Pusher from "pusher-js";
 
-const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
-  cluster: process.env.REACT_APP_PUSHER_CLUSTER,
-});
+// const tokenLocal = localStorage.getItem("token") || "";
+
+// const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
+//   cluster: process.env.REACT_APP_PUSHER_CLUSTER,
+//   authEndpoint: `${URL}/api/v1/pusher/auth`,
+//   auth: {
+//     headers: {
+//       Authorization: `Bearer ${tokenLocal}`,
+//     },
+//   },
+// });
 
 const ChatRoom = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
+  const pusher = useSelector((state) => state.pusher.pusher);
   const [other, setOther] = useState([]);
   const [fix, setFix] = useState(false);
-  const [arrivalMessage, setArrivalMessage] = useState([]);
   const [allMessages, setAllMessages] = useState([]);
+  const [arrivalMessage, setArrivalMessage] = useState(null);
+  const [liveMembers, setLiveMembers] = useState([]);
+  const [showActive, setShowActive] = useState(false);
   // const [socket, setSocket] = useState(null);
   // const socket = useSelector((state) => state.socket.socket);
 
@@ -48,14 +59,6 @@ const ChatRoom = (props) => {
   //     });
   //   });
   // }, []);
-
-  useEffect(() => {
-    if (arrivalMessage.conversation === params.messageId) {
-      setAllMessages((prev) => {
-        return [...prev, arrivalMessage];
-      });
-    }
-  }, [arrivalMessage, params.messageId]);
 
   const fetchCurrentConversation = () => {
     return getWishList(
@@ -97,7 +100,7 @@ const ChatRoom = (props) => {
   } = useQuery("currentConversation", fetchCurrentConversation, {
     refetchOnWindowFocus: false,
     enabled: !!user, // Only execute the query if userId is truthy
-  });
+  }); // to get te sender and reciever data as the message has the sender data only
   const {
     register,
     control,
@@ -130,20 +133,33 @@ const ChatRoom = (props) => {
       ) {
         send = {
           ...dataFetchCurrentConversation?.data.data.conversation,
-          latestMessage: data.data.data.message,
+          latestMessage: {
+            createdAt: Date.now(),
+            content: data.data.data.message.content,
+            sender: {
+              photo: data.data.data.message.sender.photo,
+              username: data.data.data.message.sender.username,
+              _id: data.data.data.message.sender._id,
+            },
+            conversationId: data.data.data.message.conversation,
+          },
         };
         setFix(true);
       } else {
         send = {
-          sender: {
-            _id: user._id,
-            username: user.username,
-            photo: user.photo,
+          ...dataFetchCurrentConversation?.data.data.conversation,
+          latestMessage: {
+            sender: {
+              _id: user._id,
+              username: user.username,
+              photo: user.photo,
+            },
+            recieverId: other[0]._id,
+            recieverPhoto: other[0].photo,
+            content: data.data.data.message.content,
+            conversationId: data?.data?.data?.message.conversation,
+            createdAt: Date.now(),
           },
-          recieverId: other[0]._id,
-          content: data.data.data.message.content,
-          conversationId: data.data.data.message.conversation,
-          createdAt: Date.now(),
         };
       }
 
@@ -178,34 +194,35 @@ const ChatRoom = (props) => {
   ]);
 
   useEffect(() => {
-    scrollRef?.current?.scrollIntoView({ behavior: "smooth" });
+    scrollRef?.current?.scrollIntoView();
   }, [allMessages]);
 
   useEffect(() => {
+    console.log(pusher);
     const userId = user?.id;
-    if (!userId) {
+    if (!userId || !token || !pusher) {
       return; // Wait until user ID is available
     }
-    var channel = pusher.subscribe(`channel-${user?.id}`);
-    channel.bind(`event-${user?.id}`, function (data) {
-      console.log(data);
-      if (data?.conversation === params.messageId) {
-        setAllMessages((prev) => {
-          return [
-            ...prev,
-            {
-              createdAt: Date.now(),
-              content: data.message,
-              sender: {
-                photo: other[0]?.photo,
-                username: other[0]?.username,
-                _id: other[0]?._id,
-              },
-              conversation: params.messageId,
-            },
-          ];
-        });
-      }
+    var channel = pusher?.subscribe(`channel-${user?.id}`);
+    channel?.bind(`event-${user?.id}`, function (data) {
+      setArrivalMessage(data);
+      // if (data?.conversation === paramsId) {
+      // setAllMessages((prev) => {
+      //   return [
+      //     ...prev,
+      //     {
+      //       createdAt: Date.now(),
+      //       content: data?.message,
+      //       sender: {
+      //         photo: data?.sender.photo,
+      //         username: data?.sender.username,
+      //         _id: data?.sender.id,
+      //       },
+      //       conversation: data?.conversation,
+      //     },
+      //   ];
+      // });
+      // }
       let send;
 
       if (
@@ -218,24 +235,24 @@ const ChatRoom = (props) => {
             createdAt: Date.now(),
             content: data.message,
             sender: {
-              photo: other[0]?.photo,
-              username: other[0]?.username,
-              _id: other[0]?._id,
+              photo: data?.sender.photo,
+              username: data?.sender.username,
+              _id: data?.sender.id,
             },
-            conversation: params.messageId,
+            conversationId: data?.conversation,
           },
         };
         setFix(true);
       } else {
         send = {
           sender: {
-            _id: other[0]?.id,
-            username: user.username,
-            photo: user.photo,
+            photo: data?.sender.photo,
+            username: data?.sender.username,
+            _id: data?.sender.id,
           },
           recieverId: user?.id,
-          content: data.message,
-          conversationId: params.messageId,
+          content: data?.message,
+          conversationId: data?.conversation,
           createdAt: Date.now(),
         };
       }
@@ -246,7 +263,66 @@ const ChatRoom = (props) => {
     //   channel.unsubscribe(`channel-${user?.id}`);
     //   // pusher.disconnect();
     // };
-  }, [user, params.messageId]);
+  }, [user, token, pusher]);
+
+  useEffect(() => {
+    if (!token || !pusher) {
+      return; // Wait until user ID is available
+    }
+    const channel = pusher?.subscribe(`presence-channel-${params.messageId}`);
+
+    channel?.bind("pusher:subscription_succeeded", (members) => {
+      console.log("Successfully subscribed to presence channel:", members);
+      const keysArray = Object.keys(members.members);
+      setLiveMembers(keysArray);
+    });
+
+    channel?.bind("pusher:member_added", (member) => {
+      console.log("User joined:", member);
+      setLiveMembers([member.id, user?._id]);
+    });
+
+    channel?.bind("pusher:member_removed", (member) => {
+      console.log("User left:", member);
+      setLiveMembers([user?._id]);
+    });
+    return () => {
+      console.log("Unsubscribing from the current channel");
+      channel?.unsubscribe();
+    };
+  }, [user, params, token, pusher]);
+
+  console.log(dataFetchCurrentConversation?.data.data.conversation);
+
+  useEffect(() => {
+    if (arrivalMessage?.conversation === params.messageId) {
+      setAllMessages((prev) => {
+        return [
+          ...prev,
+          {
+            createdAt: Date.now(),
+            content: arrivalMessage?.message,
+            sender: {
+              photo: arrivalMessage?.sender.photo,
+              username: arrivalMessage?.sender.username,
+              _id: arrivalMessage?.sender.id,
+            },
+            conversation: arrivalMessage?.conversation,
+          },
+        ];
+      });
+    }
+  }, [arrivalMessage]);
+
+  useEffect(() => {
+    const member = liveMembers.find((m) => m === other[0]?.id);
+    if (member) {
+      setShowActive(true);
+    } else {
+      setShowActive(false);
+    }
+  }, [liveMembers, other]);
+
   if (isLoadingFetch || isLoadingCurrentConversation) {
     return (
       <div className={classes.loading}>
@@ -265,26 +341,38 @@ const ChatRoom = (props) => {
         <Link to="/messages">
           <KeyboardArrowLeftOutlinedIcon className={classes.backIcon} />
         </Link>
-        {other.length > 0 && (
-          <img className={classes.img} src={other[0]?.photo} alt="" />
-        )}
-        {other.length > 0 && <p>{other[0]?.username}</p>}
+        <div>
+          <div className={classes.userCon}>
+            {other.length > 0 && (
+              <img className={classes.img} src={other[0]?.photo} alt="" />
+            )}
+            <div>
+              {other.length > 0 && <p>{other[0]?.username}</p>}
+              {showActive && <p className={classes.active}>connected</p>}
+              {!showActive && (
+                <p className={classes.notActive}>not connected</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
       <div className={classes.chatCon}>
         <div className={classes.messagesCon}>
           {allMessages?.map((c) => (
-            <div ref={scrollRef} key={c.id}>
+            <div ref={scrollRef} key={c._id}>
               <OneMessage message={c} own={c.sender?._id === user._id} />
             </div>
           ))}
         </div>
-        <form className={classes.form} onSubmit={handleSubmit(onsubmit)}>
-          <textarea
-            className={classes.inputChat}
-            {...register("chat", { required: true })}
-          ></textarea>
-          {isValid && <button className={classes.buttonChat}>send</button>}
-        </form>
+        {!dataFetchCurrentConversation?.data.data.conversation.closed && (
+          <form className={classes.form} onSubmit={handleSubmit(onsubmit)}>
+            <textarea
+              className={classes.inputChat}
+              {...register("chat", { required: true })}
+            ></textarea>
+            {isValid && <button className={classes.buttonChat}>send</button>}
+          </form>
+        )}
       </div>
     </div>
   );

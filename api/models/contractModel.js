@@ -46,6 +46,10 @@ const contractSchema = new mongoose.Schema(
       type: Date,
       required: [true, "Contract must have adeadline"],
     },
+    conversation: {
+      type: mongoose.Schema.ObjectId,
+      ref: "Conversation",
+    },
     client: {
       type: mongoose.Schema.ObjectId,
       ref: "User",

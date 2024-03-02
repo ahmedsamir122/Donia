@@ -36,6 +36,8 @@ import ReportsSection from "./component/dashboard/reportsSection/ReportsSection"
 import ReportsTable from "./component/dashboard/reportsSection/reportsTable/ReportsTable";
 import ReportSection from "./component/dashboard/reportsSection/reportSection/ReportSection";
 import Conversion from "./component/dashboard/contractsSection/conversion/Conversion";
+import Blocked from "./pages/Blocked";
+import PreventRoute from "./component/PreventRoute";
 
 const router = createBrowserRouter([
   {
@@ -86,8 +88,30 @@ const router = createBrowserRouter([
       { path: "/success", element: <Success /> },
     ],
   },
-  { path: "/signup", element: <SignUp /> },
-  { path: "/signin", element: <SignIn /> },
+  {
+    path: "/signup",
+    element: (
+      <PreventRoute>
+        <SignUp />
+      </PreventRoute>
+    ),
+  },
+  {
+    path: "/signin",
+    element: (
+      <PreventRoute>
+        <SignIn />
+      </PreventRoute>
+    ),
+  },
+  {
+    path: "/blocked",
+    element: (
+      <ProtectedRoute>
+        <Blocked />
+      </ProtectedRoute>
+    ),
+  },
   {
     path: "/dashboard",
     element: <Dashboard />,

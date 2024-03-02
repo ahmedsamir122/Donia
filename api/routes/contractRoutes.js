@@ -2,6 +2,7 @@ const express = require("express");
 const contractController = require("../controllers/contractController");
 const reviewCController = require("../controllers/reviewCController");
 const authController = require("../controllers/authController");
+const conversationController = require("../controllers/conversationController");
 
 const router = express.Router();
 
@@ -63,7 +64,8 @@ router
   .post(
     authController.protect,
     contractController.filterContract,
-    contractController.createContract
+    contractController.createContract,
+    conversationController.createConversation
   );
 
 // router

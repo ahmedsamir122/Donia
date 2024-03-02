@@ -5,14 +5,30 @@ const Contract = require("../models/contractModel");
 const Notification = require("../models/notificationModel");
 
 exports.getNotifications = catchAsync(async (req, res, next) => {
-  const notifications = await Notification.find({ to: req.user._id });
+  // const notifications = await Notification.find({ to: req.user._id }).sort({
+  //   createdAt: -1,
+  // });
+
+  const features = new APIFeatures(
+    Notification.find({ to: req.user._id }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const notifications = await features.query;
+
   const unseenNotifications = await Notification.find({
     to: req.user._id,
     isSeen: false,
   });
 
+  const count = await Notification.countDocuments({ to: req.user._id });
+
   res.status(200).json({
     status: "success",
+    totalResults: count,
     results: notifications.length,
     unseenResults: unseenNotifications.length,
     data: {

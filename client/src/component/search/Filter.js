@@ -41,8 +41,6 @@ const Filter = (props) => {
     }
   };
 
-  console.log(location.search);
-
   useEffect(() => {
     const query = {
       q: queryRedux,
@@ -59,15 +57,16 @@ const Filter = (props) => {
 
     // Update the URL using the navigate function
 
-    // navigate(
-    //   // "/",
-    //   {
-    //     search: new URLSearchParams(query).toString(),
-    //   },
-    //   { replace: true }
-    // );
-    const newsSearchParams = new URLSearchParams(query).toString();
-    navigate(`/search?${newsSearchParams}`);
+    navigate(
+      // "/",
+      {
+        search: new URLSearchParams(query).toString(),
+      },
+      { replace: true }
+    );
+    // const newsSearchParams = new URLSearchParams(query).toString();
+    // console.log(newsSearchParams);
+    // navigate(`/search?${newsSearchParams}`);
 
     console.log(query);
   }, [filterRate, filterReviews, queryRedux, navigate]);
@@ -75,7 +74,6 @@ const Filter = (props) => {
   useEffect(() => {
     const rate = searchParams.get("rate");
     const reviews = searchParams.get("reviews");
-    console.log(searchParams.get("rate")?.split(","));
 
     if (rate !== null) {
       setFilterRate(rate.split(","));
@@ -91,9 +89,6 @@ const Filter = (props) => {
     }
   }, [location.search, searchParams]);
 
-  console.log(filterRate?.includes("0"));
-  console.log(location);
-
   return (
     <div className={classes.main}>
       <div className={classes.topTitle}>
@@ -105,7 +100,7 @@ const Filter = (props) => {
       <div className={classes.filterCon}>
         <div className={classes.filterTop}>
           <h2 className={classes.filterName}>Rating</h2>
-          <h2 className={classes.filterClear}>clear</h2>
+          <h2 className={classes.filterClear}></h2>
         </div>
         <div className={classes.filterBottom}>
           <input
@@ -189,7 +184,7 @@ const Filter = (props) => {
       <div className={classes.filterCon}>
         <div className={classes.filterTop}>
           <h2 className={classes.filterName}>Reviews</h2>
-          <h2 className={classes.filterClear}>clear</h2>
+          <h2 className={classes.filterClear}></h2>
         </div>
         <div className={classes.filterBottom}>
           <input
@@ -279,7 +274,7 @@ const Filter = (props) => {
           <ComboBox />
         </div>
       </div> */}
-      <div className={classes.filterButton}>
+      <div className={classes.filterButton} onClick={props.onFilter}>
         <button>See results</button>
       </div>
     </div>

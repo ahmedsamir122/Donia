@@ -21,14 +21,22 @@ const SigninCard = () => {
   const { mutate, isError, error } = useMutation(postData, {
     onSuccess: (data) => {
       console.log(data.data.token);
-      localStorage.setItem("token", data.data.token);
-      dispatch(authActions.login(data.data.data.user));
-      dispatch(authActions.getToken(data.data.token));
 
-      const expiration = new Date();
-      expiration.setHours(expiration.getHours() + 48);
-      localStorage.setItem("expiration", expiration.toISOString());
-      navigate("/");
+      if (data.data.data.user.status !== "active") {
+        dispatch(authActions.login(data.data.data.user));
+        localStorage.setItem("token", "blocked");
+        navigate("/blocked");
+      }
+      if (data.data.data.user.status === "active") {
+        localStorage.setItem("token", data.data.token);
+        dispatch(authActions.login(data.data.data.user));
+        dispatch(authActions.getToken(data.data.token));
+
+        const expiration = new Date();
+        expiration.setHours(expiration.getHours() + 48);
+        localStorage.setItem("expiration", expiration.toISOString());
+        navigate("/");
+      }
       console.log(data.data.data.user);
     },
   });

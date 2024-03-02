@@ -6,16 +6,16 @@ import { useSearchParams } from "react-router-dom";
 
 const FetshingAndPagination = () => {
   const [page, setPage] = useState(1);
-  const [count, setCount] = useState();
+  const [count, setCount] = useState(0);
   const [searchParams, setSearchParams] = useSearchParams();
 
   const handlehange = (e, p) => {
-    console.log(p);
     setPage(p);
   };
 
   const countHandler = (num) => {
     setCount(num);
+    console.log(num);
   };
 
   useEffect(() => {
@@ -25,13 +25,16 @@ const FetshingAndPagination = () => {
   return (
     <div className={classes.main}>
       <TalentFetch page={page} onCountHandler={countHandler} />
-      <div className={classes.pagination}>
-        <Pagination
-          count={Math.ceil(count / 20)}
-          color="primary"
-          onChange={handlehange}
-        ></Pagination>
-      </div>
+      {count > 20 && (
+        <div className={classes.pagination}>
+          <Pagination
+            count={Math.ceil(count / 20)}
+            color="primary"
+            onChange={handlehange}
+          ></Pagination>
+        </div>
+      )}
+      {count === 0 && <p>no results found</p>}
     </div>
   );
 };

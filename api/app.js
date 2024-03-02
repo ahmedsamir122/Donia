@@ -22,6 +22,7 @@ const blockRouter = require("./routes/blockRoutes");
 const contractController = require("./controllers/contractController");
 const notificationRouter = require("./routes/notificationRoutes");
 const noteRouter = require("./routes/noteRoutes");
+const pusherRouter = require("./routes/pusherRoutes");
 
 const app = express();
 
@@ -38,18 +39,18 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// app.use(
-//   cors({
-//     credentials: true,
-//     origin: ["http://localhost:3000", "http://localhost:3001"],
-//   })
-// );
 app.use(
   cors({
     credentials: true,
-    origin: "https://donia-gamma.vercel.app",
+    origin: ["http://localhost:3000", "http://localhost:3001"],
   })
 );
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: "https://donia-gamma.vercel.app",
+//   })
+// );
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
@@ -79,6 +80,7 @@ app.use("/api/v1/conversations", conversationRouter);
 app.use("/api/v1/messages", messageRouter);
 app.use("/api/v1/notification", notificationRouter);
 app.use("/api/v1/notes", noteRouter);
+app.use("/api/v1/pusher", pusherRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`));
