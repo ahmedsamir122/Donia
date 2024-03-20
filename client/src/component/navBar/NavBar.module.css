@@ -1,9 +1,19 @@
+.header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 11;
+}
 .main {
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 76px;
   position: relative;
+}
+.logoInput {
+  display: flex;
+  gap: 10px;
 }
 .ul {
   list-style: none;
@@ -24,13 +34,21 @@
   font-style: italic;
   color: black;
 }
+.unsigned {
+  display: flex;
+  gap: 20px;
+}
 .form {
   display: flex;
   align-items: center;
   position: relative;
   padding-right: 5px;
+  border: none;
 }
-
+.input {
+  border: none;
+  border-radius: 5px;
+}
 .filterButton {
   font-size: 35px;
   cursor: pointer;
@@ -38,11 +56,10 @@
 }
 
 .form input {
-  border: 1px solid gray;
   padding: 8px;
   padding-left: 35px;
   background-color: #f7f7f7;
-  width: 450px;
+  width: 300px;
 }
 .form input:focus,
 .form input:active {
@@ -52,9 +69,14 @@
   font-size: 20px;
   position: relative;
   z-index: 3;
-  color: black;
+  background-color: #f7f7f7;
 }
-
+.navText {
+  font-size: 12px;
+  width: 100%;
+  text-align: center;
+  padding-top: 5px;
+}
 .button {
   padding: 0;
   font-size: 16px;
@@ -65,6 +87,7 @@
   transform: translateY(-50%);
   border: none;
   cursor: pointer;
+  background-color: #f7f7f7;
 }
 
 /* .lang{
@@ -74,6 +97,16 @@
 @media (max-width: 767px) {
   .button {
     right: 40px;
+  }
+  .navText {
+    display: none;
+  }
+}
+@media (min-width: 767px) {
+  .notContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 }
 @media (min-width: 767px) and (max-width: 990px) {
@@ -134,6 +167,7 @@
   border-radius: 50%;
   display: block;
   object-fit: cover;
+  margin-bottom: 3px;
 }
 
 @media (max-width: 767px) {
@@ -159,5 +193,8 @@
   }
   .form input {
     width: 100%;
+  }
+  .img {
+    margin-bottom: 0px;
   }
 }

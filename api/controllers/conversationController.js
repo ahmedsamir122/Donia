@@ -39,14 +39,14 @@ const Conversation = require("../models/conversation");
 //   });
 // });
 exports.createConversation = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.contract._id);
+  let contract = await Contract.findById(req.contract._id);
   const other = contract.freelancer.equals(req.user._id)
     ? contract.client
     : contract.freelancer;
 
   const users = [req.user.id, other];
 
-  const conversation = await Conversation.findOne({
+  let conversation = await Conversation.findOne({
     users: {
       $all: users,
     },
@@ -56,11 +56,11 @@ exports.createConversation = catchAsync(async (req, res, next) => {
     conversation = await Conversation.create({ users });
   }
   contract.conversation = conversation._id;
-  await contract.save();
+  contract = await contract.save();
 
   if (conversation.closed) {
     conversation.closed = false;
-    await conversation.save();
+    conversation = await conversation.save();
   }
   res.status(201).json({
     status: "success",
@@ -125,7 +125,7 @@ exports.getMyConversations = catchAsync(async (req, res, next) => {
     })
     .populate({
       path: "latestMessage",
-      select: "sender createdAt content",
+      select: "sender createdAt content isSeen",
     });
 
   if (usernameQuery) {
@@ -167,12 +167,17 @@ exports.closeConversation = catchAsync(async (req, res, next) => {
 exports.checkOneOfUsers = catchAsync(async (req, res, next) => {
   const conversation = await Conversation.findById(req.params.conversationId);
 
+  if (!conversation) {
+    return next(new AppError("this conversation doesn't exist", 404));
+  }
+
   const isUserInConversation = conversation.users.some((user) =>
     user.equals(req.user.id)
   );
   if (!isUserInConversation) {
     return next(new AppError("You arenot one of this conversation", 400));
   }
+
   next();
 });
 

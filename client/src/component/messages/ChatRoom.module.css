@@ -68,6 +68,20 @@
   flex-direction: column;
   min-height: calc(100% - 58px);
 }
+.buttonMore {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+}
+.loading {
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+  padding: 0;
+  height: fit-content !important;
+}
 .messagesCon {
   /* flex: 1; */
   padding: 8px;
@@ -118,4 +132,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+.date {
+  margin: auto;
+  background-color: rgb(233, 229, 229);
+  width: fit-content;
+  padding: 7px;
+  border-radius: 7px;
+  font-size: 12px;
 }

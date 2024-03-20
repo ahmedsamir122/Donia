@@ -7,7 +7,6 @@ import Talent from "./Talent";
 import classes from "./TalentsFetch.module.css";
 import { useSelector } from "react-redux";
 import { URL } from "../utils/queryFunctions";
-import Pagination from "@mui/material/Pagination";
 
 const TalentFetch = (props) => {
   const [searchParams, setSearchParams] = useSearchParams();

@@ -66,31 +66,7 @@ const AllConversations = (props) => {
     if (index < 0 && Object.keys(lastMessageRed).length > 0) {
       console.log("last", lastMessageRed);
       setNewConversation((prev) => {
-        if (lastMessageRed.conversationId) {
-          return [...prev];
-        }
-        return [
-          ...prev,
-          {
-            users: [
-              {
-                photo: lastMessageRed?.sender?.photo,
-                _id: lastMessageRed?.sender?._id,
-                username: lastMessageRed?.sender?.username,
-              },
-              {
-                photo:
-                  "https://res.cloudinary.com/dxgixa7am/image/upload/v1684210075/Donia/cgikrnwmqzxo1cgdizmw.jpg",
-                _id: lastMessageRed.recieverId,
-                username: "Ahmedfullsamir_20",
-              },
-            ],
-            closed: false,
-            createdAt: lastMessageRed.createdAt,
-            _id: lastMessageRed.conversationId,
-            latestMessage: lastMessageRed,
-          },
-        ];
+        return [...prev, lastMessageRed];
       });
     }
   }, [data?.data.data.conversations, lastMessageRed, user]);

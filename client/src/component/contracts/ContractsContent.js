@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import ContractContentOneMobil from "./ContractContentOneMobil";
 import Loading from "../loading/Loading";
 import ContractsTableHtml from "./ContractsTableHtml";
+import TroubleshootIcon from "@mui/icons-material/Troubleshoot";
 import Pagination from "@mui/material/Pagination";
 
 const ContractsContent = () => {
@@ -22,7 +23,7 @@ const ContractsContent = () => {
 
   const [allFilter, setAllFilter] = useState(true);
   const [activeFilter, setActiveFilter] = useState(false);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(null);
 
   const [showReviewModal, setShowReviewModal] = useState(false);
 
@@ -120,6 +121,7 @@ const ContractsContent = () => {
   const handlehange = (e, p) => {
     setPage(p);
   };
+  console.log(count);
   if (!user) {
     return (
       <div className={classes.mainLoading}>
@@ -150,7 +152,6 @@ const ContractsContent = () => {
             </div>
           )}
         </div>
-
         {dataContract.length > 0 && (
           <div>
             <ContractsTableHtml
@@ -171,8 +172,17 @@ const ContractsContent = () => {
                 client={client}
               />
             ))}
-          {dataContract.length === 0 && <p>your contract list is empty</p>}
         </div>
+        {count === 0 && (
+          <div className={classes.dataEmpty}>
+            <div>
+              <div className={classes.dataEmptyIcon}>
+                <TroubleshootIcon />
+              </div>
+              <div>Your contract list is empty</div>
+            </div>
+          </div>
+        )}
         <div className={classes.paginationPc}>
           {count > 10 && (
             <Pagination

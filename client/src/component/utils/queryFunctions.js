@@ -76,6 +76,30 @@ export const useEditContractActivity = () => {
   });
 };
 
+export const formatDate = (date) => {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const messageDate = new Date(date);
+
+  if (
+    messageDate.getDate() === today.getDate() &&
+    messageDate.getMonth() === today.getMonth() &&
+    messageDate.getFullYear() === today.getFullYear()
+  ) {
+    return "Today";
+  } else if (
+    messageDate.getDate() === yesterday.getDate() &&
+    messageDate.getMonth() === yesterday.getMonth() &&
+    messageDate.getFullYear() === yesterday.getFullYear()
+  ) {
+    return "Yesterday";
+  } else {
+    return `${messageDate.getDate()}/${messageDate.getMonth()}/${messageDate.getFullYear()}`;
+  }
+};
+
 // "start:port1": "react-scripts start",
 // "start:port2": "PORT=3001 react-scripts start",
 // "start:both": "concurrently \"npm run start:port1\" \"npm run start:port2\"",

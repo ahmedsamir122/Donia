@@ -126,3 +126,15 @@
   align-items: center;
   width: 100%;
 }
+.dataEmpty {
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+.dataEmptyIcon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}

@@ -2,16 +2,9 @@ import classes from "./ContractsTableHtml.module.css";
 import dateFormat from "dateformat";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "react-query";
-import { postDataProtect, URL } from "../utils/queryFunctions";
-import { useSelector } from "react-redux";
-import Pagination from "@mui/material/Pagination";
-import { useState } from "react";
 
 const ContractsTableHtml = (props) => {
   const navigate = useNavigate();
-  const token = useSelector((state) => state.auth.token);
-  const [page, setPage] = useState(1);
 
   return (
     <div>
@@ -59,7 +52,7 @@ const ContractsTableHtml = (props) => {
               <td className={`${classes.bodyCell} `}>
                 <div
                   className={`${classes.chatBody}`}
-                  onClick={() => navigate(`/messages/${props.onConversation}`)}
+                  onClick={() => navigate(`/messages/${con.conversation}`)}
                 >
                   <p className={classes.chat}>Chat</p>
                 </div>

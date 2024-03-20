@@ -14,25 +14,18 @@ const pusher = new Pusher({
 });
 
 exports.sendMessage = catchAsync(async (req, res, next) => {
+  let conversation = await Conversation.findById(req.params.conversationId);
+  const [reciever] = conversation?.users.filter((u) =>
+    req.user._id.equals(u) ? false : true
+  );
   const message = await Message.create({
     sender: req.user._id,
     conversation: req.params.conversationId,
     content: req.body.content,
+    reciever,
   });
-
-  const conversation = await Conversation.findByIdAndUpdate(
-    req.params.conversationId,
-    {
-      latestMessage: message,
-    },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-  const [reciever_id] = conversation?.users.filter((u) =>
-    req.user._id.equals(u) ? false : true
-  );
+  conversation.latestMessage = message._id;
+  conversation = await conversation.save();
   await message
     .populate({
       path: "sender",
@@ -40,7 +33,7 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
     })
     .execPopulate();
 
-  pusher.trigger(`channel-${reciever_id}`, `event-${reciever_id}`, {
+  pusher.trigger(`channel-${reciever}`, `event-${reciever}`, {
     message: req.body.content,
     conversation: req.params.conversationId,
     sender: {
@@ -59,13 +52,27 @@ exports.sendMessage = catchAsync(async (req, res, next) => {
 });
 
 exports.getMessages = catchAsync(async (req, res, next) => {
-  const messages = await Message.find({
-    conversation: req.params.conversationId,
-  });
+  // const messages = await Message.find({
+  //   conversation: req.params.conversationId,
+  // });
+
+  const features = new APIFeatures(
+    Message.find({ conversation: req.params.conversationId }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const messages = await features.query;
 
   const currentConversation = await Conversation.findById(
     req.params.conversationId
   );
+
+  const count = await Message.countDocuments({
+    conversation: req.params.conversationId,
+  });
 
   if (messages.length > 0) {
     const isUserInConversation = currentConversation.users.some((userId) =>
@@ -79,9 +86,21 @@ exports.getMessages = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
+    totalMessages: count,
     data: {
-      messages,
+      messages: messages.reverse(),
     },
+  });
+});
+exports.getunseenMessages = catchAsync(async (req, res, next) => {
+  const count = await Message.countDocuments({
+    reciever: req.user._id,
+    isSeen: false,
+  });
+
+  res.status(200).json({
+    status: "success",
+    count,
   });
 });
 exports.getMessagesAdmin = catchAsync(async (req, res, next) => {
@@ -93,5 +112,27 @@ exports.getMessagesAdmin = catchAsync(async (req, res, next) => {
     data: {
       messages,
     },
+  });
+});
+
+exports.seeMessagesOneConversation = catchAsync(async (req, res, next) => {
+  const updateQuery = {
+    $set: { isSeen: true },
+  };
+  const newMessages = await Message.updateMany(
+    {
+      conversation: req.params.conversationId,
+      reciever: req.user._id,
+      isSeen: false,
+    },
+    updateQuery,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
   });
 });

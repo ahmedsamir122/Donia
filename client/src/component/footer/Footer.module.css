@@ -1,0 +1,53 @@
+.main {
+  background-color: #139ff0;
+  padding-top: 20px;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  text-decoration: none;
+  line-height: 21px;
+  font-size: 22px;
+  font-weight: bold;
+  font-style: italic;
+  color: white;
+  cursor: pointer;
+}
+.appImg {
+  display: flex;
+  gap: 20px;
+}
+.img {
+  width: 150px;
+}
+.middle {
+  margin-top: 20px;
+  color: white;
+  font-size: 12px;
+}
+.bottom {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-size: 12px;
+}
+.bottomRight {
+  display: flex;
+  gap: 10px;
+}
+.bottomLeft {
+  color: white;
+  font-size: 12px;
+}
+.oneSocial {
+  color: black;
+}
+.oneSocialIcon {
+  font-size: 30px;
+  color: white;
+}

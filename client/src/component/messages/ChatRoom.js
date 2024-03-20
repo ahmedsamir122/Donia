@@ -8,25 +8,11 @@ import { getWishList, URL } from "../utils/queryFunctions";
 import { useQuery } from "react-query";
 import OneMessage from "./OneMessage";
 import { useMutation } from "react-query";
-import { postDataProtect } from "../utils/queryFunctions";
+import { postDataProtect, formatDate } from "../utils/queryFunctions";
 import { useEffect, useRef, useState } from "react";
 import Loading from "../loading/Loading";
-// import { io } from "socket.io-client";
 import { useDispatch } from "react-redux";
 import { lastMessageActions } from "../../store/lastMessage";
-// import Pusher from "pusher-js";
-
-// const tokenLocal = localStorage.getItem("token") || "";
-
-// const pusher = new Pusher(process.env.REACT_APP_PUSHER_KEY, {
-//   cluster: process.env.REACT_APP_PUSHER_CLUSTER,
-//   authEndpoint: `${URL}/api/v1/pusher/auth`,
-//   auth: {
-//     headers: {
-//       Authorization: `Bearer ${tokenLocal}`,
-//     },
-//   },
-// });
 
 const ChatRoom = (props) => {
   const params = useParams();
@@ -35,30 +21,14 @@ const ChatRoom = (props) => {
   const token = useSelector((state) => state.auth.token);
   const pusher = useSelector((state) => state.pusher.pusher);
   const [other, setOther] = useState([]);
-  const [fix, setFix] = useState(false);
+  const [hasNextPageMessages, sethasNextPageMessages] = useState(true);
+  const [pageMessages, setPageMessages] = useState(1);
   const [allMessages, setAllMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [liveMembers, setLiveMembers] = useState([]);
   const [showActive, setShowActive] = useState(false);
-  // const [socket, setSocket] = useState(null);
-  // const socket = useSelector((state) => state.socket.socket);
 
   const scrollRef = useRef();
-
-  // useEffect(() => {
-  //   socket?.on("getMessage", (data) => {
-  //     setArrivalMessage({
-  //       createdAt: Date.now(),
-  //       content: data.text,
-  //       sender: {
-  //         photo: other[0].photo,
-  //         username: other[0].username,
-  //         _id: other[0]._id,
-  //       },
-  //       conversation: data.conversationId,
-  //     });
-  //   });
-  // }, []);
 
   const fetchCurrentConversation = () => {
     return getWishList(
@@ -67,7 +37,10 @@ const ChatRoom = (props) => {
     );
   };
   const fetchMessages = () => {
-    return getWishList(`${URL}/api/v1/messages/${params.messageId}`, token);
+    return getWishList(
+      `${URL}/api/v1/messages/${params.messageId}?page=${pageMessages}&limit=2`,
+      token
+    );
   };
 
   const sendMessage = (data) => {
@@ -80,17 +53,22 @@ const ChatRoom = (props) => {
 
   const {
     isLoading: isLoadingFetch,
+    isFetching,
     error: errorFetch,
     data: dataFetch,
     refetch: refetchMessage,
   } = useQuery("oneConversation", fetchMessages, {
     refetchOnWindowFocus: false,
     enabled: !!user, // Only execute the query if userId is truthy
+    onSuccess: (data) => {
+      setAllMessages((prev) => [...data?.data.data.messages, ...prev]);
+    },
   });
 
-  useEffect(() => {
-    setAllMessages(dataFetch?.data.data.messages);
-  }, [dataFetch?.data.data.messages]);
+  // useEffect(() => {
+  //   console.log(dataFetch?.data.data.messages);
+  //   setAllMessages(dataFetch?.data.data.messages);
+  // }, [dataFetch?.data.data.messages]);
 
   const {
     isLoading: isLoadingCurrentConversation,
@@ -117,51 +95,24 @@ const ChatRoom = (props) => {
         return [...prev, data.data.data.message];
       });
 
-      // socket.emit("sendMessage", {
-      //   senderId: user._id,
-      //   recieverId: other[0]._id,
-      //   text: data.data.data.message.content,
-      //   conversationId: data.data.data.message.conversation,
-      //   createdAt: Date.now(),
-      // });
-
       let send;
 
-      if (
-        !dataFetchCurrentConversation?.data.data.conversation.latestMessage &&
-        !fix
-      ) {
-        send = {
-          ...dataFetchCurrentConversation?.data.data.conversation,
-          latestMessage: {
-            createdAt: Date.now(),
-            content: data.data.data.message.content,
-            sender: {
-              photo: data.data.data.message.sender.photo,
-              username: data.data.data.message.sender.username,
-              _id: data.data.data.message.sender._id,
-            },
-            conversationId: data.data.data.message.conversation,
+      send = {
+        ...dataFetchCurrentConversation?.data.data.conversation,
+        latestMessage: {
+          sender: {
+            _id: user._id,
+            username: user.username,
+            photo: user.photo,
           },
-        };
-        setFix(true);
-      } else {
-        send = {
-          ...dataFetchCurrentConversation?.data.data.conversation,
-          latestMessage: {
-            sender: {
-              _id: user._id,
-              username: user.username,
-              photo: user.photo,
-            },
-            recieverId: other[0]._id,
-            recieverPhoto: other[0].photo,
-            content: data.data.data.message.content,
-            conversationId: data?.data?.data?.message.conversation,
-            createdAt: Date.now(),
-          },
-        };
-      }
+          recieverId: other[0]._id,
+          recieverPhoto: other[0].photo,
+          content: data.data.data.message.content,
+          conversationId: data?.data?.data?.message.conversation,
+          createdAt: Date.now(),
+          isSeen: true,
+        },
+      };
 
       dispatch(lastMessageActions.getLastMessage(send));
     },
@@ -193,6 +144,29 @@ const ChatRoom = (props) => {
     user,
   ]);
 
+  const pageMessagesHandler = () => {
+    setPageMessages((prev) => {
+      const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
+      if (pageMessages === totalPageMessages) {
+        return prev;
+      } else {
+        return prev + 1;
+      }
+    });
+  };
+  useEffect(() => {
+    if (!token) {
+      return;
+    }
+    const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
+
+    if (pageMessages === totalPageMessages) {
+      sethasNextPageMessages(false);
+      return;
+    }
+    refetchMessage();
+  }, [pageMessages, refetchMessage]);
+
   useEffect(() => {
     scrollRef?.current?.scrollIntoView();
   }, [allMessages]);
@@ -206,45 +180,27 @@ const ChatRoom = (props) => {
     var channel = pusher?.subscribe(`channel-${user?.id}`);
     channel?.bind(`event-${user?.id}`, function (data) {
       setArrivalMessage(data);
-      // if (data?.conversation === paramsId) {
-      // setAllMessages((prev) => {
-      //   return [
-      //     ...prev,
-      //     {
-      //       createdAt: Date.now(),
-      //       content: data?.message,
-      //       sender: {
-      //         photo: data?.sender.photo,
-      //         username: data?.sender.username,
-      //         _id: data?.sender.id,
-      //       },
-      //       conversation: data?.conversation,
-      //     },
-      //   ];
-      // });
-      // }
+      console.log(data);
       let send;
 
-      if (
-        !dataFetchCurrentConversation?.data.data.conversation.latestMessage &&
-        !fix
-      ) {
-        send = {
-          ...dataFetchCurrentConversation?.data.data.conversation,
-          latestMessage: {
-            createdAt: Date.now(),
-            content: data.message,
-            sender: {
-              photo: data?.sender.photo,
-              username: data?.sender.username,
-              _id: data?.sender.id,
-            },
-            conversationId: data?.conversation,
+      send = {
+        users: [
+          {
+            photo: user.photo,
+            _id: user._id,
+            username: user.username,
+            id: user._id,
           },
-        };
-        setFix(true);
-      } else {
-        send = {
+          {
+            photo: data?.sender.photo,
+            _id: data?.sender.id,
+            username: data?.sender.username,
+            id: data?.sender.id,
+          },
+        ],
+        closed: false,
+        _id: data?.conversation,
+        latestMessage: {
           sender: {
             photo: data?.sender.photo,
             username: data?.sender.username,
@@ -254,16 +210,19 @@ const ChatRoom = (props) => {
           content: data?.message,
           conversationId: data?.conversation,
           createdAt: Date.now(),
-        };
-      }
-
+          isSeen: data?.conversation === params.messageId,
+          closed: false,
+        },
+      };
+      // }
+      console.log(send, params.messageId);
       dispatch(lastMessageActions.getLastMessage(send));
     });
     // return () => {
     //   channel.unsubscribe(`channel-${user?.id}`);
     //   // pusher.disconnect();
     // };
-  }, [user, token, pusher]);
+  }, [user, token, pusher, params.messageId]);
 
   useEffect(() => {
     if (!token || !pusher) {
@@ -291,8 +250,6 @@ const ChatRoom = (props) => {
       channel?.unsubscribe();
     };
   }, [user, params, token, pusher]);
-
-  console.log(dataFetchCurrentConversation?.data.data.conversation);
 
   useEffect(() => {
     if (arrivalMessage?.conversation === params.messageId) {
@@ -323,6 +280,18 @@ const ChatRoom = (props) => {
     }
   }, [liveMembers, other]);
 
+  const groupedMessages = {};
+  allMessages.forEach((message) => {
+    const date = new Date(message.createdAt);
+    const dayKey = `${date.getFullYear()}-${
+      date.getMonth() + 1
+    }-${date.getDate()}`;
+    if (!groupedMessages[dayKey]) {
+      groupedMessages[dayKey] = [];
+    }
+    groupedMessages[dayKey].push(message);
+  });
+
   if (isLoadingFetch || isLoadingCurrentConversation) {
     return (
       <div className={classes.loading}>
@@ -334,7 +303,7 @@ const ChatRoom = (props) => {
   if (isError) {
     return <div>{error.message}</div>;
   }
-
+  console.log(allMessages);
   return (
     <div className={classes.main}>
       <div className={classes.top}>
@@ -358,9 +327,31 @@ const ChatRoom = (props) => {
       </div>
       <div className={classes.chatCon}>
         <div className={classes.messagesCon}>
-          {allMessages?.map((c) => (
+          {hasNextPageMessages && (
+            <button
+              className={classes.buttonMore}
+              onClick={pageMessagesHandler}
+            >
+              load old messages
+            </button>
+          )}
+          {isFetching && <div className={classes.loading}>loading...</div>}
+          {/* {allMessages?.map((c) => (
             <div ref={scrollRef} key={c._id}>
               <OneMessage message={c} own={c.sender?._id === user._id} />
+            </div>
+          ))} */}
+          {Object.entries(groupedMessages).map(([dayKey, messagesInDay]) => (
+            <div key={dayKey}>
+              <div className={classes.date}>{formatDate(dayKey)}</div>
+              {messagesInDay.map((message) => (
+                <div ref={scrollRef} key={message._id}>
+                  <OneMessage
+                    message={message}
+                    own={message.sender?._id === user._id}
+                  />
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -372,6 +363,12 @@ const ChatRoom = (props) => {
             ></textarea>
             {isValid && <button className={classes.buttonChat}>send</button>}
           </form>
+        )}
+        {dataFetchCurrentConversation?.data.data.conversation.closed && (
+          <p>
+            this conversation is closed you can't send messages unless there is
+            new contract or you can contact us for more information
+          </p>
         )}
       </div>
     </div>

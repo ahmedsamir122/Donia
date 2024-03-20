@@ -184,7 +184,12 @@ const OneContractContent = () => {
                     <p className={classes.contractOption}>view review</p>
                   )}
 
-                <p className={classes.contractOption} onClick={chatHandler}>
+                <p
+                  className={classes.contractOption}
+                  onClick={() =>
+                    navigate(`/messages/${contract?.conversation}`)
+                  }
+                >
                   Send message
                 </p>
               </div>

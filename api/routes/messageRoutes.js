@@ -6,12 +6,17 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router
+  .route("/unseenMessages")
+  .get(authController.protect, messageController.getunseenMessages);
+
+router
   .route("/get-meesages-admin/:conversationId")
   .get(
     authController.protect,
     authController.restrictTo("admin"),
     messageController.getMessagesAdmin
   );
+
 router
   .route("/:conversationId")
   .get(
@@ -23,6 +28,11 @@ router
     authController.protect,
     conversationController.checkOneOfUsers,
     messageController.sendMessage
+  )
+  .patch(
+    authController.protect,
+    conversationController.checkOneOfUsers,
+    messageController.seeMessagesOneConversation
   );
 
 module.exports = router;

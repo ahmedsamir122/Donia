@@ -2,7 +2,8 @@ import classes from "./NavBar.module.css";
 import { useEffect, useState } from "react";
 import { CiChat1 } from "react-icons/ci";
 import { CiBellOn } from "react-icons/ci";
-import { CiSearch } from "react-icons/ci";
+import { MdOutlineLibraryBooks } from "react-icons/md";
+import SearchIcon from "@mui/icons-material/Search";
 import AccountModal from "../modal/AccountModal";
 import { Link, Outlet, useSearchParams } from "react-router-dom";
 import FilterModal from "../modal/FilterModal";
@@ -24,6 +25,7 @@ import { blocklistActions } from "../../store/blocklist";
 import { wishlistActions } from "../../store/wishlist";
 import Pusher from "pusher-js";
 import Backdrop from "./Backdrop";
+import Footer from "../footer/Footer";
 
 const NavBar = (props) => {
   const navigate = useNavigate();
@@ -60,7 +62,20 @@ const NavBar = (props) => {
   const fetchBlockList = () => {
     return getWishList(`${URL}/api/v1/block`, tokenLocal);
   };
+  const fetchUnseenMessagesNumber = () => {
+    return getWishList(`${URL}/api/v1/messages/unseenMessages`, tokenLocal);
+  };
 
+  const { isLoading: loadingunseenMessagesNumber, data: unSeenData } = useQuery(
+    "unSeenMessagesNumber",
+    fetchUnseenMessagesNumber,
+    {
+      enabled: !!user, // Only execute the query if userId is truthy
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  console.log(unSeenData?.data.count);
   const {
     isLoading: loadingProfile,
     error: errorProfile,
@@ -290,7 +305,10 @@ const NavBar = (props) => {
     e.preventDefault();
     setSearchParams({ q: searchInput });
     dispatch(queryActions.addQuery(searchInput));
-    navigate("/");
+    if (location.pathname === "/") {
+      return;
+    }
+    navigate(`/?q=${searchInput}`);
   };
 
   const changeLanguageHandler = (e) => {
@@ -309,32 +327,44 @@ const NavBar = (props) => {
     setShowNotes(false);
   };
 
+  console.log(location.pathname === "/");
   return (
     <>
       <header className={classes.header} onClick={hideLinks}>
         <div className="container">
           <div className={classes.main}>
-            <Link className={classes.logo} to="/">
-              {t("test")}
-            </Link>
-            {(user || showNavbar) && (
-              <form className={classes.form} onSubmit={submitHandler}>
-                <input
-                  type="search"
-                  defaultValue={""}
-                  onChange={inputHandler}
-                />
-                <button className={classes.button}>
-                  <CiSearch className={classes.iconSearch} />
-                </button>
-                <div
-                  className={classes.filterButton}
-                  onClick={toggleFilterHandler}
-                >
-                  <TuneIcon />
-                </div>
-              </form>
-            )}
+            <div className={classes.logoInput}>
+              <Link
+                className={classes.logo}
+                onClick={() => {
+                  dispatch(queryActions.addQuery(""));
+                }}
+                to="/"
+              >
+                {t("test")}
+              </Link>
+              {(user || showNavbar) && (
+                <form className={classes.form} onSubmit={submitHandler}>
+                  <input
+                    className={classes.input}
+                    type="search"
+                    defaultValue={""}
+                    onChange={inputHandler}
+                    placeholder="search..."
+                  />
+                  <button className={classes.button}>
+                    <SearchIcon className={classes.iconSearch} />
+                  </button>
+                  <div
+                    className={classes.filterButton}
+                    onClick={toggleFilterHandler}
+                  >
+                    <TuneIcon />
+                  </div>
+                </form>
+              )}
+            </div>
+
             {user && (
               <ul className={classes.ul}>
                 <li className={classes.lang}>
@@ -348,6 +378,8 @@ const NavBar = (props) => {
                   onClick={toggleNotesHandler}
                 >
                   <CiBellOn className={classes.not} />
+                  <div className={classes.navText}>Notifications</div>
+
                   {noteNum > 0 && noteNum < 100 && <span>{noteNum}</span>}
                   {noteNum > 99 && <span>+99</span>}
                 </li>
@@ -365,19 +397,30 @@ const NavBar = (props) => {
                   onClick={toggleMessageHandler}
                 >
                   <CiChat1 className={classes.mes} />
+                  <div className={classes.navText}>Messages</div>
+                  {unSeenData?.data.count > 0 &&
+                    unSeenData?.data.count < 100 && (
+                      <span>{unSeenData?.data.count}</span>
+                    )}
+                  {unSeenData?.data.count > 99 && <span>+99</span>}
                   {/* <span>1</span> */}
                 </li>
                 <li
                   className={classes.notContainer}
                   onClick={() => navigate("/contracts")}
                 >
-                  <LibraryBooksIcon className={classes.mes} />
+                  <MdOutlineLibraryBooks className={classes.mes} />
+                  <div className={classes.navText}>Contracts</div>
                 </li>
                 {showMessage && (
                   <MessageModal onMessage={toggleMessageHandler} />
                 )}
-                <li className={classes.user} onClick={toggleAccountHandler}>
+                <li
+                  className={classes.notContainer}
+                  onClick={toggleAccountHandler}
+                >
                   <img src={user.photo} alt="" className={classes.img} />
+                  <div className={classes.navText}>Me</div>
                 </li>
                 {showAccount && (
                   <AccountModal onAccount={toggleAccountHandler} />
@@ -385,9 +428,15 @@ const NavBar = (props) => {
               </ul>
             )}
             {!user && (
-              <Link to="/signin" className={classes.login}>
-                login
-              </Link>
+              <div className={classes.unsigned}>
+                <Link to="/signin" className={classes.login}>
+                  Log In
+                </Link>
+
+                <Link to="/signup" className={classes.login}>
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
         </div>
@@ -397,6 +446,10 @@ const NavBar = (props) => {
         <Backdrop onHideHandler={hideLinks} />
       )}
       <Outlet />
+      {(location.pathname === "/" && !user) ||
+      location.pathname.includes("messages") ? null : (
+        <Footer />
+      )}
     </>
   );
 };

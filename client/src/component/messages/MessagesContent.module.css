@@ -1,6 +1,6 @@
 .main {
   background-color: #f7f7f7;
-  max-height: calc(100vh - 76px);
+  height: calc(100vh - 76px);
   border-radius: 10px;
   padding-top: 10px;
   padding-bottom: 10px;

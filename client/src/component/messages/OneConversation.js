@@ -14,6 +14,9 @@ const OneConversation = (props) => {
   const params = useParams();
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
+  const [isSeen, setIsSeen] = useState(
+    props.conversation.latestMessage?.isSeen
+  );
 
   const other = props.conversation?.users?.filter((u) => u._id !== user._id);
 
@@ -24,13 +27,33 @@ const OneConversation = (props) => {
       token
     );
   };
+  const updateٍSeenConversation = (data) => {
+    return updateFileData(
+      `${URL}/api/v1/messages/${props.conversation._id}`,
+      data,
+      token
+    );
+  };
 
+  const {
+    mutate: mutateSeen,
+    isError: isErrorSeen,
+    error: errorSeen,
+    isLoading: isLoadingSeen,
+  } = useMutation(updateٍSeenConversation, {
+    onSuccess: (data) => {
+      setIsSeen(true);
+    },
+  });
   const { mutate, isError, error, isLoading } = useMutation(
     updateConversation,
     {
       onSuccess: (data) => {},
     }
   );
+  useEffect(() => {
+    setIsSeen(props.conversation.latestMessage?.isSeen);
+  }, [props.conversation.latestMessage?.isSeen]);
 
   const showSwal = (type) => {
     withReactContent(Swal)
@@ -56,6 +79,10 @@ const OneConversation = (props) => {
     showSwal();
   };
   console.log(props.conversation.closed);
+
+  if (!other) {
+    return;
+  }
   return (
     <React.Fragment>
       {!isLoading && (
@@ -63,9 +90,16 @@ const OneConversation = (props) => {
           className={`${classes.conversation} ${
             params.messageId === props.conversation._id && classes.active
           }`}
-          onClick={() => navigate(`/messages/${props.conversation._id}`)}
+          onClick={() => {
+            mutateSeen();
+            navigate(`/messages/${props.conversation._id}`);
+          }}
         >
-          <img className={classes.img} src={other[0]?.photo} alt="" />
+          <img
+            className={classes.img}
+            src={other ? other[0]?.photo : null}
+            alt=""
+          />
           <div className={classes.dataUser}>
             <div className={classes.dataTop}>
               <p className={classes.userName}>{other[0]?.username}</p>
@@ -77,7 +111,14 @@ const OneConversation = (props) => {
               {props.conversation?.latestMessage?.sender?._id === user?._id && (
                 <p className={classes.sender}>You:</p>
               )}
-              <p className={classes.text}>
+              <p
+                className={`${classes.text} ${
+                  !isSeen &&
+                  props.conversation?.latestMessage?.sender?._id !==
+                    user?._id &&
+                  classes.notSeen
+                }`}
+              >
                 {props.conversation.latestMessage?.content}
               </p>
             </div>
