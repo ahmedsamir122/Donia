@@ -1,10 +1,12 @@
 import classes from "./MessagesContent.module.css";
-import { useQuery } from "react-query";
+import { useQuery, useInfiniteQuery } from "react-query";
 import { useSelector } from "react-redux";
 import OneConversation from "./OneConversation";
 import { getWishList, URL } from "../utils/queryFunctions";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import React from "react";
+import { useInView } from "react-intersection-observer";
+import Loading from "../loading/Loading";
 
 const AllConversations = (props) => {
   const user = useSelector((state) => state.auth.user);
@@ -13,40 +15,62 @@ const AllConversations = (props) => {
   const [q, setQ] = useState("");
   const [sortedConversations, setSortedConversation] = useState(null);
   const [newConversations, setNewConversation] = useState([]);
+  const { ref, inView } = useInView();
+  const wasInView = useRef(false);
 
-  const fetchConversations = () => {
+  const fetchConversations = ({ pageParam = 1 }) => {
+    console.log(pageParam);
     return getWishList(
-      `${URL}/api/v1/conversations/myConversations${q}`,
+      `${URL}/api/v1/conversations/myConversations?page=${pageParam}&limit=5${q}`,
       token
     );
   };
-  const onSuccess = (data) => {
-    setNewConversation(() => {
-      return [...data?.data?.data?.conversations];
-    });
-  };
 
-  const { isLoading, error, data, refetch, isFetching } = useQuery(
-    "conversations",
-    fetchConversations,
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!user,
-      onSuccess, // Only execute the query if userId is truthy
-    }
-  );
+  const {
+    isLoading,
+    error,
+    data,
+    fetchNextPage,
+    isFetching,
+    hasNextPage,
+    refetch,
+  } = useInfiniteQuery(["conversations"], fetchConversations, {
+    getNextPageParam: (lastPage, allPages) => {
+      console.log(lastPage, allPages);
+      const nextpage = lastPage.data.data.conversations.length
+        ? allPages.length + 1
+        : undefined;
+      return nextpage;
+    },
+    refetchOnWindowFocus: false,
+    enabled: !!user,
+    onSuccess: (data) => {
+      console.log(data);
+      const newData = data.pages.reduce((acc, page) => {
+        acc.push(...page.data.data.conversations);
+        return acc;
+      }, []);
+      console.log(newData);
+      setNewConversation(newData);
+    },
+  });
+
   useEffect(() => {
-    setQ(props.searchName ? `?username=${props.searchName}` : "");
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, fetchNextPage]);
+
+  useEffect(() => {
+    setQ(props.searchName ? `&username=${props.searchName}` : "");
   }, [props.searchName]);
   useEffect(() => {
-    if (!token) {
+    if (!user) {
       return;
     }
     refetch();
-    setNewConversation(data?.data?.data?.conversations);
   }, [q, token]);
   useEffect(() => {
-    console.log("new", newConversations);
     if (!user || !newConversations) {
       return;
     }
@@ -69,7 +93,7 @@ const AllConversations = (props) => {
         return [...prev, lastMessageRed];
       });
     }
-  }, [data?.data.data.conversations, lastMessageRed, user]);
+  }, [data, lastMessageRed, user]);
 
   useEffect(() => {
     if (newConversations?.length > 1) {
@@ -90,22 +114,37 @@ const AllConversations = (props) => {
     }
   }, [newConversations]);
 
-  console.log(sortedConversations, newConversations);
-
   return (
     <React.Fragment>
       {sortedConversations?.length > 0 && (
         <div className={classes.conversationCon}>
-          {sortedConversations?.map((item) => (
-            <OneConversation
-              key={item._id}
-              conversation={item}
-              finalConverstaions={sortedConversations}
-            />
-          ))}
+          {sortedConversations?.map((item, index) => {
+            if (sortedConversations.length === index + 1) {
+              return (
+                <OneConversation
+                  key={item._id}
+                  conversation={item}
+                  finalConversations={sortedConversations}
+                  innerRef={ref}
+                />
+              );
+            }
+            return (
+              <OneConversation
+                key={item._id}
+                conversation={item}
+                finalConversations={sortedConversations}
+              />
+            );
+          })}
         </div>
       )}
-      {!sortedConversations && <p>no conversation found</p>}
+      {(isFetching || isLoading) && (
+        <div>
+          <Loading />
+        </div>
+      )}
+      {!sortedConversations && !isFetching && <p>no conversation found</p>}
     </React.Fragment>
   );
 };

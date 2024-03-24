@@ -1,6 +1,11 @@
 import classes from "./ChatRoom.module.css";
 import img1 from "../../img/user2.jpg";
-import { Link, useParams } from "react-router-dom";
+import {
+  Link,
+  useParams,
+  useSearchParams,
+  useNavigate,
+} from "react-router-dom";
 import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
@@ -17,6 +22,7 @@ import { lastMessageActions } from "../../store/lastMessage";
 const ChatRoom = (props) => {
   const params = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const user = useSelector((state) => state.auth.user);
   const token = useSelector((state) => state.auth.token);
   const pusher = useSelector((state) => state.pusher.pusher);
@@ -27,6 +33,7 @@ const ChatRoom = (props) => {
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [liveMembers, setLiveMembers] = useState([]);
   const [showActive, setShowActive] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const scrollRef = useRef();
 
@@ -36,7 +43,11 @@ const ChatRoom = (props) => {
       token
     );
   };
+
+  console.log(pageMessages);
+
   const fetchMessages = () => {
+    console.log(pageMessages); // Log the current value of pageMessages
     return getWishList(
       `${URL}/api/v1/messages/${params.messageId}?page=${pageMessages}&limit=2`,
       token
@@ -62,13 +73,17 @@ const ChatRoom = (props) => {
     enabled: !!user, // Only execute the query if userId is truthy
     onSuccess: (data) => {
       setAllMessages((prev) => [...data?.data.data.messages, ...prev]);
+      const totalPageMessages = Math.ceil(data?.data?.totalMessages / 2);
+      console.log(pageMessages, totalPageMessages);
+
+      if (pageMessages === totalPageMessages) {
+        sethasNextPageMessages(false);
+        return;
+      } else {
+        sethasNextPageMessages(true);
+      }
     },
   });
-
-  // useEffect(() => {
-  //   console.log(dataFetch?.data.data.messages);
-  //   setAllMessages(dataFetch?.data.data.messages);
-  // }, [dataFetch?.data.data.messages]);
 
   const {
     isLoading: isLoadingCurrentConversation,
@@ -125,10 +140,18 @@ const ChatRoom = (props) => {
   };
 
   useEffect(() => {
+    setAllMessages([]);
+    setPageMessages(1);
+    navigate("?new=true");
+  }, [params.messageId]);
+
+  useEffect(() => {
     if (!user) {
       return;
     }
-    refetchMessage();
+    if (searchParams.get("new")) {
+      setPageMessages(1);
+    }
     refetchCurrentConversation();
 
     if (dataFetchCurrentConversation?.data?.data?.conversation?.users) {
@@ -138,14 +161,19 @@ const ChatRoom = (props) => {
         )
       );
     }
+    refetchMessage();
   }, [
     params.messageId,
     dataFetchCurrentConversation?.data?.data?.conversation?.users,
     user,
+    pageMessages,
+    refetchCurrentConversation,
+    refetchMessage,
   ]);
 
   const pageMessagesHandler = () => {
     setPageMessages((prev) => {
+      setSearchParams({ new: false });
       const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
       if (pageMessages === totalPageMessages) {
         return prev;
@@ -154,18 +182,6 @@ const ChatRoom = (props) => {
       }
     });
   };
-  useEffect(() => {
-    if (!token) {
-      return;
-    }
-    const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
-
-    if (pageMessages === totalPageMessages) {
-      sethasNextPageMessages(false);
-      return;
-    }
-    refetchMessage();
-  }, [pageMessages, refetchMessage]);
 
   useEffect(() => {
     scrollRef?.current?.scrollIntoView();
@@ -231,7 +247,7 @@ const ChatRoom = (props) => {
     const channel = pusher?.subscribe(`presence-channel-${params.messageId}`);
 
     channel?.bind("pusher:subscription_succeeded", (members) => {
-      console.log("Successfully subscribed to presence channel:", members);
+      // console.log("Successfully subscribed to presence channel:", members);
       const keysArray = Object.keys(members.members);
       setLiveMembers(keysArray);
     });
@@ -299,11 +315,9 @@ const ChatRoom = (props) => {
       </div>
     );
   }
-
   if (isError) {
     return <div>{error.message}</div>;
   }
-  console.log(allMessages);
   return (
     <div className={classes.main}>
       <div className={classes.top}>
@@ -327,7 +341,7 @@ const ChatRoom = (props) => {
       </div>
       <div className={classes.chatCon}>
         <div className={classes.messagesCon}>
-          {hasNextPageMessages && (
+          {hasNextPageMessages && !isFetching && (
             <button
               className={classes.buttonMore}
               onClick={pageMessagesHandler}

@@ -8,6 +8,8 @@
   box-shadow: 1px 2px 7px 3px #888888;
   padding: 16px;
   border-radius: 8px;
+  height: 50vh;
+  overflow: auto;
 }
 .topTitle {
   display: flex;

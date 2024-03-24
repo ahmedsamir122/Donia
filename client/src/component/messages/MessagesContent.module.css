@@ -15,6 +15,7 @@
 }
 .left {
   flex: 1.8;
+  overflow-y: scroll;
 }
 .topLeft {
   width: 100%;
@@ -32,9 +33,10 @@
   top: 50%;
   left: 10px;
   transform: translateY(-50%);
+  cursor: pointer;
 }
 .conversationCon {
-  max-height: calc(100vh - 76px - 10px);
+  /* max-height: 100%; */
   overflow-y: auto;
 }
 

@@ -75,7 +75,6 @@ const NavBar = (props) => {
     }
   );
 
-  console.log(unSeenData?.data.count);
   const {
     isLoading: loadingProfile,
     error: errorProfile,
@@ -327,7 +326,6 @@ const NavBar = (props) => {
     setShowNotes(false);
   };
 
-  console.log(location.pathname === "/");
   return (
     <>
       <header className={classes.header} onClick={hideLinks}>

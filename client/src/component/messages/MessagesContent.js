@@ -3,11 +3,13 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import { Outlet } from "react-router-dom";
 import AllConversations from "./AllConversations";
 import { useState } from "react";
+import { useRef } from "react";
 
 const MessageContent = () => {
   const [username, setUsername] = useState("");
+  const usenameRef = useRef();
   const searchHandler = (e) => {
-    setUsername(e.target.value);
+    setUsername(usenameRef.current.value);
   };
   return (
     <div className={classes.main}>
@@ -18,9 +20,12 @@ const MessageContent = () => {
               <input
                 className={classes.input}
                 placeholder="Search messages "
-                onChange={searchHandler}
+                ref={usenameRef}
               />
-              <SearchOutlinedIcon className={classes.searchIcon} />
+              <SearchOutlinedIcon
+                className={classes.searchIcon}
+                onClick={searchHandler}
+              />
             </div>
 
             <AllConversations searchName={username} />

@@ -78,7 +78,6 @@ const OneConversation = (props) => {
     console.log("close");
     showSwal();
   };
-  console.log(props.conversation.closed);
 
   if (!other) {
     return;
@@ -94,6 +93,7 @@ const OneConversation = (props) => {
             mutateSeen();
             navigate(`/messages/${props.conversation._id}`);
           }}
+          ref={props.innerRef}
         >
           <img
             className={classes.img}

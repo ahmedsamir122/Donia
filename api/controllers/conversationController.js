@@ -111,40 +111,82 @@ exports.getOneConversationAdmin = catchAsync(async (req, res, next) => {
 });
 exports.getMyConversations = catchAsync(async (req, res, next) => {
   const usernameQuery = req.query.username;
+  const currentUserID = req.user._id;
+
   const baseQuery = {
-    users: { $elemMatch: { $eq: req.user._id } },
+    users: currentUserID,
     latestMessage: { $exists: true },
   };
 
-  // Conditionally include the 'users' filter if the 'username' query parameter is present
+  // Conditionally include the 'username' filter if the 'username' query parameter is present
+  if (usernameQuery) {
+    const conversations = await Conversation.find(baseQuery)
+      .populate({
+        path: "users",
+        select: "username photo",
+      })
+      .populate({
+        path: "latestMessage",
+        select: "sender createdAt content isSeen",
+      })
+      .exec();
 
-  let conversations = await Conversation.find(baseQuery)
-    .populate({
-      path: "users",
-      select: "username photo",
-    })
-    .populate({
-      path: "latestMessage",
-      select: "sender createdAt content isSeen",
+    // Filter the conversations where the other user's username includes the specified letters
+    const filteredConversations = conversations.filter((conversation) => {
+      const otherUser = conversation.users.find(
+        (user) => user._id.toString() !== currentUserID.toString()
+      );
+      return otherUser.username
+        .toLowerCase()
+        .includes(usernameQuery.toLowerCase());
     });
 
-  if (usernameQuery) {
-    conversations = conversations.filter((conv) =>
-      conv.users.some(
-        (user) =>
-          user.username.match(new RegExp(usernameQuery, "gi")) &&
-          user._id.toString() !== req.user._id.toString()
-      )
-    );
-  }
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
 
-  res.status(200).json({
-    status: "success",
-    results: conversations.length,
-    data: {
-      conversations,
-    },
-  });
+    const paginatedConversations = filteredConversations.slice(
+      startIndex,
+      endIndex
+    );
+    res.status(200).json({
+      status: "success",
+      results: filteredConversations.length,
+      data: {
+        conversations: paginatedConversations,
+      },
+    });
+  } else {
+    // If no username query is provided, return all conversations without filtering
+    const features = new APIFeatures(
+      Conversation.find(baseQuery)
+        .populate({
+          path: "users",
+          select: "username photo",
+        })
+        .populate({
+          path: "latestMessage",
+          select: "sender createdAt content isSeen",
+        }),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    let conversations = await features.query;
+
+    const count = await Conversation.countDocuments(baseQuery);
+
+    res.status(200).json({
+      status: "success",
+      results: count,
+      data: {
+        conversations,
+      },
+    });
+  }
 });
 
 exports.closeConversation = catchAsync(async (req, res, next) => {
