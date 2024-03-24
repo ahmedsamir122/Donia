@@ -104,9 +104,15 @@ exports.getunseenMessages = catchAsync(async (req, res, next) => {
   });
 });
 exports.getMessagesAdmin = catchAsync(async (req, res, next) => {
-  const messages = await Message.find({
-    conversation: req.params.conversationId,
-  });
+  const features = new APIFeatures(
+    Message.find({ conversation: req.params.conversationId }),
+    req.query
+  )
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
+  const messages = await features.query;
   res.status(200).json({
     status: "success",
     data: {
