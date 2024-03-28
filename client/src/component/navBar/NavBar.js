@@ -121,7 +121,7 @@ const NavBar = (props) => {
   }, [location]);
 
   useEffect(() => {
-    if (!tokenLocal) {
+    if (!tokenLocal || !user) {
       return;
     }
 
@@ -148,6 +148,8 @@ const NavBar = (props) => {
     dispatch,
     navigate,
     tokenExpiration,
+
+    user,
   ]);
   useEffect(() => {
     if (!tokenLocal || !dataProfile?.data.data?.user) {
