@@ -66,14 +66,14 @@ const NavBar = (props) => {
     return getWishList(`${URL}/api/v1/messages/unseenMessages`, tokenLocal);
   };
 
-  // const {
-  //   isLoading: loadingunseenMessagesNumber,
-  //   data: unSeenData,
-  //   refetch: refetchUnseenMessagesNumber,
-  // } = useQuery("unSeenMessagesNumber", fetchUnseenMessagesNumber, {
-  //   enabled: !!user, // Only execute the query if userId is truthy
-  //   refetchOnWindowFocus: false,
-  // });
+  const {
+    isLoading: loadingunseenMessagesNumber,
+    data: unSeenData,
+    refetch: refetchUnseenMessagesNumber,
+  } = useQuery("unSeenMessagesNumber", fetchUnseenMessagesNumber, {
+    enabled: !!user, // Only execute the query if userId is truthy
+    refetchOnWindowFocus: false,
+  });
 
   const {
     isLoading: loadingProfile,
@@ -138,7 +138,7 @@ const NavBar = (props) => {
     refetchProfil();
     refetchWishList();
     refetchBlockList();
-    // refetchUnseenMessagesNumber();
+    refetchUnseenMessagesNumber();
   }, [
     token,
     tokenLocal,
@@ -149,7 +149,7 @@ const NavBar = (props) => {
     dispatch,
     navigate,
     tokenExpiration,
-    // refetchUnseenMessagesNumber,
+    refetchUnseenMessagesNumber,
   ]);
   useEffect(() => {
     if (!tokenLocal || !dataProfile?.data.data?.user) {
@@ -408,12 +408,12 @@ const NavBar = (props) => {
                 >
                   <CiChat1 className={classes.mes} />
                   <div className={classes.navText}>Messages</div>
-                  {/* {unSeenData?.data.count > 0 &&
+                  {unSeenData?.data.count > 0 &&
                     unSeenData?.data.count < 100 && (
                       <span>{unSeenData?.data.count}</span>
                     )}
-                  {unSeenData?.data.count > 99 && <span>+99</span>} 
-                  <span>1</span> */}
+                  {unSeenData?.data.count > 99 && <span>+99</span>}
+                  {/* // <span>1</span>  */}
                 </li>
                 <li
                   className={classes.notContainer}
