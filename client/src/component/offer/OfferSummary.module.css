@@ -1,0 +1,56 @@
+.main {
+  flex: 1;
+}
+.subMain {
+  border: 1px solid rgb(207, 205, 205);
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+@media (min-width: 767px) {
+  .subMain {
+    position: sticky;
+    top: 84px;
+  }
+}
+.summaryTitle {
+  font-size: 18px;
+  border-bottom: 1px solid rgb(207, 205, 205);
+  padding-bottom: 5px;
+  margin-bottom: 16px;
+}
+.itemBox {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.itemDetails {
+  font-size: 12px;
+}
+.totalBox {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  border-top: 1px solid rgb(207, 205, 205);
+  padding-top: 10px;
+}
+.totalTitle {
+  font-size: 16px;
+  font-weight: 500;
+}
+.totalNumber {
+  font-size: 24px;
+  font-weight: 500;
+}
+.submit {
+  width: 100%;
+  padding: 10px;
+  background-color: #03b2cb;
+  color: white;
+  border: none;
+  font-size: 20px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}

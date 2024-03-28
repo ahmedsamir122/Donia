@@ -10,7 +10,7 @@ import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeft
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { getWishList, URL } from "../utils/queryFunctions";
-import { useQuery } from "react-query";
+import { useQuery, useInfiniteQuery } from "react-query";
 import OneMessage from "./OneMessage";
 import { useMutation } from "react-query";
 import { postDataProtect, formatDate } from "../utils/queryFunctions";
@@ -27,7 +27,7 @@ const ChatRoom = (props) => {
   const token = useSelector((state) => state.auth.token);
   const pusher = useSelector((state) => state.pusher.pusher);
   const [other, setOther] = useState([]);
-  const [hasNextPageMessages, sethasNextPageMessages] = useState(true);
+  // const [hasNextPageMessages, sethasNextPageMessages] = useState(true);
   const [pageMessages, setPageMessages] = useState(1);
   const [allMessages, setAllMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
@@ -44,12 +44,12 @@ const ChatRoom = (props) => {
     );
   };
 
-  console.log(pageMessages);
+  // console.log(pageMessages);
 
-  const fetchMessages = () => {
-    console.log(pageMessages); // Log the current value of pageMessages
+  const fetchMessages = ({ pageParam = 1 }) => {
+    console.log(pageParam); // Log the current value of pageMessages
     return getWishList(
-      `${URL}/api/v1/messages/${params.messageId}?page=${pageMessages}&limit=2`,
+      `${URL}/api/v1/messages/${params.messageId}?page=${pageParam}&limit=2`,
       token
     );
   };
@@ -62,28 +62,77 @@ const ChatRoom = (props) => {
     );
   };
 
+  // const {
+  //   isLoading: isLoadingFetch,
+  //   isFetching,
+  //   error: errorFetch,
+  //   data: dataFetch,
+  //   refetch: refetchMessage,
+  // } = useQuery("oneConversation", fetchMessages, {
+  //   refetchOnWindowFocus: false,
+  //   enabled: !!user, // Only execute the query if userId is truthy
+  //   onSuccess: (data) => {
+  //     setAllMessages((prev) => [...data?.data.data.messages, ...prev]);
+  //     const totalPageMessages = Math.ceil(data?.data?.totalMessages / 2);
+  //     console.log(pageMessages, totalPageMessages);
+
+  //     if (pageMessages === totalPageMessages) {
+  //       sethasNextPageMessages(false);
+  //       return;
+  //     } else {
+  //       sethasNextPageMessages(true);
+  //     }
+  //   },
+  // });
+
   const {
     isLoading: isLoadingFetch,
-    isFetching,
-    error: errorFetch,
+    error: errorMessages,
     data: dataFetch,
+    fetchNextPage,
+    isFetching,
+    hasNextPage,
     refetch: refetchMessage,
-  } = useQuery("oneConversation", fetchMessages, {
-    refetchOnWindowFocus: false,
-    enabled: !!user, // Only execute the query if userId is truthy
-    onSuccess: (data) => {
-      setAllMessages((prev) => [...data?.data.data.messages, ...prev]);
-      const totalPageMessages = Math.ceil(data?.data?.totalMessages / 2);
+  } = useInfiniteQuery(["oneConversation"], fetchMessages, {
+    getNextPageParam: (lastPage, allPages) => {
+      const totalPageMessages = Math.ceil(lastPage?.data?.totalMessages / 2);
       console.log(pageMessages, totalPageMessages);
-
-      if (pageMessages === totalPageMessages) {
-        sethasNextPageMessages(false);
-        return;
+      // const nextpage = lastPage.data.data.messages.length;
+      if (pageMessages < totalPageMessages) {
+        return pageMessages;
       } else {
-        sethasNextPageMessages(true);
+        return undefined;
       }
     },
+    refetchOnWindowFocus: false,
+    enabled: !!user,
+    onSuccess: (data) => {
+      console.log(data);
+      const newData = data.pages.reduce((acc, page) => {
+        acc.unshift(...page.data.data.messages); // Prepend messages instead of appending
+        return acc;
+      }, []);
+      setAllMessages((prev) => [
+        ...data.pages[data.pages.length - 1].data.data.messages,
+        ...prev,
+      ]); // Combine with existing messages
+    },
   });
+  console.log(dataFetch);
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+  }, [params.messageId, user]);
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    setAllMessages([]);
+
+    setPageMessages(1);
+    refetchMessage();
+  }, [params.messageId, fetchNextPage, refetchMessage, user]);
 
   const {
     isLoading: isLoadingCurrentConversation,
@@ -140,18 +189,12 @@ const ChatRoom = (props) => {
   };
 
   useEffect(() => {
-    setAllMessages([]);
-    setPageMessages(1);
-    navigate("?new=true");
-  }, [params.messageId]);
-
-  useEffect(() => {
-    if (!user) {
+    if (!user || !token) {
       return;
     }
-    if (searchParams.get("new")) {
-      setPageMessages(1);
-    }
+    // if (searchParams.get("new") === true) {
+    //   setPageMessages(1);
+    // }
     refetchCurrentConversation();
 
     if (dataFetchCurrentConversation?.data?.data?.conversation?.users) {
@@ -161,27 +204,35 @@ const ChatRoom = (props) => {
         )
       );
     }
-    refetchMessage();
+    // refetchMessage();
+    // fetchNextPage(1);
   }, [
     params.messageId,
     dataFetchCurrentConversation?.data?.data?.conversation?.users,
     user,
-    pageMessages,
     refetchCurrentConversation,
-    refetchMessage,
+    token,
   ]);
 
   const pageMessagesHandler = () => {
-    setPageMessages((prev) => {
-      setSearchParams({ new: false });
-      const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
-      if (pageMessages === totalPageMessages) {
-        return prev;
-      } else {
-        return prev + 1;
-      }
-    });
+    // setPageMessages((prev) => {
+    //   setSearchParams({ new: false });
+    //   const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
+    //   if (pageMessages === totalPageMessages) {
+    //     return prev;
+    //   } else {
+    //     return prev + 1;
+    //   }
+    // });
+    setPageMessages((prev) => prev + 1);
   };
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    fetchNextPage();
+  }, [pageMessages, user]);
 
   useEffect(() => {
     scrollRef?.current?.scrollIntoView();
@@ -341,7 +392,7 @@ const ChatRoom = (props) => {
       </div>
       <div className={classes.chatCon}>
         <div className={classes.messagesCon}>
-          {hasNextPageMessages && !isFetching && (
+          {hasNextPage && !isFetching && (
             <button
               className={classes.buttonMore}
               onClick={pageMessagesHandler}

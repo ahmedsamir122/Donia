@@ -302,12 +302,22 @@ const NavBar = (props) => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    setSearchParams({ q: searchInput });
-    dispatch(queryActions.addQuery(searchInput));
-    if (location.pathname === "/") {
-      return;
+    if (location.pathname.includes("search")) {
+      navigate(`/search`);
     }
-    navigate(`/?q=${searchInput}`);
+    if (!location.pathname.includes("search")) {
+      navigate(`/`);
+    }
+
+    setTimeout(() => {
+      setSearchParams({ q: searchInput });
+      dispatch(queryActions.addQuery(searchInput));
+      if (location.pathname.includes("search")) {
+        navigate(`?q=${searchInput}`);
+        return;
+      }
+      navigate(`/?q=${searchInput}`);
+    }, 500);
   };
 
   const changeLanguageHandler = (e) => {

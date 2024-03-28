@@ -198,7 +198,6 @@ exports.getPublicContractsCAdmin = catchAsync(async (req, res, next) => {
 
 exports.filterContract = catchAsync(async (req, res, next) => {
   const talent = await User.findOne({ username: req.params.username });
-
   if (talent.perform === "client") {
     return next(new AppError("this user isn't a talent", 400));
   }

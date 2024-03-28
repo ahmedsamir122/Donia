@@ -38,6 +38,7 @@ import ReportSection from "./component/dashboard/reportsSection/reportSection/Re
 import Conversion from "./component/dashboard/contractsSection/conversion/Conversion";
 import Blocked from "./pages/Blocked";
 import PreventRoute from "./component/PreventRoute";
+import Offer from "./pages/Offer";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +75,7 @@ const router = createBrowserRouter([
         ],
       },
       { path: "/contracts/:contractId", element: <OneContract /> },
+      { path: "/offer/:username", element: <Offer /> },
       {
         path: "/:username",
         element: <Talent />,

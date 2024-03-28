@@ -33,7 +33,16 @@ const TalentOne = (props) => {
     );
   };
 
-  const { mutate, isError, error, isLoading } = useMutation(postData);
+  const { mutate, isError, error, isLoading } = useMutation(postData, {
+    onSuccess: () => {
+      navigate(`/offer/${props.onData.username}`);
+    },
+    onError: () => {
+      setShowModal((prev) => {
+        return !prev;
+      });
+    },
+  });
 
   const showLinksModalHandler = () => {
     setShowLinksModal((prev) => {
@@ -54,10 +63,6 @@ const TalentOne = (props) => {
     }
 
     mutate();
-
-    setShowModal((prev) => {
-      return !prev;
-    });
   };
 
   if (isLoading) {

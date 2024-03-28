@@ -1,0 +1,19 @@
+.main {
+  background-color: #f7f7f7;
+}
+.mainTitle {
+  text-align: left;
+  font-size: 48px;
+  line-height: 48px;
+  font-weight: 400;
+  margin-top: 20px;
+  margin-bottom: 30px;
+}
+
+@media (min-width: 767px) {
+  .body {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+  }
+}
