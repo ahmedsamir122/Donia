@@ -27,13 +27,11 @@ const ChatRoom = (props) => {
   const token = useSelector((state) => state.auth.token);
   const pusher = useSelector((state) => state.pusher.pusher);
   const [other, setOther] = useState([]);
-  // const [hasNextPageMessages, sethasNextPageMessages] = useState(true);
   const [pageMessages, setPageMessages] = useState(1);
   const [allMessages, setAllMessages] = useState([]);
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [liveMembers, setLiveMembers] = useState([]);
   const [showActive, setShowActive] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const scrollRef = useRef();
 
@@ -61,29 +59,6 @@ const ChatRoom = (props) => {
       token
     );
   };
-
-  // const {
-  //   isLoading: isLoadingFetch,
-  //   isFetching,
-  //   error: errorFetch,
-  //   data: dataFetch,
-  //   refetch: refetchMessage,
-  // } = useQuery("oneConversation", fetchMessages, {
-  //   refetchOnWindowFocus: false,
-  //   enabled: !!user, // Only execute the query if userId is truthy
-  //   onSuccess: (data) => {
-  //     setAllMessages((prev) => [...data?.data.data.messages, ...prev]);
-  //     const totalPageMessages = Math.ceil(data?.data?.totalMessages / 2);
-  //     console.log(pageMessages, totalPageMessages);
-
-  //     if (pageMessages === totalPageMessages) {
-  //       sethasNextPageMessages(false);
-  //       return;
-  //     } else {
-  //       sethasNextPageMessages(true);
-  //     }
-  //   },
-  // });
 
   const {
     isLoading: isLoadingFetch,
@@ -192,9 +167,7 @@ const ChatRoom = (props) => {
     if (!user || !token) {
       return;
     }
-    // if (searchParams.get("new") === true) {
-    //   setPageMessages(1);
-    // }
+
     refetchCurrentConversation();
 
     if (dataFetchCurrentConversation?.data?.data?.conversation?.users) {
@@ -204,8 +177,6 @@ const ChatRoom = (props) => {
         )
       );
     }
-    // refetchMessage();
-    // fetchNextPage(1);
   }, [
     params.messageId,
     dataFetchCurrentConversation?.data?.data?.conversation?.users,
@@ -215,15 +186,6 @@ const ChatRoom = (props) => {
   ]);
 
   const pageMessagesHandler = () => {
-    // setPageMessages((prev) => {
-    //   setSearchParams({ new: false });
-    //   const totalPageMessages = Math.ceil(dataFetch?.data?.totalMessages / 2);
-    //   if (pageMessages === totalPageMessages) {
-    //     return prev;
-    //   } else {
-    //     return prev + 1;
-    //   }
-    // });
     setPageMessages((prev) => prev + 1);
   };
 
@@ -401,11 +363,7 @@ const ChatRoom = (props) => {
             </button>
           )}
           {isFetching && <div className={classes.loading}>loading...</div>}
-          {/* {allMessages?.map((c) => (
-            <div ref={scrollRef} key={c._id}>
-              <OneMessage message={c} own={c.sender?._id === user._id} />
-            </div>
-          ))} */}
+
           {Object.entries(groupedMessages).map(([dayKey, messagesInDay]) => (
             <div key={dayKey}>
               <div className={classes.date}>{formatDate(dayKey)}</div>

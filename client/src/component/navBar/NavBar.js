@@ -66,14 +66,14 @@ const NavBar = (props) => {
     return getWishList(`${URL}/api/v1/messages/unseenMessages`, tokenLocal);
   };
 
-  const { isLoading: loadingunseenMessagesNumber, data: unSeenData } = useQuery(
-    "unSeenMessagesNumber",
-    fetchUnseenMessagesNumber,
-    {
-      enabled: !!user, // Only execute the query if userId is truthy
-      refetchOnWindowFocus: false,
-    }
-  );
+  const {
+    isLoading: loadingunseenMessagesNumber,
+    data: unSeenData,
+    refetch: refetchUnseenMessagesNumber,
+  } = useQuery("unSeenMessagesNumber", fetchUnseenMessagesNumber, {
+    enabled: !!user, // Only execute the query if userId is truthy
+    refetchOnWindowFocus: false,
+  });
 
   const {
     isLoading: loadingProfile,
@@ -138,6 +138,7 @@ const NavBar = (props) => {
     refetchProfil();
     refetchWishList();
     refetchBlockList();
+    refetchUnseenMessagesNumber();
   }, [
     token,
     tokenLocal,
@@ -148,6 +149,7 @@ const NavBar = (props) => {
     dispatch,
     navigate,
     tokenExpiration,
+    refetchUnseenMessagesNumber,
   ]);
   useEffect(() => {
     if (!tokenLocal || !dataProfile?.data.data?.user) {
