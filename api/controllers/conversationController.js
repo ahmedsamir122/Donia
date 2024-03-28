@@ -145,7 +145,7 @@ exports.getMyConversations = catchAsync(async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
-
+    console.log("pagi", page, limit, startIndex);
     const paginatedConversations = filteredConversations.slice(
       startIndex,
       endIndex
