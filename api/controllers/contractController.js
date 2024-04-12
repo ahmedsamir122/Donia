@@ -358,7 +358,12 @@ exports.createContract = catchAsync(async (req, res, next) => {
 
   await Notification.create({
     to: other.id,
-    content: `${other.username} has requested to open a contract with you`,
+    content: `${req.user.username} has requested to open a contract with you`,
+  });
+
+  pusher.trigger(`channel-${other.id}`, `notifications-${other.id}`, {
+    to: other.id,
+    content: `${req.user.username} has requested to open a contract with you`,
   });
 
   // res.status(201).json({
