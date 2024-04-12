@@ -112,7 +112,7 @@ const OneContractContent = () => {
     <div className={classes.main}>
       {contract && (
         <div className="container">
-          {data?.data.data.contract.activity === "offer" && (
+          {contractActivity === "offer" && (
             <div className={classes.timerCon}>
               <div>the offer will end after</div>
               <div className={classes.timer}>{timer}</div>
