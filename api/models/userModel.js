@@ -54,6 +54,10 @@ const userSchema = new mongoose.Schema(
       enum: ["talent", "client"],
       default: "talent",
     },
+    bio: {
+      type: String,
+      maxLength: [1000, "the bio must have less or eqaul than 1000 characters"],
+    },
     ratingsAverageF: {
       type: Number,
       min: 1,

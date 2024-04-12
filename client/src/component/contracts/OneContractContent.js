@@ -1,5 +1,5 @@
 import classes from "./OneContractContent.module.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BackDropModal from "../modal/BackDrop";
 import ReviewModal from "../modal/ReviewModal";
 import Loading from "../loading/Loading";
@@ -11,9 +11,16 @@ import dateFormat from "dateformat";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "react-query";
 import { useEditContractActivity } from "../utils/queryFunctions";
+import TroubleshootIcon from "@mui/icons-material/Troubleshoot";
+import OneReview from "./OneReview";
+import ButtonContract from "./ButtonContract";
 
 const OneContractContent = () => {
   const [showModal, setShowModal] = useState(false);
+  const [contractActivity, setContractActivity] = useState("offer");
+  const [expired, setExpired] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [deadline, setDeadline] = useState(0); // New state variable for deadline
   const params = useParams();
   const navigate = useNavigate();
   const token = useSelector((state) => state.auth.token);
@@ -39,27 +46,48 @@ const OneContractContent = () => {
     }
   );
 
-  const startChat = (data, id) => {
-    return postDataProtect(
-      `${URL}/api/v1/conversations/${params.contractId}`,
-      data,
-      token
-    );
+  useEffect(() => {
+    setContractActivity(data?.data?.data.contract.activity);
+  }, [data?.data?.data.contract.activity]);
+
+  useEffect(() => {
+    if (data && data.data && data.data.data && data.data.data.contract) {
+      const contractExpiredAt = new Date(data.data.data.contract.expiredAt);
+
+      setDeadline(contractExpiredAt);
+    }
+  }, [data]);
+
+  const activityHandler = (activity) => {
+    setContractActivity(activity);
   };
 
-  const {
-    mutate,
-    isError: isErrorChat,
-    error: errorChat,
-  } = useMutation(startChat, {
-    onSuccess: (data) => {
-      console.log(data);
-      navigate(`/messages/${data.data.data.conversation._id}`);
-    },
-  });
-  const chatHandler = () => {
-    mutate();
-  };
+  useEffect(() => {
+    if (contractActivity !== "offer") {
+      return;
+    }
+    const intervalId = setInterval(() => {
+      if (deadline > Date.now()) {
+        // Check if the deadline is in the future
+        const remainingTime = deadline - Date.now();
+        const hours = Math.floor(remainingTime / (1000 * 60 * 60));
+        const minutes = Math.floor(
+          (remainingTime % (1000 * 60 * 60)) / (1000 * 60)
+        );
+        const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+        if (remainingTime === 0) {
+          setExpired(true);
+        }
+        setTimer(`${hours}h ${minutes}m ${seconds}s`);
+      } else {
+        setTimer("Expired"); // Set a message when the deadline has passed
+        clearInterval(intervalId); // Clear the interval when the deadline is reached
+      }
+    }, 1000);
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [deadline, contractActivity]);
 
   if (isLoading) {
     return (
@@ -76,151 +104,141 @@ const OneContractContent = () => {
   const contract = data?.data.data.contract;
 
   const client = user?.id === contract?.client?.id ? true : false;
-
+  const other = client
+    ? data?.data.data.contract.freelancer
+    : data?.data.data.contract.client;
   console.log(client);
   return (
     <div className={classes.main}>
       {contract && (
         <div className="container">
+          {data?.data.data.contract.activity === "offer" && (
+            <div className={classes.timerCon}>
+              <div>the offer will end after</div>
+              <div className={classes.timer}>{timer}</div>
+              <div></div>
+            </div>
+          )}
           <div className={classes.contractCon}>
             <div className={classes.contractLeft}>
-              <div className={classes.contractDetailsCon}>
-                <h3 className={classes.contractDetailsName}>Status</h3>
-                <p className={classes.contractDetailsOne}>
-                  {contract?.activity}
-                </p>
+              <div className={classes.topLeft}>
+                <div className={classes.statusCon}>
+                  <div>Status:</div>
+                  <div className={classes.offer}>{contractActivity}</div>
+                </div>
+
+                <div className={classes.deadlineCon}>
+                  <div>Deadline:</div>
+                  <div className={classes.date}>
+                    {" "}
+                    {dateFormat(contract.deadline, "mmmm d, yyyy")}
+                  </div>
+                </div>
+                <div className={classes.budgetCon}>
+                  <div>Budget:</div>
+                  <div className={classes.date}>
+                    {" "}
+                    {data.data.data.contract.budget}
+                  </div>
+                </div>
               </div>
-              <div className={classes.contractDetailsCon}>
-                <h3 className={classes.contractDetailsName}>Contract Title</h3>
-                <p className={classes.contractDetailsOne}>{contract?.name} </p>
+              <div className={classes.contractDescription}>
+                <div className={classes.title}>{contract.name}</div>
+                <div className={classes.description}>{contract.task}</div>
               </div>
-              <div className={classes.contractDetailsCon}>
-                <h3 className={classes.contractDetailsName}>Job Description</h3>
-                <p className={classes.contractDetailsOne}>{contract?.task}</p>
-              </div>
-              <div className={classes.contractDetailsCon}>
-                <h3 className={classes.contractDetailsName}>Offer Expires</h3>
-                <p className={classes.contractDetailsOne}>
-                  {dateFormat(contract?.deadline, " mmmm dS, yyyy")}
-                </p>
-              </div>
-              <div className={classes.contractDetailsCon}>
-                <h3 className={classes.contractDetailsName}>Offer Date</h3>
-                <p className={classes.contractDetailsOne}>
-                  {dateFormat(contract?.createdAt, " mmmm dS, yyyy")}
-                </p>
+              {(contractActivity === "expiredDeadline" ||
+                contractActivity === "approved" ||
+                contractActivity === "refused_final") && (
+                <div className={classes.reviewsCon}>
+                  <div className={classes.reviewsTop}>
+                    <div className={classes.reviewsTitle}>Reviews</div>
+                    {((data?.data?.data.contract.reviewFs.length === 0 &&
+                      !client) ||
+                      (data?.data?.data.contract.reviewCs.length === 0 &&
+                        client)) && (
+                      <div
+                        className={classes.addReviewIcon}
+                        onClick={() => setShowModal(true)}
+                      >
+                        +
+                      </div>
+                    )}
+                  </div>
+                  <div className={classes.reviewsBothCon}>
+                    {data?.data?.data.contract.reviewFs.map((review) => (
+                      <OneReview
+                        client={client}
+                        otherData={other}
+                        review={review}
+                      />
+                    ))}
+                    {data?.data?.data.contract.reviewFs.length > 0 &&
+                      data?.data?.data.contract.reviewCs.length > 0 && (
+                        <div className={classes.spaceBetween}></div>
+                      )}
+                    {data?.data?.data.contract.reviewCs.map((review) => (
+                      <OneReview
+                        client={client}
+                        otherData={other}
+                        review={review}
+                      />
+                    ))}
+                    {data?.data?.data.contract.reviewFs.length === 0 &&
+                      data?.data?.data.contract.reviewCs.length === 0 && (
+                        <div className={classes.dataEmpty}>
+                          <div>
+                            <div className={classes.dataEmptyIcon}>
+                              <TroubleshootIcon />
+                            </div>
+                            <div className={classes.dataEmptyIconText}>
+                              No reviews
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                </div>
+              )}
+              <div className={classes.buttonCon}>
+                <ButtonContract
+                  activity={contractActivity}
+                  client={client}
+                  onActivity={activityHandler}
+                />
               </div>
             </div>
             <div className={classes.contractRight}>
-              <div className={classes.contractOptionCon}>
-                {contract.activity === "offer" && !client && (
-                  <p
-                    onClick={() =>
-                      mutate(
-                        `${URL}/api/v1/contracts/${params.contractId}/accept`
-                      )
-                    }
-                    className={classes.contractOption}
-                  >
-                    Accept Offer
-                  </p>
-                )}
-                {contract.activity === "offer" && !client && (
-                  <p
-                    className={classes.contractOption}
-                    onClick={() =>
-                      mutate(
-                        `${URL}/api/v1/contracts/${params.contractId}/refuse`
-                      )
-                    }
-                  >
-                    Decline Offer
-                  </p>
-                )}
-                {contract.activity === "progress" && !client && (
-                  <p
-                    className={classes.contractOption}
-                    onClick={() =>
-                      mutate(
-                        `${URL}/api/v1/contracts/${params.contractId}/submit`
-                      )
-                    }
-                  >
-                    submit your work
-                  </p>
-                )}
-                {contract.activity === "submit" && client && (
-                  <p className={classes.contractOption}>report</p>
-                )}
-                {contract.activity === "submit" &&
-                  client &&
-                  contract.reviewCs.length === 0 && (
-                    <p
-                      className={classes.contractOption}
-                      onClick={() => setShowModal(true)}
-                    >
-                      add review
-                    </p>
-                  )}
-                {contract.activity === "submit" &&
-                  !client &&
-                  contract.reviewFs.length === 0 && (
-                    <p
-                      className={classes.contractOption}
-                      onClick={() => setShowModal(true)}
-                    >
-                      add review
-                    </p>
-                  )}
-
-                {contract.activity === "submit" &&
-                  client &&
-                  contract.reviewCs.length > 0 && (
-                    <p className={classes.contractOption}>view review</p>
-                  )}
-                {contract.activity === "submit" &&
-                  !client &&
-                  contract.reviewFs.length > 0 && (
-                    <p className={classes.contractOption}>view review</p>
-                  )}
-
-                <p
-                  className={classes.contractOption}
-                  onClick={() =>
-                    navigate(`/messages/${contract?.conversation}`)
-                  }
-                >
-                  Send message
-                </p>
-              </div>
-              <div className={classes.contractClientCon}>
-                <h3 className={classes.contractClientTitle}>
-                  {client ? "The talent" : "the client"}
-                </h3>
-                <div
-                  className={classes.user}
-                  onClick={() =>
-                    navigate(
-                      client
-                        ? `/${contract.freelancer?.username}`
-                        : `/u/${contract.client?.username}`
-                    )
-                  }
-                >
+              <div className={classes.userData}>
+                <div className={classes.userTitle}>
+                  {client ? "talent" : "client"}
+                </div>
+                <div className={classes.userNameBox}>
                   <img
+                    className={classes.img}
                     src={
                       client
                         ? ` ${contract.freelancer?.photo}`
                         : `${contract.client?.photo}`
                     }
-                    className={classes.img}
                     alt=""
                   />
-                  <p className={classes.contractClientName}>
+                  <div className={classes.userName}>
                     {client
-                      ? `${contract.freelancer?.username}`
+                      ? ` ${contract.freelancer?.username}`
                       : `${contract.client?.username}`}
-                  </p>
+                  </div>
+                </div>
+                <div className={classes.chatBox}>
+                  <div
+                    className={classes.chat}
+                    onClick={() =>
+                      navigate(
+                        `/messages/${data?.data?.data.contract.conversation}`
+                      )
+                    }
+                  >
+                    send message
+                  </div>
                 </div>
               </div>
             </div>
@@ -228,7 +246,7 @@ const OneContractContent = () => {
         </div>
       )}
       {showModal && <BackDropModal onClick={showModalHandler} />}
-      {showModal && <ReviewModal onClick={showModalHandler} />}
+      {showModal && <ReviewModal onClick={showModalHandler} client={client} />}
     </div>
   );
 };

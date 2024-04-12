@@ -1,5 +1,6 @@
 .main {
   height: 100%;
+  position: relative;
 }
 .top {
   display: flex;
@@ -115,7 +116,8 @@
     left: 0;
     height: 100vh;
     background-color: white;
-    width: 100vw;
+    width: 100%;
+    z-index: 70;
   }
   .backIcon {
     display: block;
@@ -140,4 +142,11 @@
   padding: 7px;
   border-radius: 7px;
   font-size: 12px;
+}
+.closedText {
+  border: 1px solid rgb(233, 229, 229);
+  border-radius: 7px;
+  font-size: 16px;
+  margin-top: auto;
+  padding: 7px;
 }

@@ -82,14 +82,14 @@ const Account = (props) => {
         <AiOutlineHeart className={classes.icon} />
         <div className={classes.iconName}>My Wishlist</div>
       </Link>
-      <Link
+      {/* <Link
         className={classes.item}
         to="/help"
         onClick={() => props.onAccount()}
       >
         <HelpIcon className={classes.icon} />
         <div className={classes.iconName}>Help</div>
-      </Link>
+      </Link> */}
       <div className={classes.item} onClick={logoutHandler}>
         <MdOutlineLogout className={classes.iconLogout} />
         <div className={classes.iconLogoutName}>Logout</div>

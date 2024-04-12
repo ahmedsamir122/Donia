@@ -1,0 +1,27 @@
+.buttonContract {
+  width: fit-content;
+  padding: 8px;
+  background-color: #139ff0;
+  color: white;
+  margin-bottom: 10px;
+  border: none;
+  cursor: pointer;
+}
+.buttonContractCancel {
+  width: fit-content;
+  padding: 8px;
+  background-color: #139ff0;
+  color: white;
+  margin-bottom: 10px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.buttonContract:disabled {
+  cursor: default;
+  background-color: #cacaca;
+}
+.complainText {
+  font-size: 14px;
+  color: rgb(204, 201, 201);
+}

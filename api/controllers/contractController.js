@@ -6,7 +6,9 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const User = require("../models/userModel");
 const Block = require("../models/blockModel");
+const createReport = require("../utils/createReport");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY_MY);
+const { pusher } = require("./messageController");
 
 exports.getAllContracts = catchAsync(async (req, res, next) => {
   //excute the query
@@ -262,7 +264,11 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       (obj) => Object.keys(obj)[0] === el
     );
 
-    if (el === "filterMinimumBudget" && oneObject[el] > req.body.budget) {
+    console.log(el, oneObject[el], req.body.budget);
+    if (
+      el === "filterMinimumBudget" &&
+      parseInt(oneObject[el]) > parseInt(req.body.budget)
+    ) {
       return next(
         new AppError("your budget is lower than what this talent requests", 400)
       );
@@ -270,10 +276,10 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   });
 
   if (
-    new Date(req.body.deadline) < new Date(Date.now() + 24 * 60 * 60 * 1000)
+    new Date(req.body.deadline) < new Date(Date.now() + 48 * 60 * 60 * 1000)
   ) {
     return next(
-      new AppError("the deadline has to be minimum after 24 hours", 400)
+      new AppError("the deadline has to be minimum after 48 hours", 400)
     );
   }
   console.log(new Date(req.body.deadline), Date.now());
@@ -295,8 +301,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
     mode: "payment",
     // success_url: `${req.protocol}://${req.get("host")}/success`,
-    success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
-    // success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    // success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
     // cancel_url: `${req.protocol}://${req.get("host")}/${req.params.username}`,
     cancel_url: `https://donia-v1dk-ahmedsamir122.vercel.app/${req.params.username}`,
     customer_email: req.user.email,
@@ -369,11 +375,11 @@ exports.getContract = catchAsync(async (req, res, next) => {
   const contract = await Contract.findById(req.params.id)
     .populate({
       path: "reviewFs",
-      select: "review rating",
+      select: "review rating createdAt",
     })
     .populate({
       path: "reviewCs",
-      select: "review rating",
+      select: "review rating createdAt",
     })
     .populate({
       path: "client",
@@ -408,6 +414,161 @@ exports.getContract = catchAsync(async (req, res, next) => {
     },
   });
 });
+exports.updateContract = catchAsync(async (req, res, next) => {
+  const contract = await Contract.findById(req.params.id)
+    .populate({
+      path: "client",
+      select: "username photo",
+    })
+    .populate({
+      path: "freelancer",
+      select: "username photo",
+    });
+
+  freelancer = contract.freelancer._id.equals(req.user.id);
+  client = contract.client._id.equals(req.user.id);
+  let check = false;
+  switch (req.body.activity) {
+    case "cancel":
+      if (freelancer && contract.activity === "offer") {
+        check = true;
+        await Notification.create({
+          to: contract.client._id,
+          content: `${contract.freelancer.username} has cancelled your offer`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.client._id}`,
+          `notifications-${contract.client._id}`,
+          {
+            to: contract.client._id,
+            content: `${contract.freelancer.username} has cancelled your offer`,
+          }
+        );
+      }
+      break;
+    case "progress":
+      if (freelancer && contract.activity === "offer") {
+        check = true;
+        await Notification.create({
+          to: contract.client._id,
+          content: `${contract.freelancer.username} has accepted your offer`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.client._id}`,
+          `notifications-${contract.client._id}`,
+          {
+            to: contract.client._id,
+            content: `${contract.freelancer.username} has accepted your offer`,
+          }
+        );
+      }
+      break;
+    case "submit":
+      if (freelancer && contract.activity === "progress") {
+        check = true;
+        contract.submitDate = Date.now();
+        await contract.save();
+        await Notification.create({
+          to: contract.client._id,
+          content: `${contract.freelancer.username} has submitted the work`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.client._id}`,
+          `notifications-${contract.client._id}`,
+          {
+            to: contract.client._id,
+            content: `${contract.freelancer.username} has submitted the work`,
+          }
+        );
+      }
+      break;
+    case "approved":
+      if (client && contract.activity === "submit") {
+        check = true;
+        await Notification.create({
+          to: contract.freelancer._id,
+          content: `${contract.client.username} has approved your work`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.freelancer._id}`,
+          `notifications-${contract.freelancer._id}`,
+          {
+            to: contract.client._id,
+            content: `${contract.client.username} has approved your offer`,
+          }
+        );
+      }
+      break;
+    case "complain":
+      if (freelancer && contract.activity === "refused") {
+        check = true;
+        await createReport({
+          complainer: req.user._id,
+          contract: req.params.id,
+          type: "contract",
+        });
+        await Notification.create({
+          to: contract.client._id,
+          content: `${contract.freelancer.username} has complained on contract`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.client._id}`,
+          `notifications-${contract.client._id}`,
+          {
+            to: contract.client._id,
+            content: `${contract.freelancer.username} has complained on contract`,
+          }
+        );
+      }
+      break;
+    case "refused":
+      if (client && contract.activity === "submit") {
+        check = true;
+        contract.refusedDate = Date.now();
+        await contract.save();
+        await Notification.create({
+          to: contract.freelancer._id,
+          content: `${contract.client.username} has refused your work`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.freelancer._id}`,
+          `notifications-${contract.freelancer._id}`,
+          {
+            to: contract.client._id,
+            content: `${contract.client.username} has refused your work`,
+          }
+        );
+      }
+      break;
+  }
+  let newContract;
+  if (check) {
+    newContract = await Contract.findByIdAndUpdate(
+      req.params.id,
+      { activity: req.body.activity },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+  } else {
+    return next(
+      new AppError("you can't update the status of this contract", 400)
+    );
+  }
+  res.status(200).json({
+    status: "success",
+    data: {
+      contract: newContract,
+    },
+  });
+});
 
 exports.deleteContract = catchAsync(async (req, res, next) => {
   const contract = await Contract.findByIdAndDelete(req.params.id);
@@ -420,209 +581,4 @@ exports.deleteContract = catchAsync(async (req, res, next) => {
     status: "success",
     data: null,
   });
-});
-
-exports.acceptContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.id).populate({
-    path: "freelancer",
-    select: "username",
-  });
-
-  if (!contract.freelancer.equals(req.user.id)) {
-    return next(new AppError("You can not accept this contract!", 403));
-  }
-
-  if (contract.activity !== "offer") {
-    return next(new AppError("You can not accept this contract anymore!", 400));
-  }
-
-  if (
-    new Date(contract.deadline) < new Date(Date.now()) ||
-    new Date(contract.expiredAt) < new Date(Date.now())
-  ) {
-    return next(new AppError("this offer isn't valid anymore!", 400));
-  }
-
-  const newContract = await Contract.findByIdAndUpdate(
-    req.params.id,
-    { activity: "progress" },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  console.log("note", contract.freelancer);
-
-  await Notification.create({
-    to: contract.freelancer,
-    content: `${contract.freelancer.username} has accepted your offer`,
-  });
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      contract: newContract,
-    },
-  });
-});
-
-exports.submitContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.id).populate({
-    path: "freelancer",
-    select: "username",
-  });
-
-  if (!contract.freelancer.equals(req.user.id)) {
-    return next(new AppError("You can not accept this contract!", 400));
-  }
-
-  if (contract.activity !== "progress") {
-    return next(new AppError("You can not accept this contract anymore!", 400));
-  }
-
-  if (new Date(contract.deadline) < new Date(Date.now())) {
-    return next(new AppError("you have exceeded the deadline!", 400));
-  }
-
-  const newContract = await Contract.findByIdAndUpdate(
-    req.params.id,
-    { activity: "submit", submitDate: Date.now() },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  await Notification.create({
-    to: contract.freelancer,
-    content: `${contract.freelancer.username} has submitted his task`,
-  });
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      contract: newContract,
-    },
-  });
-});
-// exports.approveContract = catchAsync(async (req, res, next) => {
-//   const contract = await Contract.findById(req.params.id);
-
-//   if (!contract.client.equals(req.user.id)) {
-//     return next(new AppError("You can not approve this contract!", 400));
-//   }
-
-//   if (submitDate + 3 * 24 * 60 * 60 * 1000 < Date.now()) {
-//     return next(new AppError("the contract has been already approved!", 400));
-//   }
-
-//   if (contract.activity !== "submit") {
-//     return next(new AppError("You can not approve this contract!", 400));
-//   }
-
-//   const newContract = await Contract.findByIdAndUpdate(
-//     req.params.id,
-//     { activity: "approved" },
-//     {
-//       new: true,
-//       runValidators: true,
-//     }
-//   );
-//   res.status(200).json({
-//     status: "success",
-//     data: {
-//       contract: newContract,
-//     },
-//   });
-// });
-
-exports.refuseContract = catchAsync(async (req, res, next) => {
-  const contract = await Contract.findById(req.params.id).populate({
-    path: "freelancer",
-    select: "username",
-  });
-
-  if (!contract.freelancer.equals(req.user.id)) {
-    return next(new AppError("You can not refuse this contract!", 400));
-  }
-
-  if (contract.activity !== "offer") {
-    return next(new AppError("You can not refuse this contract anymore!", 400));
-  }
-
-  const newContract = await Contract.findByIdAndUpdate(
-    req.params.id,
-    { activity: "refuse" },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  await Notification.create({
-    to: contract.freelancer,
-    content: `${contract.freelancer.username} has refused your offer`,
-  });
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      contract: newContract,
-    },
-  });
-});
-
-exports.expiredCheck = catchAsync(async (req, res, next) => {
-  const contractsExpiredC = await Contract.find({
-    client: req.user.id,
-    activity: "offer",
-    expiredAt: { $lt: Date.now() },
-  });
-
-  if (contractsExpiredC.length > 0) {
-    for (const contract of contractsExpiredC) {
-      contract.activity = "expired";
-      await contract.save();
-    }
-  }
-
-  const contractsExpiredDeadlineC = await Contract.find({
-    client: req.user.id,
-    activity: "progress",
-    deadline: { $lt: Date.now() },
-  });
-
-  if (contractsExpiredDeadlineC.length > 0) {
-    for (const contract of contractsExpiredDeadlineC) {
-      contract.activity = "expired";
-      await contract.save();
-    }
-  }
-  const contractsExpiredF = await Contract.find({
-    freelancer: req.user.id,
-    activity: "offer",
-    expiredAt: { $lt: Date.now() },
-  });
-
-  if (contractsExpiredF.length > 0) {
-    for (const contract of contractsExpiredF) {
-      contract.activity = "expired";
-      await contract.save();
-    }
-  }
-
-  const contractsExpiredDeadlineF = await Contract.find({
-    freelancer: req.user.id,
-    activity: "progress",
-    deadline: { $lt: Date.now() },
-  });
-
-  if (contractsExpiredDeadlineF.length > 0) {
-    for (const contract of contractsExpiredDeadlineF) {
-      contract.activity = "expired";
-      await contract.save();
-    }
-  }
-  next();
 });

@@ -21,15 +21,11 @@ const ContractsTableHtml = (props) => {
         <tbody>
           {props.onData.map((con) => (
             <tr>
-              <td className={`${classes.bodyCell} ${classes.nameBody}`}>
-                {
-                  <Link
-                    className={classes.contractName}
-                    to={`/contracts/${con._id}`}
-                  >
-                    {con.name}
-                  </Link>
-                }
+              <td
+                className={`${classes.bodyCell} ${classes.nameBody}`}
+                onClick={() => navigate(`/contracts/${con._id}`)}
+              >
+                {con.name}
               </td>
               <td className={`${classes.bodyCell} ${classes.statusBody}`}>
                 {con.activity}

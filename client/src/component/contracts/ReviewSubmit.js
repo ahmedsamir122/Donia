@@ -37,6 +37,27 @@ const ReviewSubmit = (props) => {
 
   const { mutate, isError, error } = useMutation(postData, {
     onSuccess: (data) => {
+      console.log(data.data.data.newReview);
+      queryClient.setQueryData("oneContract", (oldData) => {
+        const contract = oldData.data.data.contract;
+        console.log(oldData);
+        return {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            data: {
+              ...oldData.data.data,
+              contract: {
+                ...contract,
+                [props.client ? "reviewCs" : "reviewFs"]: [
+                  data.data.data.newReview,
+                ],
+              },
+            },
+          },
+        };
+      });
+
       props.onClick();
     },
   });

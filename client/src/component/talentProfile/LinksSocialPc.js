@@ -9,7 +9,11 @@ const LinksSocialPc = (props) => {
   return (
     <React.Fragment>
       {(props.onData.links.length === 0 || !props.onData.links) && (
-        <div className={classes.link}>Please add your social media account</div>
+        <div className={classes.link}>
+          {props.showEdit
+            ? "Please add your social media links"
+            : "No links added "}
+        </div>
       )}
       {props.onData.links.length > 0 && (
         <ul>

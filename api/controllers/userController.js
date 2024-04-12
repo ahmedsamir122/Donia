@@ -179,7 +179,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     "links",
     "wishList",
     "block",
-    "perform"
+    "perform",
+    "bio"
   );
   if (req.file) filteredBody.photo = req.file.path;
 

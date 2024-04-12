@@ -23,18 +23,7 @@ const OneNotification = (props) => {
   const { mutate, isError, error } = useMutation(deleteOneNotification, {
     onSuccess: (data) => {
       console.log("success");
-      queryClient.setQueryData("notifications", (oldData) => {
-        const updatedData = {
-          data: {
-            data: {
-              notifications: oldData.data.data.notifications.filter(
-                (note) => note.id !== props.onData.id
-              ),
-            },
-          },
-        };
-        return updatedData;
-      });
+      props.onDeleteNotifications(props.onData.id);
     },
   });
 

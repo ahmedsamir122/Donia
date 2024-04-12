@@ -14,11 +14,14 @@ const contractSchema = new mongoose.Schema(
       type: String,
       enum: [
         "offer",
-        "refuse",
+        "cancel",
         "expired",
         "expiredDeadline",
         "progress",
         "submit",
+        "refused",
+        "complain",
+        "refused_final",
         "approved",
       ],
       default: "offer",
@@ -38,9 +41,12 @@ const contractSchema = new mongoose.Schema(
     submitDate: {
       type: Date,
     },
+    refusedDate: {
+      type: Date,
+    },
     expiredAt: {
       type: Date,
-      default: Date.now() + 3 * 24 * 60 * 60 * 1000,
+      default: Date.now() + 2 * 24 * 60 * 60 * 1000,
     },
     deadline: {
       type: Date,
@@ -79,6 +85,60 @@ contractSchema.virtual("reviewCs", {
   localField: "_id",
 });
 
+contractSchema.post("find", async function (docs, next) {
+  // console.log(docs);
+  for (const contract of docs) {
+    if (contract.activity === "offer" && Date.now() > contract.expiredAt) {
+      contract.activity = "expired";
+      await contract.save();
+    }
+    if (contract.activity === "progress" && Date.now() > contract.deadline) {
+      contract.activity = "expiredDeadline";
+      await contract.save();
+    }
+    if (
+      contract.activity === "submit" &&
+      Date.now() > contract.submitDate + 72 * 24 * 60 * 60 * 1000
+    ) {
+      contract.activity = "approved";
+      await contract.save();
+    }
+    if (
+      contract.activity === "refused" &&
+      Date.now() > contract.refusedDate + 72 * 24 * 60 * 60 * 1000
+    ) {
+      contract.activity = "refused_final";
+      await contract.save();
+    }
+  }
+  next();
+});
+contractSchema.post("findOne", async function (doc, next) {
+  if (doc.activity === "offer" && Date.now() > doc.expiredAt) {
+    doc.activity = "expired";
+    await doc.save();
+  }
+  if (doc.activity === "progress" && Date.now() > doc.deadline) {
+    doc.activity = "expiredDeadline";
+    await doc.save();
+  }
+  if (
+    doc.activity === "submit" &&
+    Date.now() > doc.submitDate + 72 * 24 * 60 * 60 * 1000
+  ) {
+    doc.activity = "approved";
+    await doc.save();
+  }
+  if (
+    doc.activity === "refused" &&
+    Date.now() > doc.refusedDate + 72 * 24 * 60 * 60 * 1000
+  ) {
+    doc.activity = "refused_final";
+    await doc.save();
+  }
+
+  next();
+});
 const Contract = mongoose.model("Contract", contractSchema);
 
 module.exports = Contract;

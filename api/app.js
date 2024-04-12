@@ -39,18 +39,22 @@ const limiter = rateLimit({
 });
 app.use("/api", limiter);
 
-// app.use(
-//   cors({
-//     credentials: true,
-//     origin: ["http://localhost:3000", "http://localhost:3001"],
-//   })
-// );
 app.use(
   cors({
     credentials: true,
-    origin: "https://donia-gamma.vercel.app",
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "https://donia-gamma.vercel.app",
+    ],
   })
 );
+// app.use(
+//   cors({
+//     credentials: true,
+//     origin: "https://donia-gamma.vercel.app",
+//   })
+// );
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();

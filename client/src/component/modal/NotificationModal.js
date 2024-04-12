@@ -11,6 +11,7 @@ const NotificationCard = (props) => {
         loading={props.loading}
         onPageHandler={props.onPageHandler}
         hasNextPage={props.hasNextPage}
+        onDeleteNotifications={props.onDeleteNotifications}
       />
     </React.Fragment>
   );
@@ -25,6 +26,7 @@ const NotificationModal = (props) => {
           loading={props.loading}
           onPageHandler={props.onPageHandler}
           hasNextPage={props.hasNextPage}
+          onDeleteNotifications={props.onDeleteNotifications}
         />,
         document.getElementById("Notification")
       )}

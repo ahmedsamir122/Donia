@@ -1,0 +1,25 @@
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.topRight {
+  font-size: 14px;
+  color: #4d525b;
+}
+.client {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+.img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.content {
+  margin-top: 20px;
+  font-size: 15;
+}

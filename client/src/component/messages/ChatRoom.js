@@ -388,7 +388,7 @@ const ChatRoom = (props) => {
           </form>
         )}
         {dataFetchCurrentConversation?.data.data.conversation.closed && (
-          <p>
+          <p className={classes.closedText}>
             this conversation is closed you can't send messages unless there is
             new contract or you can contact us for more information
           </p>

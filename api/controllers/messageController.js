@@ -13,6 +13,8 @@ const pusher = new Pusher({
   cluster: process.env.PUSHER_CLUSTER,
 });
 
+exports.pusher = pusher;
+
 exports.sendMessage = catchAsync(async (req, res, next) => {
   let conversation = await Conversation.findById(req.params.conversationId);
   const [reciever] = conversation?.users.filter((u) =>

@@ -32,9 +32,20 @@ const Notifications = (props) => {
       {props.dataNotes.length > 0 &&
         props.dataNotes.map((note, index) => {
           if (props.dataNotes.length === index + 1) {
-            return <OneNotification onData={note} innerRef={ref} />;
+            return (
+              <OneNotification
+                onData={note}
+                innerRef={ref}
+                onDeleteNotifications={props.onDeleteNotifications}
+              />
+            );
           }
-          return <OneNotification onData={note} />;
+          return (
+            <OneNotification
+              onData={note}
+              onDeleteNotifications={props.onDeleteNotifications}
+            />
+          );
         })}
       {props.dataNotes.length === 0 && (
         <div> there is no notifications found</div>

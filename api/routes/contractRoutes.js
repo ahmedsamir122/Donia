@@ -29,18 +29,10 @@ router
   );
 router
   .route("/my-contractsF")
-  .get(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.getMyContractsF
-  );
+  .get(authController.protect, contractController.getMyContractsF);
 router
   .route("/my-contractsC")
-  .get(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.getMyContractsC
-  );
+  .get(authController.protect, contractController.getMyContractsC);
 
 router
   .route("/open/:username")
@@ -55,7 +47,6 @@ router
   .post(
     authController.protect,
     contractController.filterContract,
-    contractController.expiredCheck,
     contractController.getCheckoutSession
   );
 
@@ -79,47 +70,11 @@ router
 
 router
   .route("/:id")
-  .get(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.getContract
-  )
-
-  .delete(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.deleteContract
-  );
+  .get(authController.protect, contractController.getContract)
+  .patch(authController.protect, contractController.updateContract)
+  .delete(authController.protect, contractController.deleteContract);
 router
   .route("/re/:contractId")
   .post(authController.protect, reviewCController.createReview);
-
-router
-  .route("/:id/accept")
-  .patch(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.acceptContract
-  );
-
-router
-  .route("/:id/submit")
-  .patch(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.submitContract
-  );
-
-// router
-//   .route("/:id/approve")
-//   .patch(authController.protect, contractController.approveContract);
-
-router
-  .route("/:id/cancel")
-  .patch(
-    authController.protect,
-    contractController.expiredCheck,
-    contractController.refuseContract
-  );
 
 module.exports = router;

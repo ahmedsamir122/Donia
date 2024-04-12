@@ -51,3 +51,11 @@
   font-size: 30px;
   color: white;
 }
+@media (max-width: 768px) {
+  /* .appImg {
+    display: block;
+  } */
+  .img {
+    width: 75px;
+  }
+}

@@ -16,6 +16,7 @@ import AddLinksModal from "../modal/LinksAccounts";
 import { useMutation } from "react-query";
 import { postDataProtect, URL } from "../utils/queryFunctions";
 import Loading from "../loading/Loading";
+import About from "./About";
 
 const TalentOne = (props) => {
   const [showModal, setShowModal] = useState(false);
@@ -103,6 +104,9 @@ const TalentOne = (props) => {
             )}
             {props.showEdit && !props.client && showAccount && (
               <LinkAccount onData={props.onData} />
+            )}
+            {showAccount && (
+              <About onData={props.onData} showEdit={props.showEdit} />
             )}
             {props.showEdit && !props.client && showAccount && <FilterList />}
             <ReviewsTalentOne

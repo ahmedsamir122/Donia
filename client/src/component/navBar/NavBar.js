@@ -50,6 +50,7 @@ const NavBar = (props) => {
   const token = useSelector((state) => state.auth.token);
   const tokenLocal = localStorage.getItem("token") || "";
   const tokenExpiration = localStorage.getItem("expiration");
+  const pusher = useSelector((state) => state.pusher.pusher);
 
   const getMyProfile = () => {
     return getWishList(`${URL}/api/v1/users/me`, tokenLocal);
@@ -302,6 +303,34 @@ const NavBar = (props) => {
     dispatch(pusherActions.getPusher(pusher));
   }, [tokenLocal, dispatch, token]);
 
+  useEffect(() => {
+    console.log(pusher);
+    if (!user || !pusher) {
+      return; // Wait until user ID is available
+    }
+    var channel = pusher?.subscribe(`channel-${user?.id}`);
+    channel?.bind(`notifications-${user?.id}`, function (data) {
+      console.log(data);
+      setNoteNum((prev) => prev + 1);
+      setNotificationData((prev) => [data, ...prev]);
+    });
+    // return () => {
+    //   channel.unsubscribe(`channel-${user?.id}`);
+    //   // pusher.disconnect();
+    // };
+  }, [user, pusher]);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+    refetchNotifications();
+  }, [refetchNotifications, noteNum, user]);
+
+  const deleteNotificationHandler = (id) => {
+    setNotificationData((prev) => prev.filter((note) => note.id !== id));
+  };
+
   const submitHandler = (e) => {
     e.preventDefault();
     if (location.pathname.includes("search")) {
@@ -400,6 +429,7 @@ const NavBar = (props) => {
                     loading={isFetching}
                     onPageHandler={pageNotifictionHandler}
                     hasNextPage={hasNextPageNotifications}
+                    onDeleteNotifications={deleteNotificationHandler}
                   />
                 )}
                 <li

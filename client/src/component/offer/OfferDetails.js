@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { postDataProtect, URL } from "../utils/queryFunctions";
 import { useMutation } from "react-query";
 
-const OfferDetails = () => {
+const OfferDetails = (props) => {
   const params = useParams();
   const token = useSelector((state) => state.auth.token);
 
@@ -46,7 +46,6 @@ const OfferDetails = () => {
       deadline,
     });
   };
-
   return (
     <div className={classes.main}>
       <div className={classes.boxCaution}>
@@ -88,11 +87,26 @@ const OfferDetails = () => {
             type="date"
             id="deadline"
             className={classes.input}
-            {...register("deadline", { required: true })}
+            {...register("deadline", {
+              required: true,
+              validate: (value) => {
+                const selectedDate = new Date(value); // Convert the selected date string to a Date object
+                const minimumDate = new Date(Date.now() + 48 * 60 * 60 * 1000); // Get the minimum date (current date + 48 hours)
+
+                // Compare timestamps to check if the selected date is after the minimum date
+                return selectedDate.getTime() > minimumDate.getTime();
+              },
+            })}
           />
-          <p className={classes.dateWarning}>( minimum 72hours )</p>
+          <p className={classes.dateWarning}>( minimum 48hours )</p>
           {errors.deadline?.type === "required" && (
             <p className={classes.error}>please enter your deadline date</p>
+          )}
+          {errors.deadline?.type === "validate" && (
+            <p className={classes.error}>the deadline minimum is 48 hours </p>
+          )}
+          {isError && error?.response?.data?.message.includes("deadline") && (
+            <p className={classes.error}>{error?.response.data.message}</p>
           )}
         </div>
         <div className={classes.box}>
@@ -102,9 +116,13 @@ const OfferDetails = () => {
             id="price"
             className={classes.input}
             {...register("budget", { required: true })}
+            onChange={(e) => props.onPrice(e.target.value)}
           />
           {errors.budget?.type === "required" && (
             <p className={classes.error}>please enter your budget</p>
+          )}
+          {isError && error?.response?.data?.message.includes("budget") && (
+            <p className={classes.error}>{error?.response.data.message}</p>
           )}
         </div>
         <button className={classes.submit}>submit your offer</button>
