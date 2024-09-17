@@ -98,14 +98,16 @@ contractSchema.post("find", async function (docs, next) {
     }
     if (
       contract.activity === "submit" &&
-      Date.now() > contract.submitDate + 72 * 24 * 60 * 60 * 1000
+      Date.now() >
+        new Date(contract.submitDate).getTime() + 72 * 24 * 60 * 60 * 1000
     ) {
       contract.activity = "approved";
       await contract.save();
     }
     if (
       contract.activity === "refused" &&
-      Date.now() > contract.refusedDate + 72 * 24 * 60 * 60 * 1000
+      Date.now() >
+        new Date(contract.refusedDate).getTime() + 72 * 24 * 60 * 60 * 1000
     ) {
       contract.activity = "refused_final";
       await contract.save();
@@ -124,14 +126,14 @@ contractSchema.post("findOne", async function (doc, next) {
   }
   if (
     doc.activity === "submit" &&
-    Date.now() > doc.submitDate + 72 * 24 * 60 * 60 * 1000
+    Date.now() > new Date(doc.submitDate).getTime() + 72 * 24 * 60 * 60 * 1000
   ) {
     doc.activity = "approved";
     await doc.save();
   }
   if (
     doc.activity === "refused" &&
-    Date.now() > doc.refusedDate + 72 * 24 * 60 * 60 * 1000
+    Date.now() > new Date(doc.refusedDate).getTime() + 72 * 24 * 60 * 60 * 1000
   ) {
     doc.activity = "refused_final";
     await doc.save();

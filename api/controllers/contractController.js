@@ -301,8 +301,8 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
     mode: "payment",
     // success_url: `${req.protocol}://${req.get("host")}/success`,
-    // success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
-    success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+    // success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
     // cancel_url: `${req.protocol}://${req.get("host")}/${req.params.username}`,
     cancel_url: `https://donia-v1dk-ahmedsamir122.vercel.app/${req.params.username}`,
     customer_email: req.user.email,
@@ -375,6 +375,8 @@ exports.createContract = catchAsync(async (req, res, next) => {
   req.contract = newContract;
   next();
 });
+
+//midtrans
 
 exports.getContract = catchAsync(async (req, res, next) => {
   const contract = await Contract.findById(req.params.id)
