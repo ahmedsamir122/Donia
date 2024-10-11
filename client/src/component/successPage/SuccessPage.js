@@ -5,35 +5,31 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useSelector } from "react-redux";
-import { postDataProtect, URL } from "../utils/queryFunctions";
+import { updateFileData, URL } from "../utils/queryFunctions";
 const SuccessPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const token = useSelector((state) => state.auth.token);
 
-  const [username, setUsername] = useState("");
-  const [name, setName] = useState("");
-  const [task, setTask] = useState("");
-  const [budget, setBudget] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [contractId, setContractId] = useState("");
 
   const postData = (data) => {
-    return postDataProtect(`${URL}/api/v1/contracts/${username}`, data, token);
+    return updateFileData(`${URL}/api/v1/contracts/${contractId}`, data, token);
   };
 
-  const { mutate } = useMutation(postData, {
-    onSuccess: (data) => {},
+  const { mutate, isError, error } = useMutation(postData, {
+    onSuccess: (data) => {
+      // props.onActivity(data.data.data.contract.activity);
+    },
   });
 
+  // console.log(props.activity);
+
   useEffect(() => {
-    setUsername(searchParams.get("username"));
-    setName(searchParams.get("name"));
-    setTask(searchParams.get("task"));
-    setBudget(searchParams.get("budget"));
-    setDeadline(searchParams.get("deadline"));
-    if (!username || !name || !task || !budget) {
+    setContractId(searchParams.get("contractId"));
+    if (!contractId) {
       return;
     }
-    mutate({ name, task, budget, deadline });
+    mutate({ activity: "offer", tokenMidtrans: "used" });
   }, [token]);
 
   return (

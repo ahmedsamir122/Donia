@@ -4,7 +4,12 @@ import BackDropModal from "../modal/BackDrop";
 import ReviewModal from "../modal/ReviewModal";
 import Loading from "../loading/Loading";
 import { useParams } from "react-router-dom";
-import { URL, getWishList, postDataProtect } from "../utils/queryFunctions";
+import {
+  URL,
+  getWishList,
+  postDataProtect,
+  MIDTRANS_CLIENT_KEY,
+} from "../utils/queryFunctions";
 import { useQuery, useMutation } from "react-query";
 import { useSelector } from "react-redux";
 import dateFormat from "dateformat";
@@ -26,6 +31,26 @@ const OneContractContent = () => {
   const token = useSelector((state) => state.auth.token);
   const user = useSelector((state) => state.auth.user);
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // You can also change below url value to any script url you wish to load,
+    // for example this is snap.js for Sandbox Env (Note: remove `.sandbox` from url if you want to use production version)
+    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+
+    let scriptTag = document.createElement("script");
+    scriptTag.src = midtransScriptUrl;
+
+    // Optional: set script attribute, for example snap.js have data-client-key attribute
+    // (change the value according to your client-key)
+    const myMidtransClientKey = MIDTRANS_CLIENT_KEY;
+    scriptTag.setAttribute("data-client-key", myMidtransClientKey);
+
+    document.body.appendChild(scriptTag);
+
+    return () => {
+      document.body.removeChild(scriptTag);
+    };
+  }, []);
 
   const showModalHandler = () => {
     setShowModal((prev) => {
@@ -108,6 +133,10 @@ const OneContractContent = () => {
     ? data?.data.data.contract.freelancer
     : data?.data.data.contract.client;
   console.log(client);
+
+  const paymentHandler = () => {
+    window.snap.pay(contract.tokenMidtrans);
+  };
   return (
     <div className={classes.main}>
       {contract && (
@@ -208,6 +237,11 @@ const OneContractContent = () => {
               </div>
             </div>
             <div className={classes.contractRight}>
+              {contract.activity === "pending" && (
+                <div className={classes.paymentButton} onClick={paymentHandler}>
+                  continue payment
+                </div>
+              )}
               <div className={classes.userData}>
                 <div className={classes.userTitle}>
                   {client ? "talent" : "client"}

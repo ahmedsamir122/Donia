@@ -2,12 +2,19 @@ import classes from "./OfferDetails.module.css";
 import { useForm } from "react-hook-form";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { postDataProtect, URL } from "../utils/queryFunctions";
+import {
+  postDataProtect,
+  URL,
+  MIDTRANS_CLIENT_KEY,
+} from "../utils/queryFunctions";
 import { useMutation } from "react-query";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const OfferDetails = (props) => {
   const params = useParams();
   const token = useSelector((state) => state.auth.token);
+  const navigate = useNavigate();
 
   const postData = (data) => {
     return postDataProtect(
@@ -16,10 +23,36 @@ const OfferDetails = (props) => {
       token
     );
   };
+
+  useEffect(() => {
+    // You can also change below url value to any script url you wish to load,
+    // for example this is snap.js for Sandbox Env (Note: remove `.sandbox` from url if you want to use production version)
+    const midtransScriptUrl = "https://app.sandbox.midtrans.com/snap/snap.js";
+
+    let scriptTag = document.createElement("script");
+    scriptTag.src = midtransScriptUrl;
+
+    // Optional: set script attribute, for example snap.js have data-client-key attribute
+    // (change the value according to your client-key)
+    const myMidtransClientKey = MIDTRANS_CLIENT_KEY;
+    scriptTag.setAttribute("data-client-key", myMidtransClientKey);
+
+    document.body.appendChild(scriptTag);
+
+    return () => {
+      document.body.removeChild(scriptTag);
+    };
+  }, []);
   const { mutate, isError, error, isLoading } = useMutation(postData, {
     onSuccess: (data) => {
-      console.log(data.data.session.url);
-      window.location.href = data.data.session.url;
+      console.log(data.data);
+      window.snap.pay(data.data.tokenMidtrans, {
+        // Function triggered when the user closes the modal without completing payment
+        onClose: function () {
+          // Redirect the user to a specific URL when they close the modal
+          navigate(`/contracts/${data.data.contract._id}`);
+        },
+      });
     },
   });
 
@@ -38,7 +71,7 @@ const OfferDetails = (props) => {
       "budget",
       "deadline",
     ]);
-    console.log(params.userId, name, task, budget, deadline);
+    console.log(params.userId, name, task, budget, deadline, URL);
     mutate({
       name,
       task,

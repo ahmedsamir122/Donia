@@ -10,9 +10,14 @@ const contractSchema = new mongoose.Schema(
       type: Number,
       required: [true, "the contract must have a budget"],
     },
+    tokenMidtrans: {
+      type: String,
+      unique: [true, "this email already exists"],
+    },
     activity: {
       type: String,
       enum: [
+        "pending",
         "offer",
         "cancel",
         "expired",
@@ -24,7 +29,7 @@ const contractSchema = new mongoose.Schema(
         "refused_final",
         "approved",
       ],
-      default: "offer",
+      default: "pending",
     },
     task: {
       type: String,

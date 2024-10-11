@@ -9,6 +9,14 @@ const Block = require("../models/blockModel");
 const createReport = require("../utils/createReport");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY_MY);
 const { pusher } = require("./messageController");
+const Midtrans = require("midtrans-client");
+const moment = require("moment");
+
+let snap = new Midtrans.Snap({
+  isProduction: false,
+  serverKey: process.env.MIDTRANS_SERVER_KEY,
+  clientKey: process.env.MIDTRANS_CLIENT_KEY,
+});
 
 exports.getAllContracts = catchAsync(async (req, res, next) => {
   //excute the query
@@ -257,6 +265,10 @@ exports.openContract = catchAsync(async (req, res, next) => {
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const talent = await User.findOne({ username: req.params.username });
+
+  if (!talent) {
+    return next(new AppError("this user doesn't exist", 404));
+  }
   const filterNames = talent.filterValues?.map((el) => Object.keys(el)[0]);
 
   filterNames.forEach((el) => {
@@ -284,34 +296,75 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   }
   console.log(new Date(req.body.deadline), Date.now());
 
-  const session = await stripe.checkout.sessions.create({
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: req.body.name,
-          },
-          unit_amount: req.body.budget * 100 * 1.02,
-        },
-        quantity: 1,
-      },
-    ],
-    payment_method_types: ["card"],
-
-    mode: "payment",
-    // success_url: `${req.protocol}://${req.get("host")}/success`,
-    success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
-    // success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
-    // cancel_url: `${req.protocol}://${req.get("host")}/${req.params.username}`,
-    cancel_url: `https://donia-v1dk-ahmedsamir122.vercel.app/${req.params.username}`,
-    customer_email: req.user.email,
-    client_reference_id: req.params.username,
+  const newContract = await Contract.create({
+    ...req.body,
+    freelancer: talent._id,
+    client: req.user._id,
   });
+
+  let expiryStartTime = moment().format("YYYY-MM-DD HH:mm:ss Z");
+
+  let parameter = {
+    transaction_details: {
+      order_id: newContract._id,
+      gross_amount: newContract.budget,
+    },
+    customer_details: {
+      email: req.user?.email,
+      phone: req.user?.phone,
+    },
+    callbacks: {
+      // finish: `http://localhost:3000/success?contractId=${newContract._id}&status=success`,
+      finish: `https://donia-gamma.vercel.app/success?contractId=${newContract._id}&status=success`,
+
+      // Redirect to pending status page if payment was not completed
+      // pending: `http://localhost:3000/contracts/${newContract._id}?status=pending`,
+      pending: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=pending`,
+
+      // Redirect to error page if something goes wrong with the payment
+      // error: `http://localhost:3000/contracts/${newContract._id}?status=error`,
+      error: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=error`,
+    },
+    expiry: {
+      start_time: expiryStartTime,
+      unit: "hour",
+      duration: 12, // Transaction expires after 24 hours
+    },
+  };
+
+  const tokenMidtrans = await snap.createTransactionToken(parameter);
+  newContract.tokenMidtrans = tokenMidtrans;
+  await newContract.save();
+
+  // const session = await stripe.checkout.sessions.create({
+  //   line_items: [
+  //     {
+  //       price_data: {
+  //         currency: "usd",
+  //         product_data: {
+  //           name: req.body.name,
+  //         },
+  //         unit_amount: req.body.budget * 100 * 1.02,
+  //       },
+  //       quantity: 1,
+  //     },
+  //   ],
+  //   payment_method_types: ["card"],
+
+  //   mode: "payment",
+  //   // success_url: `${req.protocol}://${req.get("host")}/success`,
+  //   success_url: `http://localhost:3000/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+  //   // success_url: `https://donia-gamma.vercel.app/success?name=${req.body.name}&budget=${req.body.budget}&task=${req.body.task}&username=${req.params.username}&deadline=${req.body.deadline}`,
+  //   // cancel_url: `${req.protocol}://${req.get("host")}/${req.params.username}`,
+  //   cancel_url: `https://donia-v1dk-ahmedsamir122.vercel.app/${req.params.username}`,
+  //   customer_email: req.user.email,
+  //   client_reference_id: req.params.username,
+  // });
 
   res.status(200).json({
     status: "success",
-    session,
+    tokenMidtrans,
+    contract: newContract,
   });
 });
 
@@ -376,8 +429,6 @@ exports.createContract = catchAsync(async (req, res, next) => {
   next();
 });
 
-//midtrans
-
 exports.getContract = catchAsync(async (req, res, next) => {
   const contract = await Contract.findById(req.params.id)
     .populate({
@@ -436,6 +487,25 @@ exports.updateContract = catchAsync(async (req, res, next) => {
   client = contract.client._id.equals(req.user.id);
   let check = false;
   switch (req.body.activity) {
+    case "offer":
+      if (contract.activity === "pending") {
+        check = true;
+        contract.tokenMidtrans = "used";
+        await Notification.create({
+          to: contract.freelancer._id,
+          content: `${contract.client.username} has sent you an offer`,
+        });
+
+        pusher.trigger(
+          `channel-${contract.freelancer._id}`,
+          `notifications-${contract.freelancer._id}`,
+          {
+            to: contract.freelancer._id,
+            content: `${contract.client.username} has sent you an offer`,
+          }
+        );
+      }
+      break;
     case "cancel":
       if (freelancer && contract.activity === "offer") {
         check = true;
@@ -556,14 +626,8 @@ exports.updateContract = catchAsync(async (req, res, next) => {
   }
   let newContract;
   if (check) {
-    newContract = await Contract.findByIdAndUpdate(
-      req.params.id,
-      { activity: req.body.activity },
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    contract.activity = req.body.activity;
+    await contract.save();
   } else {
     return next(
       new AppError("you can't update the status of this contract", 400)
