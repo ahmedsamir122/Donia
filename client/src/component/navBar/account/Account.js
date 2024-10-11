@@ -26,6 +26,7 @@ const Account = (props) => {
   const { mutate, isError, error } = useMutation(logOut, {
     onSuccess: (data) => {
       localStorage.removeItem("token");
+      localStorage.removeItem("expiration");
       dispatch(authActions.logout());
       navigate("/");
     },
