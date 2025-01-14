@@ -61,7 +61,10 @@ exports.getAllContracts = catchAsync(async (req, res, next) => {
 
 exports.getPublicContractsF = catchAsync(async (req, res, next) => {
   const talent = await User.findOne({ username: req.params.username });
-  const contracts = await Contract.find({ freelancer: talent._id })
+  const contracts = await Contract.find({
+    freelancer: talent._id,
+    managerStatus: talent.perform === "manager",
+  })
     .select("-name -budget -deadline -activity -task")
     .populate({
       path: "client",
@@ -105,10 +108,17 @@ exports.getPublicContractsC = catchAsync(async (req, res, next) => {
 
 exports.getMyContractsF = catchAsync(async (req, res, next) => {
   const features = new APIFeatures(
-    Contract.find({ freelancer: req.user._id })
+    Contract.find({
+      freelancer: req.user._id,
+      managerStatus: req.user.perform === "manager",
+    })
       .populate({
         path: "client",
         select: "username",
+      })
+      .populate({
+        path: "talent",
+        select: "username photo",
       })
       .populate("reviewCs")
       .populate("reviewFs"),
@@ -118,6 +128,7 @@ exports.getMyContractsF = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate();
+
   const contracts = await features.query;
 
   const count = await Contract.countDocuments({ freelancer: req.user._id });
@@ -314,16 +325,16 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       phone: req.user?.phone,
     },
     callbacks: {
-      // finish: `http://localhost:3000/success?contractId=${newContract._id}&status=success`,
-      finish: `https://donia-gamma.vercel.app/success?contractId=${newContract._id}&status=success`,
+      finish: `http://localhost:3000/success?contractId=${newContract._id}&status=success`,
+      // finish: `https://donia-gamma.vercel.app/success?contractId=${newContract._id}&status=success`,
 
       // Redirect to pending status page if payment was not completed
-      // pending: `http://localhost:3000/contracts/${newContract._id}?status=pending`,
-      pending: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=pending`,
+      pending: `http://localhost:3000/contracts/${newContract._id}?status=pending`,
+      // pending: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=pending`,
 
       // Redirect to error page if something goes wrong with the payment
-      // error: `http://localhost:3000/contracts/${newContract._id}?status=error`,
-      error: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=error`,
+      error: `http://localhost:3000/contracts/${newContract._id}?status=error`,
+      // error: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=error`,
     },
     expiry: {
       start_time: expiryStartTime,
@@ -402,12 +413,24 @@ exports.createContract = catchAsync(async (req, res, next) => {
   if (!other) {
     return next(new AppError("this user doesn't exist", 404));
   }
-
-  const newContract = await Contract.create({
-    ...req.body,
-    freelancer: other._id,
-    client: req.user._id,
-  });
+  let newContract;
+  if (req.body.talent) {
+    newContract = await Contract.create({
+      ...req.body,
+      freelancer: other._id,
+      client: req.user._id,
+      talent: req.body.talent,
+      managerStatus: true,
+    });
+    return next(new AppError("this user doesn't exist", 404));
+  }
+  if (!req.body.talent) {
+    newContract = await Contract.create({
+      ...req.body,
+      freelancer: other._id,
+      client: req.user._id,
+    });
+  }
 
   await Notification.create({
     to: other.id,
@@ -488,26 +511,28 @@ exports.updateContract = catchAsync(async (req, res, next) => {
   let check = false;
   switch (req.body.activity) {
     case "offer":
-      if (contract.activity === "pending") {
+      if (freelancer && contract.activity === "pending") {
         check = true;
-        contract.tokenMidtrans = "used";
+        contract.acceptDate = Date.now();
+        await contract.save();
+        // contract.tokenMidtrans = "used";
         await Notification.create({
-          to: contract.freelancer._id,
-          content: `${contract.client.username} has sent you an offer`,
+          to: contract.client._id,
+          content: `${contract.freelancer.username} has agreed to your offer`,
         });
 
         pusher.trigger(
-          `channel-${contract.freelancer._id}`,
-          `notifications-${contract.freelancer._id}`,
+          `channel-${contract.client._id}`,
+          `notifications-${contract.client._id}`,
           {
-            to: contract.freelancer._id,
-            content: `${contract.client.username} has sent you an offer`,
+            to: contract.client._id,
+            content: `${contract.freelancer.username} has sent you an offer`,
           }
         );
       }
       break;
     case "cancel":
-      if (freelancer && contract.activity === "offer") {
+      if (freelancer && contract.activity === "pending") {
         check = true;
         await Notification.create({
           to: contract.client._id,
@@ -525,19 +550,19 @@ exports.updateContract = catchAsync(async (req, res, next) => {
       }
       break;
     case "progress":
-      if (freelancer && contract.activity === "offer") {
+      if (client && contract.activity === "offer") {
         check = true;
         await Notification.create({
           to: contract.client._id,
-          content: `${contract.freelancer.username} has accepted your offer`,
+          content: `${contract.client.username} has activated the contract`,
         });
 
         pusher.trigger(
-          `channel-${contract.client._id}`,
-          `notifications-${contract.client._id}`,
+          `channel-${contract.freelancer._id}`,
+          `notifications-${contract.freelancer._id}`,
           {
-            to: contract.client._id,
-            content: `${contract.freelancer.username} has accepted your offer`,
+            to: contract.freelancer._id,
+            content: `${contract.client.username} has activated the contract`,
           }
         );
       }

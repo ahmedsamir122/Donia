@@ -53,17 +53,21 @@ const NavBar = (props) => {
   const pusher = useSelector((state) => state.pusher.pusher);
 
   const getMyProfile = () => {
+    console.log("profile");
     return getWishList(`${URL}/api/v1/users/me`, tokenLocal);
   };
 
   const fetchWishList = () => {
+    console.log("wish");
     return getWishList(`${URL}/api/v1/wishList`, tokenLocal);
   };
 
   const fetchBlockList = () => {
+    console.log("block");
     return getWishList(`${URL}/api/v1/block`, tokenLocal);
   };
   const fetchUnseenMessagesNumber = () => {
+    console.log("message");
     return getWishList(`${URL}/api/v1/messages/unseenMessages`, tokenLocal);
   };
 
@@ -72,7 +76,7 @@ const NavBar = (props) => {
     data: unSeenData,
     refetch: refetchUnseenMessagesNumber,
   } = useQuery("unSeenMessagesNumber", fetchUnseenMessagesNumber, {
-    enabled: !!user, // Only execute the query if userId is truthy
+    enabled: false, // Only execute the query if userId is truthy
     refetchOnWindowFocus: false,
   });
 
@@ -239,6 +243,9 @@ const NavBar = (props) => {
   };
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
     const totalPageNotification = Math.ceil(data?.data?.totalResults / 2);
 
     if (pageNotification === totalPageNotification) {

@@ -12,8 +12,9 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      required: [true, "Please write your email"],
+      // required: [true, "Please write your email"],
       unique: [true, "this email already exists"],
+      sparse: true, // This allows MongoDB to ignore null values when enforcing uniqueness
       lowercase: true,
       validate: [validator.isEmail, "Please write avalid email"],
     },
@@ -51,8 +52,23 @@ const userSchema = new mongoose.Schema(
     },
     perform: {
       type: String,
-      enum: ["talent", "client"],
+      enum: ["talent", "client", "manager"],
       default: "talent",
+    },
+    category: {
+      type: [String],
+      enum: {
+        values: [
+          "Actor",
+          "Singer",
+          "Comedian",
+          "Model",
+          "Mc/Host",
+          "Influencer",
+          "Expertise",
+        ],
+        message: "{VALUE} is not a valid category",
+      },
     },
     bio: {
       type: String,
@@ -87,8 +103,17 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "3d", "1w", "2w", "1m", "diactive"],
-      default: "active",
+      enum: [
+        "pending",
+        "active",
+        "3d",
+        "1w",
+        "2w",
+        "1m",
+        "diactive",
+        "blocked",
+      ],
+      default: "pending",
     },
     links: [String],
     phone: {
@@ -99,6 +124,16 @@ const userSchema = new mongoose.Schema(
       default: Date.now(),
       select: false,
     },
+    alreadyWithdraw: {
+      type: Number,
+      default: 0,
+    },
+    talents: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
+      },
+    ],
     blockUntill: Date,
     passwordChangeAt: Date,
     passwordResetToken: String,

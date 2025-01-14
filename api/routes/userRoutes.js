@@ -5,12 +5,14 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.post("/signup", authController.signup);
+router.patch("/verifyPhone", authController.verifyPhone);
 router.post("/signin", authController.signin);
 router.get("/refresh", authController.getAccessToken);
 router.get("/logout", authController.logout);
 
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
+router.patch("/resetPasswordByPhone", authController.resetPasswordByPhone);
 router.patch(
   "/updatePassword",
   authController.protect,
@@ -24,6 +26,12 @@ router.patch(
 );
 router.get("/me", authController.protect, userController.getMe);
 router.delete("/deleteMe", authController.protect, userController.deleteMe);
+
+router.patch(
+  "/updateWithDraw",
+  authController.protect,
+  userController.updateWithDraw
+);
 
 router
   .route("/")
@@ -44,6 +52,14 @@ router
     authController.restrictTo("admin"),
     userController.blockUser
   );
+
+router
+  .route("/addTalent/:username")
+  .patch(authController.protect, userController.addTalent);
+
+router
+  .route("/removeTalent/:username")
+  .patch(authController.protect, userController.removeTalent);
 
 router
   .route("/:username")

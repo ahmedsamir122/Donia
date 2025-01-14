@@ -1,5 +1,6 @@
 const APIFeatures = require("../utils/apiFeatures");
 const User = require("../models/userModel");
+const Contract = require("../models/contractModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const { findById } = require("../models/userModel");
@@ -59,13 +60,13 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
 });
 exports.getAllTalents = catchAsync(async (req, res, next) => {
   //   excute the query
-  const features = new APIFeatures(User.find({ perform: "talent" }), req.query)
+  const features = new APIFeatures(User.find({ status: "active" }), req.query)
     .filter()
     .sort()
     .limitFields()
     .paginate();
   const totalFeatures = new APIFeatures(
-    User.find({ perform: "talent" }),
+    User.find({ status: "active" }),
     req.query
   )
     .filter()
@@ -135,7 +136,23 @@ exports.getUser = catchAsync(async (req, res, next) => {
 });
 
 exports.getMe = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const user = await User.findById(req.user.id).populate({
+    path: "talents",
+    select: "username photo -_id",
+  });
+
+  const stats = await Contract.aggregate([
+    {
+      $match: {
+        freelancer: { $eq: req.user._id },
+        activity: { $eq: "approved" },
+      },
+    },
+    {
+      $group: { _id: null, totalEarnings: { $sum: "$budget" } },
+    },
+  ]);
+  user._doc.totalEarnings = stats.length > 0 ? stats[0].totalEarnings : 0;
   res.status(200).json({
     status: "success",
     data: {
@@ -143,6 +160,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
     },
   });
 });
+
 exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
@@ -188,6 +206,28 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
+  res.status(200).json({
+    status: "success",
+    data: {
+      user: newUser,
+    },
+  });
+});
+exports.updateWithDraw = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError("This route is not for the password updates.", 400)
+    );
+  }
+
+  const newUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { alreadyWithdraw: req.body.amount },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
   res.status(200).json({
     status: "success",
     data: {
@@ -254,6 +294,57 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     status: "success",
     data: {
       message: "The has been deleted successfully",
+    },
+  });
+});
+exports.addTalent = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({
+    username: req.params.username,
+  });
+
+  if (!user) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+
+  // const newTalnts = req.user.talents.push(user.id);
+  console.log("talent", req.user.talents);
+
+  const newUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { $addToSet: { talents: user.id } },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  res.status(201).json({
+    status: "success",
+    data: {
+      message: "The talent has been added successfully",
+    },
+  });
+});
+exports.removeTalent = catchAsync(async (req, res, next) => {
+  const user = await User.findOne({
+    username: req.params.username,
+  });
+  if (!user) {
+    return next(new AppError("No user found with that ID", 404));
+  }
+
+  const newUser = await User.findByIdAndUpdate(
+    req.user.id,
+    { $pull: { talents: user.id } },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(201).json({
+    status: "success",
+    data: {
+      message: "The talent has been removed successfully",
     },
   });
 });

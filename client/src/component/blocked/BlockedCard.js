@@ -14,10 +14,15 @@ const BlockedCard = () => {
   const dispatch = useDispatch();
 
   let data;
-  if (user?.status === "diactive") {
+  if (user?.status === "blocked") {
     data = `Your account has been blocked for more information you can contact us`;
   }
-  if (user?.status !== "diactive") {
+  if (
+    user?.status === "3d" ||
+    user?.status === "1w" ||
+    user?.status === "2w" ||
+    user?.status === "1m"
+  ) {
     data = `Your account has been blocked untill ${dateFormat(
       user?.blockUntilldateFormat,
       " mmmm dS, yyyy"

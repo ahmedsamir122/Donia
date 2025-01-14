@@ -12,7 +12,10 @@ const contractSchema = new mongoose.Schema(
     },
     tokenMidtrans: {
       type: String,
-      unique: [true, "this email already exists"],
+    },
+    count: {
+      type: Boolean,
+      default: false,
     },
     activity: {
       type: String,
@@ -21,6 +24,7 @@ const contractSchema = new mongoose.Schema(
         "offer",
         "cancel",
         "expired",
+        "expiredPayment",
         "expiredDeadline",
         "progress",
         "submit",
@@ -42,6 +46,9 @@ const contractSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now(),
+    },
+    acceptDate: {
+      type: Date,
     },
     submitDate: {
       type: Date,
@@ -71,6 +78,14 @@ const contractSchema = new mongoose.Schema(
       ref: "User",
       required: [true, "Contract must belong to a user"],
     },
+    talent: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
+    managerStatus: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
@@ -93,8 +108,16 @@ contractSchema.virtual("reviewCs", {
 contractSchema.post("find", async function (docs, next) {
   // console.log(docs);
   for (const contract of docs) {
-    if (contract.activity === "offer" && Date.now() > contract.expiredAt) {
+    if (contract.activity === "pending" && Date.now() > contract.expiredAt) {
       contract.activity = "expired";
+      await contract.save();
+    }
+    if (
+      contract.activity === "offer" &&
+      Date.now() >
+        new Date(contract.acceptDate).getTime() + 72 * 24 * 60 * 60 * 1000
+    ) {
+      contract.activity = "expiredPayment";
       await contract.save();
     }
     if (contract.activity === "progress" && Date.now() > contract.deadline) {
@@ -121,8 +144,15 @@ contractSchema.post("find", async function (docs, next) {
   next();
 });
 contractSchema.post("findOne", async function (doc, next) {
-  if (doc.activity === "offer" && Date.now() > doc.expiredAt) {
+  if (doc.activity === "pending" && Date.now() > doc.expiredAt) {
     doc.activity = "expired";
+    await doc.save();
+  }
+  if (
+    doc.activity === "offer" &&
+    Date.now() > new Date(doc.acceptDate).getTime() + 72 * 24 * 60 * 60 * 1000
+  ) {
+    doc.activity = "expiredPayment";
     await doc.save();
   }
   if (doc.activity === "progress" && Date.now() > doc.deadline) {

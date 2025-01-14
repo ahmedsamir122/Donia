@@ -39,6 +39,7 @@ import Conversion from "./component/dashboard/contractsSection/conversion/Conver
 import Blocked from "./pages/Blocked";
 import PreventRoute from "./component/PreventRoute";
 import Offer from "./pages/Offer";
+import ForgotPassword from "./pages/ForgotPassword";
 
 const router = createBrowserRouter([
   {
@@ -103,6 +104,14 @@ const router = createBrowserRouter([
     element: (
       <PreventRoute>
         <SignIn />
+      </PreventRoute>
+    ),
+  },
+  {
+    path: "/forgotPassword",
+    element: (
+      <PreventRoute>
+        <ForgotPassword />
       </PreventRoute>
     ),
   },

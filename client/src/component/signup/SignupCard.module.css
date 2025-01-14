@@ -141,3 +141,8 @@ h3 {
 select:focus {
   outline: none;
 }
+
+.verifyForm {
+  display: flex;
+  flex-direction: column;
+}

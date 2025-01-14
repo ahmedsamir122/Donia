@@ -8,6 +8,12 @@ class APIFeatures {
     const excludedFields = ["page", "sort", "limit", "fields"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
+    if (queryObj.category) {
+      const categories = queryObj.category.split(","); // Split the comma-separated values
+      this.query = this.query.find({ category: { $in: categories } });
+      delete queryObj.category; // Remove category after processing
+    }
+
     // 1b)advanced filtering
     let filterInterval = [];
     Object.keys(queryObj).forEach((el) => {

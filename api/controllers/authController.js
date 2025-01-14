@@ -7,6 +7,7 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const sendEmail = require("../utils/email");
 const { findOne } = require("../models/userModel");
+const admin = require("../firebase");
 
 const generateCookie = (res, token) => {
   const cookieOptions = {
@@ -26,28 +27,84 @@ exports.signup = catchAsync(async (req, res, next) => {
   if (req.body.username.includes(" ")) {
     return next(new AppError("username should not contain spaces.", 401));
   }
+
+  let user = await User.findOne({ phone: req.body.phone });
+
+  if (!req.body.category || req.body.category.length === 0) {
+    return next(new AppError("Please select at least one category", 401));
+  }
+  if (user && user.status === "active") {
+    // Create a new user if they don’t already exist
+    return next(new AppError("this phone number already exists.", 401));
+  }
+  if (user && user.status === "pending") {
+    // Create a new user if they don’t already exist
+    return res.status(201).json({
+      status: "success",
+      // token: accessToken,
+      data: {
+        user,
+      },
+    });
+  }
+
   const newUser = await User.create({
     username: req.body.username.trim(),
-    email: req.body.email,
+    // email: req.body?.email,
     city: req.body.city,
     country: req.body.country,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     phone: req.body.phone,
     perform: req.body.perform,
+    category: req.body.category,
   });
 
-  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_REFRESH, {
-    expiresIn: process.env.JWT_EXPIRES_IN_REFRESH,
+  // const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET_REFRESH, {
+  //   expiresIn: process.env.JWT_EXPIRES_IN_REFRESH,
+  // });
+
+  // const accessToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+  //   expiresIn: process.env.JWT_EXPIRES_IN,
+  // });
+
+  // newUser.password = undefined;
+
+  // generateCookie(res, token);
+  res.status(201).json({
+    status: "success",
+    // token: accessToken,
+    data: {
+      user: newUser,
+    },
   });
+});
+
+exports.verifyPhone = catchAsync(async (req, res, next) => {
+  const idToken = req.body.token;
+
+  console.log(idToken);
+
+  // Verify the token with Firebase Admin SDK
+  const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+  const phoneNumber = decodedToken.phone_number;
+
+  // Check if user already exists in the database
+  let user = await User.findOne({ phone: phoneNumber });
+  if (!user) {
+    // Create a new user if they don’t already exist
+    return next(new AppError("there no user with this phone number.", 404));
+  }
+
+  user.status = "active";
+  const newUser = await user.save({ validateBeforeSave: false });
 
   const accessToken = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-  newUser.password = undefined;
-
-  generateCookie(res, token);
+  generateCookie(res, accessToken);
   res.status(201).json({
     status: "success",
     token: accessToken,
@@ -58,13 +115,38 @@ exports.signup = catchAsync(async (req, res, next) => {
 });
 
 exports.signin = catchAsync(async (req, res, next) => {
-  const { email, password } = await req.body;
+  const { phone, password } = await req.body;
 
-  if (!email || !password) {
-    return next(new AppError("Please write email and password", 400));
+  if (!phone || !password) {
+    return next(new AppError("Please write phone and password", 400));
   }
 
-  const user = await User.findOne({ email }).select("+password");
+  const user = await User.findOne({ phone: req.body.phone }).select(
+    "+password"
+  );
+
+  if (user && user.status === "pending") {
+    // Create a new user if they don’t already exist
+    return res.status(201).json({
+      status: "success",
+      // token: accessToken,
+      message: "you need to activate your account",
+      data: {
+        user,
+      },
+    });
+  }
+  if (user && user.status === "blocked") {
+    // Create a new user if they don’t already exist
+    return res.status(201).json({
+      status: "success",
+      // token: accessToken,
+      message: "your account has been blocked",
+      data: {
+        user,
+      },
+    });
+  }
 
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
@@ -193,7 +275,13 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
-  if (currentUser.status !== "active" && currentUser.blockUntill > Date.now()) {
+  if (
+    (currentUser.status === "3d" ||
+      currentUser.status === "1w" ||
+      currentUser.status === "2w" ||
+      currentUser.status === "1m") &&
+    currentUser.blockUntill > Date.now()
+  ) {
     return next(
       new AppError(
         `your account is blocked untill ${currentUser.blockUntill}.`,
@@ -201,10 +289,16 @@ exports.protect = catchAsync(async (req, res, next) => {
       )
     );
   }
-  if (currentUser.status === "diactive") {
+  if (currentUser.status === "blocked") {
     return next(new AppError(`your account is blocked .`, 401));
   }
-  if (currentUser.status !== "active" && currentUser.blockUntill < Date.now()) {
+  if (
+    (currentUser.status === "3d" ||
+      currentUser.status === "1w" ||
+      currentUser.status === "2w" ||
+      currentUser.status === "1m") &&
+    currentUser.blockUntill < Date.now()
+  ) {
     currentUser.status = "active";
     currentUser.blockUntill = undefined;
     currentUser.save({ validateBeforeSave: false });
@@ -264,6 +358,49 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+exports.resetPasswordByPhone = catchAsync(async (req, res, next) => {
+  const idToken = req.body.token;
+
+  console.log(idToken);
+
+  // Verify the token with Firebase Admin SDK
+  const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+  const phoneNumber = decodedToken.phone_number;
+
+  if (phoneNumber !== req.body.phone) {
+    return next(new AppError("This phone number doesn't belong to you.", 400));
+  }
+
+  // Check if user already exists in the database
+  let user = await User.findOne({ phone: phoneNumber });
+  if (!user) {
+    // Create a new user if they don’t already exist
+    return next(new AppError("there no user with this phone number.", 404));
+  }
+  if (user.status === "pending") {
+    // Create a new user if they don’t already exist
+    user.status = "active";
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  const newUser = await user.save();
+
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN,
+  });
+
+  generateCookie(res, token);
+
+  res.status(200).json({
+    status: "success",
+    token,
+    data: {
+      user,
+    },
+  });
+});
 exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
