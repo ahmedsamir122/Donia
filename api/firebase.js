@@ -1,6 +1,6 @@
 // firebase.js
 const admin = require("firebase-admin");
-const serviceAccount = require("./donia-d3204-firebase-adminsdk-9jp7t-87ddf06a80.json");
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 // Initialize the Firebase Admin SDK
 admin.initializeApp({
