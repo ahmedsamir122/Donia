@@ -1,4 +1,5 @@
 /api/node_modules/*
+/api/api/donia-d3204-firebase-adminsdk-9jp7t-87ddf06a80.json/*
 /client/node_modules/*
 
 /client/.pnp
