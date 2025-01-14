@@ -325,16 +325,16 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
       phone: req.user?.phone,
     },
     callbacks: {
-      finish: `http://localhost:3000/success?contractId=${newContract._id}&status=success`,
-      // finish: `https://donia-gamma.vercel.app/success?contractId=${newContract._id}&status=success`,
+      // finish: `http://localhost:3000/success?contractId=${newContract._id}&status=success`,
+      finish: `https://donia-gamma.vercel.app/success?contractId=${newContract._id}&status=success`,
 
       // Redirect to pending status page if payment was not completed
-      pending: `http://localhost:3000/contracts/${newContract._id}?status=pending`,
-      // pending: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=pending`,
+      // pending: `http://localhost:3000/contracts/${newContract._id}?status=pending`,
+      pending: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=pending`,
 
       // Redirect to error page if something goes wrong with the payment
-      error: `http://localhost:3000/contracts/${newContract._id}?status=error`,
-      // error: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=error`,
+      // error: `http://localhost:3000/contracts/${newContract._id}?status=error`,
+      error: `https://donia-gamma.vercel.app/contracts/${newContract._id}?status=error`,
     },
     expiry: {
       start_time: expiryStartTime,
